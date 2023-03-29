@@ -14,8 +14,8 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml test/testaux/
+      - run: pip install . -r requirements-dev.txt
+      - run: pytest -rw --durations=5 --junitxml=junit-results.xml test/testaux/
       - store_test_results:
           path: junit-results.xml
   testcompute:
@@ -31,11 +31,11 @@ jobs:
       NUMEXPR_NUM_THREADS: "1"
     steps:
       - checkout
-      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pip install . -r requirements-dev.txt
       - run: |
           circleci tests glob "test/testcompute/**/*.py" \
             | circleci tests split --split-by=timings \
-            | xargs env PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml
+            | xargs env pytest -rw --durations=5 --junitxml=junit-results.xml
       - store_test_results:
           path: junit-results.xml
 workflows:

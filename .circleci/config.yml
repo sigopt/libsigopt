@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   check-license-disclaimers:
     docker:
-      - image: cimg/python:3
+      - image: cimg/python:3.10
     steps:
       - checkout
       - run: python tools/check_copyright_and_license_disclaimers.py .

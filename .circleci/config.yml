@@ -1,0 +1,46 @@
+version: 2.1
+
+jobs:
+  check-license-disclaimers:
+    docker:
+      - image: cimg/python:3.10
+    resource_class: small
+    steps:
+      - checkout
+      - run: python tools/check_copyright_and_license_disclaimers.py .
+  testaux:
+    docker:
+      - image: cimg/python:3.10
+    resource_class: small
+    steps:
+      - checkout
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml test/testaux/
+      - store_test_results:
+          path: junit-results.xml
+  testcompute:
+    docker:
+      - image: cimg/python:3.10
+    resource_class: small
+    parallelism: 4
+    environment:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+    steps:
+      - checkout
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: |
+          circleci tests glob "test/testcompute/**/*.py" \
+            | circleci tests split --split-by=timings \
+            | xargs env PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml
+      - store_test_results:
+          path: junit-results.xml
+workflows:
+  main:
+    jobs:
+      - check-license-disclaimers
+      - testaux
+      - testcompute

@@ -7,14 +7,22 @@ jobs:
     steps:
       - checkout
       - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: PYTHONPATH=. pytest test/testaux/
+      - run: PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml test/testaux/
+      - store_test_results:
+          path: junit-results.xml
   testcompute:
     docker:
       - image: cimg/python:3.10
+    parallelism: 4
     steps:
       - checkout
       - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: PYTHONPATH=. pytest test/testcompute/
+      - run: |
+          circleci tests glob "test/testcompute/**/*.py" \
+            | circleci tests split --split-by=timings \
+            | xargs PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml
+      - store_test_results:
+          path: junit-results.xml
 workflows:
   main:
     jobs:

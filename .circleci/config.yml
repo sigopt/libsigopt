@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - run: pip install . -r requirements-dev.txt
-      - run: pytest -rw --durations=5 --override-ini=junit_family=xunit1 --junitxml=junit-results.xml test/testaux/
+      - run: pytest -rw --durations=5 --junitxml=junit-results.xml test/testaux/
       - store_test_results:
           path: junit-results.xml
   testcompute:
@@ -35,7 +35,7 @@ jobs:
       - run: |
           circleci tests glob "test/testcompute/**/*.py" \
             | circleci tests split --split-by=timings \
-            | xargs env pytest -rw --durations=5 --override-ini=junit_family=xunit1 --junitxml=junit-results.xml
+            | xargs env pytest -rw --durations=5 --junitxml=junit-results.xml
       - store_test_results:
           path: junit-results.xml
 workflows:

@@ -4,12 +4,14 @@ jobs:
   check-license-disclaimers:
     docker:
       - image: cimg/python:3.10
+    resource_class: small
     steps:
       - checkout
       - run: python tools/check_copyright_and_license_disclaimers.py .
   testaux:
     docker:
       - image: cimg/python:3.10
+    resource_class: small
     steps:
       - checkout
       - run: pip install -r requirements.txt -r requirements-dev.txt
@@ -19,6 +21,7 @@ jobs:
   testcompute:
     docker:
       - image: cimg/python:3.10
+    resource_class: small
     parallelism: 4
     steps:
       - checkout

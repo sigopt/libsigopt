@@ -26,7 +26,7 @@ jobs:
       - run: |
           circleci tests glob "test/testcompute/**/*.py" \
             | circleci tests split --split-by=timings \
-            | xargs PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml
+            | xargs env PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml
       - store_test_results:
           path: junit-results.xml
 workflows:

@@ -23,6 +23,12 @@ jobs:
             | xargs PYTHONPATH=. pytest -rw --durations=5 --junitxml=junit-results.xml
       - store_test_results:
           path: junit-results.xml
+  check-license-disclaimers:
+    docker:
+      - image: cimg/python:stable
+    steps:
+      - checkout
+      - run: python tools/check_copyright_and_license_disclaimers.py .
 workflows:
   main:
     jobs:

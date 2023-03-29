@@ -90,8 +90,6 @@ def check_all(directory, verbose=False):
   else:
     gen = os.walk(directory)
   for dirpath, _, filenames in gen:
-    if any(skip in dirpath for skip in SKIP_DIRECTORIES):
-      continue
     for filename in filenames:
       absolute_filename = os.path.join(dirpath, filename)
       filetype = guess_filetype(absolute_filename)

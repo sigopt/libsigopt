@@ -6,4 +6,4 @@ It should probably not be manually installed unless you are doing research or ma
 
 ## License
 
-`libsigopt` is licensed under the Apache 2.0 license. See the [LICENSE](./LICENSE) for more information.
+`libsigopt` is licensed under the Apache 2.0 license. See the [LICENSE](./LICENSE) file for more information.

@@ -2,7 +2,7 @@
 
 `libsigopt` is a module that contains various optimization utilities.
 
-It should very rarely be manually installed.
+It should probably not be manually installed unless you are doing research or making a contribution.
 
 ## License
 

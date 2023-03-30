@@ -9,6 +9,14 @@ jobs:
       - checkout
       - run: grep pre-commit requirements-dev.txt | xargs pip install
       - run: pre-commit run --all-files
+  pylint:
+    docker:
+      - image: cimg/python:3.10
+    resource_class: small
+    steps:
+      - checkout
+      - run: pip install . -r requirements-dev.txt
+      - run: pylint --output-format=text
   testaux:
     docker:
       - image: cimg/python:3.10
@@ -43,5 +51,6 @@ workflows:
   main:
     jobs:
       - pre-commit
+      - pylint
       - testaux
       - testcompute

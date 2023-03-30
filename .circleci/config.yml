@@ -16,7 +16,7 @@ jobs:
     steps:
       - checkout
       - run: pip install . -r requirements-dev.txt
-      - run: pylint --output-format=text
+      - run: pylint --output-format=text libsigopt/ test/
   testaux:
     docker:
       - image: cimg/python:3.10

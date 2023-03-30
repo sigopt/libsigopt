@@ -70,6 +70,7 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
     the problem_size for a LogProfileLikelihood for an experiment with two parameters and AUTO_NOISE
     would be 4 - 1 = 3 since we do not need to optimize for alpha.
   """
+
   @property
   def num_hyperparameters(self):
     return self.covariance.num_hyperparameters + (1 if self.use_auto_noise else 0)
@@ -88,20 +89,32 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
 
   def get_hyperparameters(self):
     if self.use_auto_noise:
-      hyperparameters = numpy.append(self.covariance.hyperparameters, self.tikhonov_param)
+      hyperparameters = numpy.append(
+        self.covariance.hyperparameters, self.tikhonov_param
+      )
     else:
       hyperparameters = self.covariance.hyperparameters
     return numpy.log(hyperparameters) if self.log_domain else hyperparameters
 
   def set_hyperparameters(self, hyperparameters):
     if len(hyperparameters) != self.problem_size:
-      extra_advice = " Remember to include 1 extra hyperparameter for auto_noise." if self.use_auto_noise else ""
-      raise ValueError(f"Expected {self.problem_size} hyperparameters, received {len(hyperparameters)}.{extra_advice}")
-    hp_linear_domain = numpy.exp(hyperparameters) if self.log_domain else hyperparameters
+      extra_advice = (
+        " Remember to include 1 extra hyperparameter for auto_noise."
+        if self.use_auto_noise
+        else ""
+      )
+      raise ValueError(
+        f"Expected {self.problem_size} hyperparameters, received {len(hyperparameters)}.{extra_advice}"
+      )
+    hp_linear_domain = (
+      numpy.exp(hyperparameters) if self.log_domain else hyperparameters
+    )
     # Don't pass the noise term in covariance.hyperparameters since we pass it as a separate param
     self.covariance.hyperparameters = hp_linear_domain[: self.gp.dim + 1]
     tikhonov_param = hp_linear_domain[-1] if self.use_auto_noise else None
-    self.gp = GaussianProcess(self.covariance, self.historical_data, self.mean_poly_indices, tikhonov_param)
+    self.gp = GaussianProcess(
+      self.covariance, self.historical_data, self.mean_poly_indices, tikhonov_param
+    )
 
   hyperparameters = property(get_hyperparameters, set_hyperparameters)
   current_point = hyperparameters
@@ -123,7 +136,9 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
 
   compute_objective_function = compute_log_likelihood
 
-  def compute_grad_log_likelihood(self, include_nonzero_correction=INCLUDE_NONZERO_MEAN_GRADIENT_CORRECTION):
+  def compute_grad_log_likelihood(
+    self, include_nonzero_correction=INCLUDE_NONZERO_MEAN_GRADIENT_CORRECTION
+  ):
     r"""
         Compute the gradient (wrt hyperparameters) of the _log_likelihood_type measure at the specified hyperparameters.
 
@@ -136,7 +151,9 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
         The log_scaling accounts for d/da L(exp(a)) = L'(exp(a)) * exp(a).
 
         """
-    grad_hyperparameter_cov_tensor = self.covariance.build_kernel_hparam_grad_tensor(self.gp.points_sampled)
+    grad_hyperparameter_cov_tensor = self.covariance.build_kernel_hparam_grad_tensor(
+      self.gp.points_sampled
+    )
     if self.use_auto_noise:
       grad_hyperparameter_cov_tensor = numpy.concatenate(
         (grad_hyperparameter_cov_tensor, numpy.eye(self.gp.num_sampled)[:, :, None]),
@@ -150,12 +167,17 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
       dK = grad_hyperparameter_cov_tensor[:, :, k]
       dKKinvy_Pb = numpy.dot(dK, Kinvy_Pb)
       grad_log_marginal[k] = -numpy.dot(Kinvy_Pb, dKKinvy_Pb)
-      grad_log_marginal[k] += numpy.trace(scipy.linalg.cho_solve(K_chol, dK, overwrite_b=True))
+      grad_log_marginal[k] += numpy.trace(
+        scipy.linalg.cho_solve(K_chol, dK, overwrite_b=True)
+      )
       if not self.gp.has_zero_mean and include_nonzero_correction:
         P = self.gp.P
         KinvP = self.gp.K_inv_P
         PKP_chol = self.gp.PKP_chol
-        temp = -numpy.dot(P, scipy.linalg.cho_solve(PKP_chol, numpy.dot(KinvP.T, numpy.dot(dK, Kinvy_Pb))))
+        temp = -numpy.dot(
+          P,
+          scipy.linalg.cho_solve(PKP_chol, numpy.dot(KinvP.T, numpy.dot(dK, Kinvy_Pb))),
+        )
         grad_log_marginal[k] += 2 * numpy.dot(Kinvy_Pb, temp)
 
     log_scaling = numpy.exp(self.hyperparameters) if self.log_domain else 1.0

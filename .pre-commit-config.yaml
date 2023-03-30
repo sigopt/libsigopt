@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=100]
+      - id: check-ast
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: detect-aws-credentials
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: no-commit-to-branch
+        args: [--branch=main]
+      - id: requirements-txt-fixer
+      - id: sort-simple-yaml
+      - id: trailing-whitespace
+  - repo: https://github.com/sigopt/black.git
+    rev: sigopt-22.10.0
+    hooks:
+      - id: black
+  - repo: https://github.com/sigopt/libsigopt.git
+    rev: pre-commit-0.0.0
+    hooks:
+      - id: apply-copyright-notice

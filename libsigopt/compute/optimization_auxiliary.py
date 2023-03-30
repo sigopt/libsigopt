@@ -57,7 +57,9 @@ class LBFGSBParameters:
   maxfun: int = 15000  # maximum number of objective function calls to make
   maxcor: int = 10  # maximum number of variable metric corrections
   ftol: float = 1.0e-4  # iterate until (f^k - f^{k+1})/max{|f^k|,|f^{k+1}|,1} <= ftol
-  gtol: float = 1.0e-4  # cutoff for highest component of gradient to be a critical point
+  gtol: float = (
+    1.0e-4  # cutoff for highest component of gradient to be a critical point
+  )
   eps: float = 1.0e-8  # step size for approximating the gradient
 
   def scipy_kwargs(self) -> dict:

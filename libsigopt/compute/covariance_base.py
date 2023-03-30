@@ -73,7 +73,9 @@ class CovarianceBase(object):
         """
     raise NotImplementedError
 
-  def build_kernel_matrix(self, points_sampled, points_to_sample=None, noise_variance=None):
+  def build_kernel_matrix(
+    self, points_sampled, points_to_sample=None, noise_variance=None
+  ):
     """Compute the kernel matrix, K(x_i, z_j) for points_to_sample x_i and points_sampled z_j.
 
         If points_to_sample==None then the symmetric matrix with z_j for both rows and columns is created.
@@ -82,11 +84,15 @@ class CovarianceBase(object):
         symmetric case, it adds the noise_variance to the diagonal.
 
         """
-    kernel_matrix = self.process_variance * self._build_kernel_matrix(points_sampled, points_to_sample)
+    kernel_matrix = self.process_variance * self._build_kernel_matrix(
+      points_sampled, points_to_sample
+    )
 
     if noise_variance is not None:
       nx, nz = kernel_matrix.shape
-      assert nx == nz  # Or else there should be no noise_variance term because it would be meaningless
+      assert (
+        nx == nz
+      )  # Or else there should be no noise_variance term because it would be meaningless
       kernel_matrix.flat[:: nx + 1] += noise_variance
     return kernel_matrix
 
@@ -135,7 +141,8 @@ class DifferentiableCovariance(CovarianceBase):
     hyperparameter_grad_covariance = numpy.empty((n, self.num_hyperparameters))
     hyperparameter_grad_covariance[:, 0] = self._covariance(x, z)
     hyperparameter_grad_covariance[:, 1:] = (
-      self.process_variance * self._hyperparameter_grad_covariance_without_process_variance(x, z)
+      self.process_variance
+      * self._hyperparameter_grad_covariance_without_process_variance(x, z)
     )
 
     return hyperparameter_grad_covariance
@@ -149,9 +156,13 @@ class DifferentiableCovariance(CovarianceBase):
         The tensor returned is Kgrad[:, :, d] = grad_d Kmat, for Kmat from build_radial_kernel_matrix.
 
         """
-    return self.process_variance * self._build_kernel_grad_tensor(points_sampled, points_to_sample)
+    return self.process_variance * self._build_kernel_grad_tensor(
+      points_sampled, points_to_sample
+    )
 
-  def _build_kernel_hparam_grad_tensor_without_process_variance(self, points_sampled, points_to_sample=None):
+  def _build_kernel_hparam_grad_tensor_without_process_variance(
+    self, points_sampled, points_to_sample=None
+  ):
     raise NotImplementedError()
 
   def build_kernel_hparam_grad_tensor(self, points_sampled, points_to_sample=None):
@@ -168,7 +179,9 @@ class DifferentiableCovariance(CovarianceBase):
     kg_tensor[:, :, 0] = self._build_kernel_matrix(points_sampled, points_to_sample)
     kg_tensor[:, :, 1:] = (
       self.process_variance
-      * self._build_kernel_hparam_grad_tensor_without_process_variance(points_sampled, points_to_sample)
+      * self._build_kernel_hparam_grad_tensor_without_process_variance(
+        points_sampled, points_to_sample
+      )
     )
 
     return kg_tensor
@@ -182,6 +195,7 @@ class RadialCovariance(CovarianceBase):
     array [alpha, l_1, l_2, ..., l_dim], where dim is the dimension of the physical space of interest.
 
     """
+
   def __init__(self, hyperparameters):
     self._hyperparameters = None
     self._length_scales = None
@@ -196,7 +210,9 @@ class RadialCovariance(CovarianceBase):
 
   def check_hyperparameters_are_valid(self, new_hyperparameters):
     new_hyperparameters = numpy.asarray(new_hyperparameters, dtype=float)
-    assert len(new_hyperparameters.shape) == 1, f"Hyperparameters should be in 1D array, not {new_hyperparameters}"
+    assert (
+      len(new_hyperparameters.shape) == 1
+    ), f"Hyperparameters should be in 1D array, not {new_hyperparameters}"
     if (
       numpy.any(numpy.isnan(new_hyperparameters))
       or numpy.any(numpy.isinf(new_hyperparameters))
@@ -253,11 +269,15 @@ class RadialCovariance(CovarianceBase):
     data_shape = data.shape
     eval_shape = eval_points.shape
     if len(data_shape) != 2 or len(eval_shape) != 2:
-      raise ValueError(f"Points must be a 2D array: data.shape = {data_shape}, eval_points.shape = {eval_shape}")
+      raise ValueError(
+        f"Points must be a 2D array: data.shape = {data_shape}, eval_points.shape = {eval_shape}"
+      )
     elif data_shape != eval_shape:
       raise ValueError(f"Data size {data_shape}, Eval size {eval_shape}")
     elif data_shape[1] != self.dim:
-      raise ValueError(f"Points dimension {data_shape[1]}, Covariance dimension {self.dim}")
+      raise ValueError(
+        f"Points dimension {data_shape[1]}, Covariance dimension {self.dim}"
+      )
 
     diff_vecs = eval_points - data
     r = numpy.sqrt(numpy.sum(numpy.power(diff_vecs / self._length_scales, 2), axis=1))
@@ -285,7 +305,9 @@ class RadialCovariance(CovarianceBase):
     if eval_points is None:
       return self._build_symmetric_distance_matrix_squared(data, build_diff_matrices)
     else:
-      return self._build_nonsymmetric_distance_matrix_squared(data, eval_points, build_diff_matrices)
+      return self._build_nonsymmetric_distance_matrix_squared(
+        data, eval_points, build_diff_matrices
+      )
 
   def _build_symmetric_distance_matrix_squared(self, data, build_diff_matrices):
     diff_mats = None
@@ -294,7 +316,9 @@ class RadialCovariance(CovarianceBase):
       diff_mats = data[:, None, :] - data[None, :, :]
     return dist_mat_sq, diff_mats
 
-  def _build_nonsymmetric_distance_matrix_squared(self, data, eval_points, build_diff_matrices):
+  def _build_nonsymmetric_distance_matrix_squared(
+    self, data, eval_points, build_diff_matrices
+  ):
     diff_mats = None
     x = eval_points / self._length_scales[None, :]
     z = data / self._length_scales[None, :]
@@ -304,7 +328,9 @@ class RadialCovariance(CovarianceBase):
     return dist_mat_sq, diff_mats
 
   def _build_kernel_matrix(self, points_sampled, points_to_sample=None):
-    return self.eval_radial_kernel(self._build_distance_matrix_squared(points_sampled, points_to_sample)[0])
+    return self.eval_radial_kernel(
+      self._build_distance_matrix_squared(points_sampled, points_to_sample)[0]
+    )
 
 
 class DifferentiableRadialCovariance(DifferentiableCovariance, RadialCovariance):
@@ -322,10 +348,16 @@ class DifferentiableRadialCovariance(DifferentiableCovariance, RadialCovariance)
 
   def _build_kernel_grad_tensor(self, points_sampled, points_to_sample=None):
     """Compute the gradient wrt physical dimensions of a kernel matrix, as stored in a 3D tensor."""
-    dm_sq, diff_mats = self._build_distance_matrix_squared(points_sampled, points_to_sample, True)
+    dm_sq, diff_mats = self._build_distance_matrix_squared(
+      points_sampled, points_to_sample, True
+    )
     return self.eval_radial_kernel_grad(dm_sq, diff_mats)
 
-  def _build_kernel_hparam_grad_tensor_without_process_variance(self, points_sampled, points_to_sample=None):
+  def _build_kernel_hparam_grad_tensor_without_process_variance(
+    self, points_sampled, points_to_sample=None
+  ):
     """Compute the gradient wrt the hyperparameters of a kernel matrix, as stored in a 3D tensor."""
-    dm_sq, diff_mats = self._build_distance_matrix_squared(points_sampled, points_to_sample, True)
+    dm_sq, diff_mats = self._build_distance_matrix_squared(
+      points_sampled, points_to_sample, True
+    )
     return self.eval_radial_kernel_hparam_grad(dm_sq, diff_mats)

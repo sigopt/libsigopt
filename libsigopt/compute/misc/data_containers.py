@@ -41,9 +41,15 @@ class MetricMidpointInfo(object):
     return self.negate * self.scale * (values - self.midpoint)
 
   def relative_objective_variance(self, value_vars):
-    value_vars = value_vars if value_vars is not None else numpy.full_like(value_vars, DEFAULT_VALUE_VAR)
+    value_vars = (
+      value_vars
+      if value_vars is not None
+      else numpy.full_like(value_vars, DEFAULT_VALUE_VAR)
+    )
     if self.skip:
-      return numpy.fmax(value_vars, 1e-6)  # Experimenting with MINIMUM_VALUE_VAR changes other things too
+      return numpy.fmax(
+        value_vars, 1e-6
+      )  # Experimenting with MINIMUM_VALUE_VAR changes other things too
     return numpy.fmax(value_vars * self.scale**2, MINIMUM_VALUE_VAR)
 
   def undo_scaling(self, values):
@@ -66,10 +72,16 @@ class MultiMetricMidpointInfo(MetricMidpointInfo):
     super().__init__()
 
     assert len(numpy.asarray(values).shape) == 2, "values must be an n-D array"
-    assert objectives is None or len(objectives) == values.shape[1], "there must be an objective for each metric"
+    assert (
+      objectives is None or len(objectives) == values.shape[1]
+    ), "there must be an objective for each metric"
 
     self.tuple_of_smmi = tuple(
-      SingleMetricMidpointInfo(values=values[:, i], failures=failures, objective=objectives[i] if objectives else None)
+      SingleMetricMidpointInfo(
+        values=values[:, i],
+        failures=failures,
+        objective=objectives[i] if objectives else None,
+      )
       for i in range(values.shape[1])
     )
 
@@ -91,13 +103,13 @@ class MultiMetricMidpointInfo(MetricMidpointInfo):
 class SingleMetricMidpointInfo(MetricMidpointInfo):
   def __init__(self, values, failures, objective=None):
     """Rescales the data from
-          [min, max]
-          to
-          [MIDPOINT_NORMALIZATION_SCALE_FACTOR, -MIDPOINT_NORMALIZATION_SCALE_FACTOR]
-          Note the application of the -1 that is applied, to convert a max problem to a min problem.
+        [min, max]
+        to
+        [MIDPOINT_NORMALIZATION_SCALE_FACTOR, -MIDPOINT_NORMALIZATION_SCALE_FACTOR]
+        Note the application of the -1 that is applied, to convert a max problem to a min problem.
 
-          This also now computes the "lie" or "failure" value, which I think makes sense because it's
-          doing essentially the same computation
+        This also now computes the "lie" or "failure" value, which I think makes sense because it's
+        doing essentially the same computation
 
         """
     super().__init__()
@@ -111,7 +123,9 @@ class SingleMetricMidpointInfo(MetricMidpointInfo):
       self.force_skip = True
 
     if not self.force_skip:
-      self.min, self.max = numpy.min(self.non_fail_values), numpy.max(self.non_fail_values)
+      self.min, self.max = numpy.min(self.non_fail_values), numpy.max(
+        self.non_fail_values
+      )
       self.midpoint = (self.max + self.min) * 0.5
 
       if (self.max - self.min) * 0.5 < MINIMUM_METRIC_HALF_WIDTH:
@@ -131,9 +145,17 @@ class SingleMetricMidpointInfo(MetricMidpointInfo):
 
     maximizing = bool(self.negate == -1)
     if lie_method == CONSTANT_LIAR_MIN:
-      return numpy.min(self.non_fail_values) if maximizing else numpy.max(self.non_fail_values)
+      return (
+        numpy.min(self.non_fail_values)
+        if maximizing
+        else numpy.max(self.non_fail_values)
+      )
     elif lie_method == CONSTANT_LIAR_MAX:
-      return numpy.max(self.non_fail_values) if maximizing else numpy.min(self.non_fail_values)
+      return (
+        numpy.max(self.non_fail_values)
+        if maximizing
+        else numpy.min(self.non_fail_values)
+      )
     elif lie_method == CONSTANT_LIAR_MEAN:
       return numpy.mean(self.non_fail_values)
 
@@ -151,7 +173,11 @@ class HistoricalData(object):
   def __str__(self):
     """String representation of this HistoricalData object."""
     return "\n".join(
-      [repr(self.points_sampled), repr(self.points_sampled_value), repr(self.points_sampled_noise_variance)]
+      [
+        repr(self.points_sampled),
+        repr(self.points_sampled_value),
+        repr(self.points_sampled_noise_variance),
+      ]
     )
 
   def append_lies(self, points_being_sampled, lie_value, lie_value_var):
@@ -161,19 +187,31 @@ class HistoricalData(object):
       lie_value_var * numpy.ones(len(points_being_sampled)),
     )
 
-  def append_historical_data(self, points_sampled, points_sampled_value, points_sampled_noise_variance):
+  def append_historical_data(
+    self, points_sampled, points_sampled_value, points_sampled_noise_variance
+  ):
     """Append lists of points_sampled, their values, and their noise variances to the data members of this class."""
     if points_sampled.size == 0:
       return
 
     assert len(points_sampled.shape) == 2
-    assert len(points_sampled_value.shape) == len(points_sampled_noise_variance.shape) == 1
-    assert len(points_sampled) == len(points_sampled_value) == len(points_sampled_noise_variance)
+    assert (
+      len(points_sampled_value.shape) == len(points_sampled_noise_variance.shape) == 1
+    )
+    assert (
+      len(points_sampled)
+      == len(points_sampled_value)
+      == len(points_sampled_noise_variance)
+    )
     assert points_sampled.shape[1] == self.dim
 
     self.points_sampled = numpy.append(self.points_sampled, points_sampled, axis=0)
-    self.points_sampled_value = numpy.append(self.points_sampled_value, points_sampled_value)
-    self.points_sampled_noise_variance = numpy.append(self.points_sampled_noise_variance, points_sampled_noise_variance)
+    self.points_sampled_value = numpy.append(
+      self.points_sampled_value, points_sampled_value
+    )
+    self.points_sampled_noise_variance = numpy.append(
+      self.points_sampled_noise_variance, points_sampled_noise_variance
+    )
 
   @property
   def num_sampled(self):

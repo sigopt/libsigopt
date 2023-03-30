@@ -25,7 +25,11 @@ from libsigopt.compute.misc.constant import (
   DEFAULT_COVARIANCE_KERNEL,
   DEFAULT_TASK_COVARIANCE_KERNEL,
 )
-from libsigopt.compute.misc.data_containers import HistoricalData, MultiMetricMidpointInfo, SingleMetricMidpointInfo
+from libsigopt.compute.misc.data_containers import (
+  HistoricalData,
+  MultiMetricMidpointInfo,
+  SingleMetricMidpointInfo,
+)
 from libsigopt.compute.misc.multimetric import (
   CONVEX_COMBINATION,
   EPSILON_CONSTRAINT,
@@ -60,10 +64,18 @@ def filter_points_sampled(points_sampled, metrics_info):
 
   return (
     points_sampled.points,
-    points_sampled.values[:, optimized_metrics_index] if has_optimization_metrics else _UNSET,
-    points_sampled.value_vars[:, optimized_metrics_index] if has_optimization_metrics else _UNSET,
-    points_sampled.values[:, constraint_metrics_index] if has_constraint_metrics else _UNSET,
-    points_sampled.value_vars[:, constraint_metrics_index] if has_constraint_metrics else _UNSET,
+    points_sampled.values[:, optimized_metrics_index]
+    if has_optimization_metrics
+    else _UNSET,
+    points_sampled.value_vars[:, optimized_metrics_index]
+    if has_optimization_metrics
+    else _UNSET,
+    points_sampled.values[:, constraint_metrics_index]
+    if has_constraint_metrics
+    else _UNSET,
+    points_sampled.value_vars[:, constraint_metrics_index]
+    if has_constraint_metrics
+    else _UNSET,
     points_sampled.failures,
     points_sampled.task_costs,
   )
@@ -71,25 +83,37 @@ def filter_points_sampled(points_sampled, metrics_info):
 
 def form_one_hot_points_with_tasks(domain, points, task_costs=None):
   assert isinstance(domain, CategoricalDomain)
-  one_hot_points = numpy.array([domain.map_categorical_point_to_one_hot(p) for p in points])
+  one_hot_points = numpy.array(
+    [domain.map_categorical_point_to_one_hot(p) for p in points]
+  )
   if task_costs is not None and one_hot_points.size:
     one_hot_points = numpy.concatenate((one_hot_points, task_costs[:, None]), axis=1)
   return one_hot_points
 
 
-def form_metric_midpoint_info(points_sampled_values, points_sampled_failures, metric_objectives):
+def form_metric_midpoint_info(
+  points_sampled_values, points_sampled_failures, metric_objectives
+):
   if len(points_sampled_values.shape) == 1:
-    mmi = SingleMetricMidpointInfo(points_sampled_values, points_sampled_failures, metric_objectives)
+    mmi = SingleMetricMidpointInfo(
+      points_sampled_values, points_sampled_failures, metric_objectives
+    )
   else:
-    mmi = MultiMetricMidpointInfo(points_sampled_values, points_sampled_failures, metric_objectives)
+    mmi = MultiMetricMidpointInfo(
+      points_sampled_values, points_sampled_failures, metric_objectives
+    )
   return mmi
 
 
-def identify_scaled_values_exceeding_scaled_upper_thresholds(scaled_values, scaled_upper_thresholds):
+def identify_scaled_values_exceeding_scaled_upper_thresholds(
+  scaled_values, scaled_upper_thresholds
+):
   within_bounds = numpy.full(len(scaled_values), True, dtype=bool)
   for i, scaled_upper_threshold in enumerate(scaled_upper_thresholds):
     if not numpy.isnan(scaled_upper_threshold):
-      within_bounds = numpy.logical_and(within_bounds, scaled_values[:, i] < scaled_upper_threshold)
+      within_bounds = numpy.logical_and(
+        within_bounds, scaled_values[:, i] < scaled_upper_threshold
+      )
   return numpy.logical_not(within_bounds)
 
 
@@ -163,7 +187,9 @@ class View(object):
     self._one_hot_points_being_sampled_points = _UNSET
     self._one_hot_points_to_evaluate_points = _UNSET
     self.dim_with_task = self.one_hot_points_sampled_points.shape[1]
-    assert self.dim_with_task == self.domain.one_hot_dim + (1 if self.task_cost_populated else 0)
+    assert self.dim_with_task == self.domain.one_hot_dim + (
+      1 if self.task_cost_populated else 0
+    )
 
     self.form_multimetric_info()
 
@@ -186,14 +212,22 @@ class View(object):
     self.scaled_optimized_lie_values = self._mmi.relative_objective_value(
       self._mmi.compute_lie_value(CONSTANT_LIAR_MIN)
     )
-    self.points_sampled_for_af_values = self._mmi.relative_objective_value(self.points_sampled_for_af_values)
-    self.points_sampled_for_af_values[self.points_sampled_failures] = self.scaled_optimized_lie_values
-    self.points_sampled_for_af_value_vars = self._mmi.relative_objective_variance(self.points_sampled_for_af_value_vars)
+    self.points_sampled_for_af_values = self._mmi.relative_objective_value(
+      self.points_sampled_for_af_values
+    )
+    self.points_sampled_for_af_values[
+      self.points_sampled_failures
+    ] = self.scaled_optimized_lie_values
+    self.points_sampled_for_af_value_vars = self._mmi.relative_objective_variance(
+      self.points_sampled_for_af_value_vars
+    )
     unscaled_optimized_metrics_thresholds = numpy.asarray(
       self.params["metrics_info"].user_specified_thresholds,
       dtype=float,
     )[self.optimized_metrics_index]
-    self.optimized_metrics_thresholds = self._mmi.relative_objective_value(unscaled_optimized_metrics_thresholds)
+    self.optimized_metrics_thresholds = self._mmi.relative_objective_value(
+      unscaled_optimized_metrics_thresholds
+    )
 
   def _preprocess_constraint_metrics(self):
     self.constraint_metrics_index = self.params["metrics_info"].constraint_metrics_index
@@ -211,16 +245,24 @@ class View(object):
     self.scaled_constraint_lie_values = self._constraint_mmi.relative_objective_value(
       self._constraint_mmi.compute_lie_value(CONSTANT_LIAR_MIN)
     )
-    self.points_sampled_for_pf_values = self._constraint_mmi.relative_objective_value(self.points_sampled_for_pf_values)
-    self.points_sampled_for_pf_values[self.points_sampled_failures] = self.scaled_constraint_lie_values
-    self.points_sampled_for_pf_value_vars = self._constraint_mmi.relative_objective_variance(
-      self.points_sampled_for_pf_value_vars
+    self.points_sampled_for_pf_values = self._constraint_mmi.relative_objective_value(
+      self.points_sampled_for_pf_values
+    )
+    self.points_sampled_for_pf_values[
+      self.points_sampled_failures
+    ] = self.scaled_constraint_lie_values
+    self.points_sampled_for_pf_value_vars = (
+      self._constraint_mmi.relative_objective_variance(
+        self.points_sampled_for_pf_value_vars
+      )
     )
     unscaled_constraint_thresholds = numpy.asarray(
       self.params["metrics_info"].user_specified_thresholds,
       dtype=float,
     )[self.constraint_metrics_index]
-    self.constraint_thresholds = self._constraint_mmi.relative_objective_value(unscaled_constraint_thresholds)
+    self.constraint_thresholds = self._constraint_mmi.relative_objective_value(
+      unscaled_constraint_thresholds
+    )
 
   @property
   def one_hot_points_to_evaluate_points(self):
@@ -228,7 +270,9 @@ class View(object):
       self._one_hot_points_to_evaluate_points = form_one_hot_points_with_tasks(
         self.domain,
         self.params["points_to_evaluate"].points,
-        self.params["points_to_evaluate"].task_costs if self.task_cost_populated else None,
+        self.params["points_to_evaluate"].task_costs
+        if self.task_cost_populated
+        else None,
       )
     return self._one_hot_points_to_evaluate_points
 
@@ -238,7 +282,9 @@ class View(object):
       self._one_hot_points_being_sampled_points = form_one_hot_points_with_tasks(
         self.domain,
         self.params["points_being_sampled"].points,
-        self.params["points_being_sampled"].task_costs if self.task_cost_populated else None,
+        self.params["points_being_sampled"].task_costs
+        if self.task_cost_populated
+        else None,
       )
     return self._one_hot_points_being_sampled_points
 
@@ -302,17 +348,27 @@ class GPView(View):
     assert isinstance(domain, CategoricalDomain)
     length_scales = hyperparameter_dict["length_scales"]
 
-    one_hot_length_scales = domain.map_categorical_length_scales_to_one_hot(length_scales)
+    one_hot_length_scales = domain.map_categorical_length_scales_to_one_hot(
+      length_scales
+    )
     hyperparameters = (
       [hyperparameter_dict["alpha"]]
       + one_hot_length_scales
-      + ([] if hyperparameter_dict["task_length"] is None else [hyperparameter_dict["task_length"]])
+      + (
+        []
+        if hyperparameter_dict["task_length"] is None
+        else [hyperparameter_dict["task_length"]]
+      )
     )
 
     physical_covariance_class = COVARIANCE_TYPES_TO_CLASSES[DEFAULT_COVARIANCE_KERNEL]
     if self.task_cost_populated:
-      task_covariance_class = COVARIANCE_TYPES_TO_CLASSES[DEFAULT_TASK_COVARIANCE_KERNEL]
-      covariance = MultitaskTensorCovariance(hyperparameters, physical_covariance_class, task_covariance_class)
+      task_covariance_class = COVARIANCE_TYPES_TO_CLASSES[
+        DEFAULT_TASK_COVARIANCE_KERNEL
+      ]
+      covariance = MultitaskTensorCovariance(
+        hyperparameters, physical_covariance_class, task_covariance_class
+      )
     else:
       covariance = physical_covariance_class(hyperparameters)
 
@@ -432,7 +488,10 @@ class GPView(View):
     )
 
     threshold_0 = threshold_1 = None
-    if not numpy.any(numpy.isnan(self.optimized_metrics_thresholds)) and len(self.optimized_metrics_thresholds) == 2:
+    if (
+      not numpy.any(numpy.isnan(self.optimized_metrics_thresholds))
+      and len(self.optimized_metrics_thresholds) == 2
+    ):
       threshold_0, threshold_1 = self.optimized_metrics_thresholds
     if constraint_metrics_index == 0:
       threshold_0 = constraint_threshold
@@ -468,13 +527,18 @@ class GPView(View):
 
   def form_probabilistic_failures_model(self):
     if not (
-      self.multimetric_info.method in (PROBABILISTIC_FAILURES, EPSILON_CONSTRAINT) or self.has_constraint_metrics
+      self.multimetric_info.method in (PROBABILISTIC_FAILURES, EPSILON_CONSTRAINT)
+      or self.has_constraint_metrics
     ):
       return None
 
-    list_of_failures = self._form_probabilistic_failures_for_pareto_frontier_optimization()
+    list_of_failures = (
+      self._form_probabilistic_failures_for_pareto_frontier_optimization()
+    )
     if self.has_constraint_metrics:
-      list_of_failures.extend(self._form_list_of_probabilistic_failures_for_constraint_metrics())
+      list_of_failures.extend(
+        self._form_list_of_probabilistic_failures_for_constraint_metrics()
+      )
 
     return ProductOfListOfProbabilisticFailures(list_of_failures)
 
@@ -495,7 +559,9 @@ class GPView(View):
       points_being_sampled=self.one_hot_points_being_sampled_points,
     )
 
-  def form_acquisition_function(self, gaussian_process, probabilistic_failures, use_parallel_ei):
+  def form_acquisition_function(
+    self, gaussian_process, probabilistic_failures, use_parallel_ei
+  ):
     if use_parallel_ei:
       return self._form_parallel_ei(gaussian_process, probabilistic_failures)
     if probabilistic_failures:

@@ -1,13 +1,14 @@
 version: 2.1
 
 jobs:
-  check-license-disclaimers:
+  pre-commit:
     docker:
       - image: cimg/python:3.10
     resource_class: small
     steps:
       - checkout
-      - run: python tools/check_copyright_and_license_disclaimers.py .
+      - run: grep pre-commit requirements-dev.txt | xargs pip install
+      - run: pre-commit run --all-files
   testaux:
     docker:
       - image: cimg/python:3.10
@@ -41,6 +42,6 @@ jobs:
 workflows:
   main:
     jobs:
-      - check-license-disclaimers
+      - pre-commit
       - testaux
       - testcompute

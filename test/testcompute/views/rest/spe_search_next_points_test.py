@@ -11,7 +11,9 @@ from testcompute.zigopt_input_utils import ZigoptSimulator
 class TestSearchNextPoints(object):
   def assert_call_successful(self, zigopt_simulator, domain=None):
     if domain:
-      view_input = zigopt_simulator.form_spe_search_next_points_input_from_domain(domain)
+      view_input = zigopt_simulator.form_spe_search_next_points_input_from_domain(
+        domain
+      )
     else:
       view_input, domain = zigopt_simulator.form_spe_search_next_points_inputs()
 
@@ -64,7 +66,9 @@ class TestSearchNextPoints(object):
 
   @pytest.mark.parametrize("num_optimized_metrics", [1, 2, 5])
   @pytest.mark.parametrize("num_constraint_metrics", [1, 2])
-  def test_invalid_num_optimized_metric(self, num_optimized_metrics, num_constraint_metrics):
+  def test_invalid_num_optimized_metric(
+    self, num_optimized_metrics, num_constraint_metrics
+  ):
     zs = ZigoptSimulator(
       dim=2,
       num_sampled=15,

@@ -33,7 +33,9 @@ class TestMultimetricFiltering(NumericalTestCase):
   def _form_multimetric_info(method_name):
     method = method_name
     if method == CONVEX_COMBINATION:
-      phase = numpy.random.choice([CONVEX_COMBINATION_RANDOM_SPREAD, CONVEX_COMBINATION_SEQUENTIAL])
+      phase = numpy.random.choice(
+        [CONVEX_COMBINATION_RANDOM_SPREAD, CONVEX_COMBINATION_SEQUENTIAL]
+      )
       phase_kwargs = {"fraction_of_phase_completed": numpy.random.random()}
     elif method in (EPSILON_CONSTRAINT, PROBABILISTIC_FAILURES):
       phase = numpy.random.choice(
@@ -60,18 +62,30 @@ class TestMultimetricFiltering(NumericalTestCase):
     budget = numpy.random.randint(50, 100)
     max_points = numpy.random.randint(10, 50) + budget
     assert all(
-      all(0 <= w <= 1 for w in form_convex_combination_weights(CONVEX_COMBINATION_RANDOM_SPREAD, n / budget))
+      all(
+        0 <= w <= 1
+        for w in form_convex_combination_weights(
+          CONVEX_COMBINATION_RANDOM_SPREAD, n / budget
+        )
+      )
       for n in range(max_points)
     )
     assert all(
-      all(0 <= w <= 1 for w in form_convex_combination_weights(CONVEX_COMBINATION_SEQUENTIAL, n / budget))
+      all(
+        0 <= w <= 1
+        for w in form_convex_combination_weights(
+          CONVEX_COMBINATION_SEQUENTIAL, n / budget
+        )
+      )
       for n in range(max_points)
     )
 
   def test_form_epsilon_constraint_epsilon(self):
     budget = numpy.random.randint(50, 100)
     max_points = numpy.random.randint(10, 50) + budget
-    assert all(0 <= form_epsilon_constraint_epsilon(n / budget) <= 1 for n in range(max_points))
+    assert all(
+      0 <= form_epsilon_constraint_epsilon(n / budget) <= 1 for n in range(max_points)
+    )
 
   @staticmethod
   def _create_pareto_frontier_values(count):
@@ -114,27 +128,45 @@ class TestMultimetricFiltering(NumericalTestCase):
     # Only one optima
     epsilon1 = 0.3
     epsilon2 = 0.8
-    points_sampled_values = numpy.array([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]])
-    constraint_value1 = find_epsilon_constraint_value(epsilon1, constraint_metric, points_sampled_values)
-    constraint_value2 = find_epsilon_constraint_value(epsilon2, constraint_metric, points_sampled_values)
+    points_sampled_values = numpy.array(
+      [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]]
+    )
+    constraint_value1 = find_epsilon_constraint_value(
+      epsilon1, constraint_metric, points_sampled_values
+    )
+    constraint_value2 = find_epsilon_constraint_value(
+      epsilon2, constraint_metric, points_sampled_values
+    )
     assert constraint_value1 == constraint_value2
 
     # All points are pareto frontier
     epsilon = 0.3
-    points_sampled_values = numpy.array([[0, 5], [1, 4], [2, 3], [3, 2], [4, 1], [5, 0]])
-    constraint_value = find_epsilon_constraint_value(epsilon, constraint_metric, points_sampled_values)
+    points_sampled_values = numpy.array(
+      [[0, 5], [1, 4], [2, 3], [3, 2], [4, 1], [5, 0]]
+    )
+    constraint_value = find_epsilon_constraint_value(
+      epsilon, constraint_metric, points_sampled_values
+    )
     assert constraint_value == 1.5
 
     epsilon = 0.7
-    points_sampled_values = numpy.array([[0, 5], [numpy.nan, numpy.nan], [2, 3], [3, 2], [4, 1], [5, 0]])
-    constraint_value = find_epsilon_constraint_value(epsilon, constraint_metric, points_sampled_values)
+    points_sampled_values = numpy.array(
+      [[0, 5], [numpy.nan, numpy.nan], [2, 3], [3, 2], [4, 1], [5, 0]]
+    )
+    constraint_value = find_epsilon_constraint_value(
+      epsilon, constraint_metric, points_sampled_values
+    )
     assert constraint_value == 3.5
 
     # 2 points are pareto frontier
     constraint_metric = 0
     epsilon = 0.5
-    points_sampled_values = numpy.array([[3, 4], [6, 7], [2, 1], [0, 2], [7, 3], [5, 2]])
-    constraint_value = find_epsilon_constraint_value(epsilon, constraint_metric, points_sampled_values)
+    points_sampled_values = numpy.array(
+      [[3, 4], [6, 7], [2, 1], [0, 2], [7, 3], [5, 2]]
+    )
+    constraint_value = find_epsilon_constraint_value(
+      epsilon, constraint_metric, points_sampled_values
+    )
     assert constraint_value == 1.0
 
   def test_force_minimum_successful_points(self):
@@ -146,11 +178,15 @@ class TestMultimetricFiltering(NumericalTestCase):
     points_sampled_failures = numpy.ones(num_points, dtype=bool)
     points_sampled_failures[margin:] = False
     with pytest.raises(AssertionError):
-      force_minimum_successful_points(optimizing_metric, points_sampled_values, points_sampled_failures)
+      force_minimum_successful_points(
+        optimizing_metric, points_sampled_values, points_sampled_failures
+      )
 
     points_sampled_failures = numpy.ones(margin, dtype=bool)
     with pytest.raises(AssertionError):
-      force_minimum_successful_points(optimizing_metric, points_sampled_values, points_sampled_failures)
+      force_minimum_successful_points(
+        optimizing_metric, points_sampled_values, points_sampled_failures
+      )
 
     optimizing_metric = 1
     points_sampled_failures = numpy.zeros(num_points, dtype=bool)
@@ -177,7 +213,9 @@ class TestMultimetricFiltering(NumericalTestCase):
     if successful_index_from < 0:
       expected_failures[successful_index_from:] = False
 
-    assert sum(~modified_points_sampled_failures) == MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
+    assert (
+      sum(~modified_points_sampled_failures) == MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
+    )
     assert (modified_points_sampled_failures == expected_failures).all()
 
     # Test when length of points_sampled < MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
@@ -233,12 +271,16 @@ class TestMultimetricFiltering(NumericalTestCase):
     for mpsv, psv in zip(modified_points_sampled_values, points_sampled.values):
       assert numpy.isclose(
         mpsv,
-        multimetric_info.params.weights[0] * psv[0] + multimetric_info.params.weights[1] * psv[1],
+        multimetric_info.params.weights[0] * psv[0]
+        + multimetric_info.params.weights[1] * psv[1],
       )
-    for mpsvv, psvv in zip(modified_points_sampled_value_vars, points_sampled.value_vars):
+    for mpsvv, psvv in zip(
+      modified_points_sampled_value_vars, points_sampled.value_vars
+    ):
       assert numpy.isclose(
         mpsvv,
-        multimetric_info.params.weights[0] ** 2 * psvv[0] + multimetric_info.params.weights[1] ** 2 * psvv[1],
+        multimetric_info.params.weights[0] ** 2 * psvv[0]
+        + multimetric_info.params.weights[1] ** 2 * psvv[1],
       )
     assert modified_lie_value == multimetric_info.params.weights[1]
 
@@ -278,7 +320,11 @@ class TestMultimetricFiltering(NumericalTestCase):
     multimetric_info = self._form_multimetric_info(EPSILON_CONSTRAINT)
     assert multimetric_info.method == EPSILON_CONSTRAINT
     assert isinstance(multimetric_info.params, ProbabilisticFailuresParams)
-    assert multimetric_info.params.optimizing_metric + multimetric_info.params.constraint_metric == 1
+    assert (
+      multimetric_info.params.optimizing_metric
+      + multimetric_info.params.constraint_metric
+      == 1
+    )
     assert 0 <= multimetric_info.params.epsilon <= 1
 
     num_points = MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS * 2
@@ -379,10 +425,16 @@ class TestMultimetricFiltering(NumericalTestCase):
     expected_values[points_sampled.failures] = modified_lie_value
     expected_values[num_points // 2 : -1] = modified_lie_value
 
-    assert (modified_points_sampled_values[points_sampled.failures] == lie_values[optimizing_metric]).all()
+    assert (
+      modified_points_sampled_values[points_sampled.failures]
+      == lie_values[optimizing_metric]
+    ).all()
     assert (modified_points_sampled_points == points_sampled.points).all()
     assert (modified_points_sampled_values == expected_values).all()
-    assert (modified_points_sampled_value_vars == points_sampled.value_vars[:, optimizing_metric]).all()
+    assert (
+      modified_points_sampled_value_vars
+      == points_sampled.value_vars[:, optimizing_metric]
+    ).all()
     assert modified_lie_value == lie_values[optimizing_metric]
 
   def test_filter_probabilistic_failures(self):
@@ -450,7 +502,9 @@ class TestMultimetricFiltering(NumericalTestCase):
     optimizing_metric = multimetric_info.params.optimizing_metric
     expected_values = points_sampled.values[: num_points // 2, optimizing_metric]
     expected_points = points_sampled.points[: num_points // 2, :]
-    expected_value_vars = points_sampled.value_vars[: num_points // 2, optimizing_metric]
+    expected_value_vars = points_sampled.value_vars[
+      : num_points // 2, optimizing_metric
+    ]
 
     assert (modified_points_sampled_points == expected_points).all()
     assert (modified_points_sampled_values == expected_values).all()
@@ -475,7 +529,9 @@ class TestMultimetricFiltering(NumericalTestCase):
     optimizing_metric = multimetric_info.params.optimizing_metric
     expected_values = points_sampled.values[: num_points // 2, optimizing_metric]
     expected_points = points_sampled.points[: num_points // 2, :]
-    expected_value_vars = points_sampled.value_vars[: num_points // 2, optimizing_metric]
+    expected_value_vars = points_sampled.value_vars[
+      : num_points // 2, optimizing_metric
+    ]
 
     assert (modified_points_sampled_points == expected_points).all()
     assert (modified_points_sampled_values == expected_values).all()
@@ -493,8 +549,12 @@ class TestMultimetricFiltering(NumericalTestCase):
         constraint_metric=0,
       ),
     )
-    unique_lie_value = -99  # Seeing this number in modified_points_sampled_values means a failure
-    point_sampled_values = self._create_one_optima_values(MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS)
+    unique_lie_value = (
+      -99
+    )  # Seeing this number in modified_points_sampled_values means a failure
+    point_sampled_values = self._create_one_optima_values(
+      MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
+    )
 
     points_sampled = form_points_sampled(
       domain=self.mixed_domain,
@@ -529,8 +589,12 @@ class TestMultimetricFiltering(NumericalTestCase):
         constraint_metric=0,
       ),
     )
-    unique_lie_value = -99  # Seeing this number in modified_points_sampled_values means a failure
-    point_sampled_values = self._create_one_optima_values(MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS)
+    unique_lie_value = (
+      -99
+    )  # Seeing this number in modified_points_sampled_values means a failure
+    point_sampled_values = self._create_one_optima_values(
+      MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
+    )
 
     points_sampled = form_points_sampled(
       domain=self.mixed_domain,
@@ -551,14 +615,20 @@ class TestMultimetricFiltering(NumericalTestCase):
       lie_values,
     )
 
-    num_successful = numpy.count_nonzero(modified_points_sampled_values != unique_lie_value)
+    num_successful = numpy.count_nonzero(
+      modified_points_sampled_values != unique_lie_value
+    )
     assert num_successful == MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
 
   def test_filter_optimize_one_metric(self):
     multimetric_info = self._form_multimetric_info(OPTIMIZING_ONE_METRIC)
     assert multimetric_info.method == OPTIMIZING_ONE_METRIC
     assert isinstance(multimetric_info.params, OptimizeOneMetricParams)
-    assert multimetric_info.params.optimizing_metric + multimetric_info.params.constraint_metric == 1
+    assert (
+      multimetric_info.params.optimizing_metric
+      + multimetric_info.params.constraint_metric
+      == 1
+    )
     points_sampled = form_points_sampled(
       domain=self.mixed_domain,
       num_sampled=5,
@@ -584,17 +654,38 @@ class TestMultimetricFiltering(NumericalTestCase):
 
     optimizing_metric = multimetric_info.params.optimizing_metric
     assert (modified_points_sampled_points == points_sampled.points).all()
-    assert (modified_points_sampled_values == points_sampled.values[:, optimizing_metric]).all()
-    assert (modified_points_sampled_value_vars == points_sampled.value_vars[:, optimizing_metric]).all()
+    assert (
+      modified_points_sampled_values == points_sampled.values[:, optimizing_metric]
+    ).all()
+    assert (
+      modified_points_sampled_value_vars
+      == points_sampled.value_vars[:, optimizing_metric]
+    ).all()
     assert modified_lie_value == lie_values[optimizing_metric]
 
   @pytest.mark.parametrize(
     "params",
     [
-      (CONVEX_COMBINATION, "libsigopt.compute.misc.multimetric.filter_convex_combination_sum_of_gps", 123),
-      (EPSILON_CONSTRAINT, "libsigopt.compute.misc.multimetric.filter_probabilistic_failure", 321),
-      (OPTIMIZING_ONE_METRIC, "libsigopt.compute.misc.multimetric.filter_optimizing_one_metric", 222),
-      (NOT_MULTIMETRIC, "libsigopt.compute.misc.multimetric.filter_not_multimetric", 333),
+      (
+        CONVEX_COMBINATION,
+        "libsigopt.compute.misc.multimetric.filter_convex_combination_sum_of_gps",
+        123,
+      ),
+      (
+        EPSILON_CONSTRAINT,
+        "libsigopt.compute.misc.multimetric.filter_probabilistic_failure",
+        321,
+      ),
+      (
+        OPTIMIZING_ONE_METRIC,
+        "libsigopt.compute.misc.multimetric.filter_optimizing_one_metric",
+        222,
+      ),
+      (
+        NOT_MULTIMETRIC,
+        "libsigopt.compute.misc.multimetric.filter_not_multimetric",
+        333,
+      ),
     ],
   )
   def test_filter_multimetric_points_sampled(self, params):
@@ -631,7 +722,9 @@ class TestMultimetricFiltering(NumericalTestCase):
 
   def test_filter_multimetric_points_sampled_failed(self):
     multimetric_info = self._form_multimetric_info(PROBABILISTIC_FAILURES)
-    multimetric_info = MultimetricInfo(method=PROBABILISTIC_FAILURES, params=multimetric_info.params)
+    multimetric_info = MultimetricInfo(
+      method=PROBABILISTIC_FAILURES, params=multimetric_info.params
+    )
     assert multimetric_info.method == PROBABILISTIC_FAILURES
     points_sampled = form_points_sampled(
       domain=self.mixed_domain,
@@ -652,7 +745,9 @@ class TestMultimetricFiltering(NumericalTestCase):
         lie_values,
       )
 
-    multimetric_info = MultimetricInfo(method="something_else", params=multimetric_info.params)
+    multimetric_info = MultimetricInfo(
+      method="something_else", params=multimetric_info.params
+    )
     with pytest.raises(AssertionError):
       filter_multimetric_points_sampled(
         multimetric_info,
@@ -665,7 +760,9 @@ class TestMultimetricFiltering(NumericalTestCase):
 
   def test_filter_multimetric_points_sampled_spe_failed(self):
     multimetric_info = self._form_multimetric_info(PROBABILISTIC_FAILURES)
-    multimetric_info = MultimetricInfo(method=PROBABILISTIC_FAILURES, params=multimetric_info.params)
+    multimetric_info = MultimetricInfo(
+      method=PROBABILISTIC_FAILURES, params=multimetric_info.params
+    )
     assert multimetric_info.method == PROBABILISTIC_FAILURES
     points_sampled = form_points_sampled(
       domain=self.mixed_domain,
@@ -685,7 +782,9 @@ class TestMultimetricFiltering(NumericalTestCase):
         lie_values,
       )
 
-    multimetric_info = MultimetricInfo(method="something_else", params=multimetric_info.params)
+    multimetric_info = MultimetricInfo(
+      method="something_else", params=multimetric_info.params
+    )
     with pytest.raises(AssertionError):
       filter_multimetric_points_sampled_spe(
         multimetric_info,

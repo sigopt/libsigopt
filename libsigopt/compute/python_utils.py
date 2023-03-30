@@ -4,11 +4,14 @@
 import numpy
 import scipy.linalg
 
-from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE, NONZERO_MEAN_LINEAR_MEAN_TYPE
+from libsigopt.compute.misc.constant import (
+  NONZERO_MEAN_CONSTANT_MEAN_TYPE,
+  NONZERO_MEAN_LINEAR_MEAN_TYPE,
+)
 
 
 def indices_represent_zero_mean(indices_list):
-  """Tests possible inputs to see if they correspond to the zero mean case. """
+  """Tests possible inputs to see if they correspond to the zero mean case."""
 
   return indices_list is None or numpy.asarray(indices_list, dtype=int).size == 0
 
@@ -42,7 +45,10 @@ def polynomial_index_point_check(indices_list, dim):
 
 
 def validate_polynomial_indices(polynomial_indices, nonzero_mean_type, dim):
-  if nonzero_mean_type in (NONZERO_MEAN_CONSTANT_MEAN_TYPE, NONZERO_MEAN_LINEAR_MEAN_TYPE):
+  if nonzero_mean_type in (
+    NONZERO_MEAN_CONSTANT_MEAN_TYPE,
+    NONZERO_MEAN_LINEAR_MEAN_TYPE,
+  ):
     polynomial_indices = [[0] * dim]
     if nonzero_mean_type == NONZERO_MEAN_LINEAR_MEAN_TYPE:
       polynomial_indices.extend([[int(j == k) for j in range(dim)] for k in range(dim)])
@@ -132,7 +138,9 @@ def build_grad_polynomial_tensor(indices_list, points):
               if this_index == 0:
                 grad_poly_ten[row][col][d] = 0
               else:
-                grad_poly_ten[row][col][d] *= this_index * pow(this_point, this_index - 1)
+                grad_poly_ten[row][col][d] *= this_index * pow(
+                  this_point, this_index - 1
+                )
 
   return grad_poly_ten
 
@@ -151,10 +159,14 @@ def compute_cholesky_for_gp_sampling(covariance_matrix):
     """
   # pylint: disable=unexpected-keyword-arg
   try:
-    chol_cov = scipy.linalg.cholesky(covariance_matrix, lower=True, overwrite_a=True, check_finite=False)
+    chol_cov = scipy.linalg.cholesky(
+      covariance_matrix, lower=True, overwrite_a=True, check_finite=False
+    )
   except scipy.linalg.LinAlgError:
     U, E, _ = scipy.linalg.svd(covariance_matrix, overwrite_a=True, check_finite=False)
     chol_cov = U * numpy.sqrt(E)[None, :]
-    chol_cov = scipy.linalg.qr(chol_cov.T, mode="r", overwrite_a=True, check_finite=False)[0].T
+    chol_cov = scipy.linalg.qr(
+      chol_cov.T, mode="r", overwrite_a=True, check_finite=False
+    )[0].T
   # pylint: enable=unexpected-keyword-arg
   return chol_cov

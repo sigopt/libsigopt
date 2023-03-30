@@ -14,7 +14,7 @@ from libsigopt.compute.domain import CategoricalDomain, FixedIndicesOnContinuous
 from libsigopt.compute.expected_improvement import ExpectedParallelImprovement
 from libsigopt.compute.misc.constant import CATEGORICAL_POINT_UNIQUENESS_TOLERANCE
 from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
-from libsigopt.compute.views.view import GPView
+from libsigopt.views.view import GPView
 
 
 MAXIMUM_NEIGHBORING_POINTS = 30000

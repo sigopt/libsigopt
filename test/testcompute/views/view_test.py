@@ -15,7 +15,7 @@ from libsigopt.aux.constant import (
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import CONSTANT_LIAR_MIN, NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import MultiMetricMidpointInfo, SingleMetricMidpointInfo
-from libsigopt.compute.views.view import (
+from libsigopt.views.view import (
   _UNSET,
   GPView,
   View,

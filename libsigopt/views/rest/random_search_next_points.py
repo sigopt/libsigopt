@@ -1,7 +1,7 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
-from libsigopt.compute.views.view import View
+from libsigopt.views.view import View
 
 class RandomSearchNextPoints(View):
   view_name = "random_search_next_points"

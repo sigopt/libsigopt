@@ -12,8 +12,8 @@ from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS
 from libsigopt.compute.misc.multimetric import filter_multimetric_points_sampled_spe
 from libsigopt.compute.optimization import LBFGSBOptimizer, MultistartOptimizer, SLSQPOptimizer
 from libsigopt.compute.sigopt_parzen_estimator import SigOptParzenEstimator, SPEInsufficientDataError
-from libsigopt.compute.views.rest.gp_next_points_categorical import select_random_task_by_softmax
-from libsigopt.compute.views.view import View, identify_scaled_values_exceeding_scaled_upper_thresholds
+from libsigopt.views.rest.gp_next_points_categorical import select_random_task_by_softmax
+from libsigopt.views.view import View, identify_scaled_values_exceeding_scaled_upper_thresholds
 
 
 # SPE Phases

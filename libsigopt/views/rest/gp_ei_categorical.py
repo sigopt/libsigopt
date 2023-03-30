@@ -4,7 +4,7 @@
 from libsigopt.aux.constant import PARALLEL_QEI
 from libsigopt.compute.misc.constant import DEFAULT_MAX_SIMULTANEOUS_QEI_POINTS
 from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
-from libsigopt.compute.views.view import GPView
+from libsigopt.views.view import GPView
 
 
 class GpEiCategoricalView(GPView):

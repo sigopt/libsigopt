@@ -18,7 +18,7 @@ from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import HistoricalData
 from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
-from libsigopt.compute.views.rest.gp_next_points_categorical import (
+from libsigopt.views.rest.gp_next_points_categorical import (
   GpNextPointsCategorical,
   convert_from_one_hot,
   find_best_one_hot_neighbor_by_af,

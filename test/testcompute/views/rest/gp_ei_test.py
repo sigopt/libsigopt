@@ -5,7 +5,7 @@ import pytest
 
 from libsigopt.aux.constant import PARALLEL_CONSTANT_LIAR, PARALLEL_QEI
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE
-from libsigopt.compute.views.rest.gp_ei_categorical import GpEiCategoricalView
+from libsigopt.views.rest.gp_ei_categorical import GpEiCategoricalView
 from testaux.numerical_test_case import NumericalTestCase
 from testcompute.zigopt_input_utils import ZigoptSimulator
 

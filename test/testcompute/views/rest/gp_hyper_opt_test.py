@@ -15,7 +15,7 @@ from libsigopt.aux.constant import (
 )
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE, QUANTIZED_LENGTH_SCALE_LOWER_FACTOR
-from libsigopt.compute.views.rest.gp_hyper_opt_multimetric import (
+from libsigopt.views.rest.gp_hyper_opt_multimetric import (
   DEFAULT_HYPER_OPT_OPTIMIZER_INFO,
   GpHyperOptMultimetricView,
   form_one_hot_hyperparameter_domain,

@@ -9,8 +9,8 @@ from libsigopt.compute.misc.constant import CATEGORICAL_POINT_UNIQUENESS_TOLERAN
 from libsigopt.compute.optimization_auxiliary import DEParameters, OptimizerInfo
 from libsigopt.compute.search import ProbabilityOfImprovementSearch, SearchAcquisitionFunction
 from libsigopt.compute.vectorized_optimizers import DEOptimizer
-from libsigopt.compute.views.rest.gp_next_points_categorical import GpNextPointsCategorical, convert_from_one_hot
-from libsigopt.compute.views.view import GPView
+from libsigopt.views.rest.gp_next_points_categorical import GpNextPointsCategorical, convert_from_one_hot
+from libsigopt.views.view import GPView
 
 
 RESOLVE_PHASE_PROB = 0.8

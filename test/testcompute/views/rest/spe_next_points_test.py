@@ -14,7 +14,7 @@ from libsigopt.aux.constant import (
 )
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
-from libsigopt.compute.views.rest.spe_next_points import (
+from libsigopt.views.rest.spe_next_points import (
   COMPLETION_PHASE,
   INITIALIZATION_PHASE,
   SKO_PHASE,

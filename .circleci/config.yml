@@ -1,14 +1,6 @@
 version: 2.1
 
 jobs:
-  pre-commit:
-    docker:
-      - image: cimg/python:3.10
-    resource_class: small
-    steps:
-      - checkout
-      - run: pip install . -r requirements-dev.txt
-      - run: pre-commit run --all-files
   testaux:
     docker:
       - image: cimg/python:3.10
@@ -42,6 +34,5 @@ jobs:
 workflows:
   main:
     jobs:
-      - pre-commit
       - testaux
       - testcompute

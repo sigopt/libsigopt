@@ -86,9 +86,7 @@ class TestFindInteriorPoint(NumericalTestCase):
     radius_exact = 1 / (numpy.sqrt(dim) * (numpy.sqrt(dim) + 1))
     assert feasibility
     self.assert_scalar_within_relative(radius, radius_exact, tol=1e-8)
-    self.assert_vector_within_relative(
-      center, numpy.full_like(center, radius_exact), 1e-8
-    )
+    self.assert_vector_within_relative(center, numpy.full_like(center, radius_exact), 1e-8)
 
   def test_chebyshev_center_relaxed_hypercube(self):
     dim = numpy.random.randint(2, 40)
@@ -99,15 +97,11 @@ class TestFindInteriorPoint(NumericalTestCase):
     center, radius, feasibility = find_interior_point(halfspaces)
     assert feasibility
     self.assert_scalar_within_relative(radius, 0.5, tol=1e-8)
-    self.assert_vector_within_relative(
-      center[1:], numpy.full_like(center[1:], 0.5), 1e-8
-    )
+    self.assert_vector_within_relative(center[1:], numpy.full_like(center[1:], 0.5), 1e-8)
 
 
 def map_one_hot_points_to_categorical_no_integer_snapping(domain, one_hot_points):
-  unconstrained_domain_copy = CategoricalDomain(
-    domain_components=domain.domain_components
-  )
+  unconstrained_domain_copy = CategoricalDomain(domain_components=domain.domain_components)
   return unconstrained_domain_copy.map_one_hot_points_to_categorical(one_hot_points)
 
 
@@ -199,10 +193,7 @@ class TestNeighborsFeasibility(object):
   def test_generate_neighboring_integers_grid(self):
     d = numpy.random.randint(1, MAX_GRID_DIM)
     domain = CategoricalDomain(
-      domain_components=[
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [2, 3 + d]}
-        for _ in range(d)
-      ],
+      domain_components=[{"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [2, 3 + d]} for _ in range(d)],
       constraint_list=[
         {"weights": [0.5] * d, "rhs": 1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
       ],
@@ -214,10 +205,7 @@ class TestNeighborsFeasibility(object):
   def test_generate_neighboring_integers_random(self):
     d = MAX_GRID_DIM + 1
     domain = CategoricalDomain(
-      domain_components=[
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]}
-        for _ in range(d)
-      ],
+      domain_components=[{"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]} for _ in range(d)],
       constraint_list=[
         {"weights": [1] * d, "rhs": d, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
       ],
@@ -285,9 +273,7 @@ class TestNeighborsFeasibility(object):
     assert len(one_hot_points) == len(one_hot_next_points)
     for point in one_hot_points:
       assert domain.one_hot_domain.check_point_satisfies_constraints(point)
-    categorical_points = map_one_hot_points_to_categorical_no_integer_snapping(
-      domain, one_hot_points
-    )
+    categorical_points = map_one_hot_points_to_categorical_no_integer_snapping(domain, one_hot_points)
     for categorical_point in categorical_points:
       assert domain.check_point_satisfies_constraints(categorical_point)
 
@@ -307,9 +293,7 @@ class TestNeighborsFeasibility(object):
     assert len(one_hot_points) == len(one_hot_next_points)
     for point in one_hot_points:
       assert domain.one_hot_domain.check_point_satisfies_constraints(point)
-    categorical_points = map_one_hot_points_to_categorical_no_integer_snapping(
-      domain, one_hot_points
-    )
+    categorical_points = map_one_hot_points_to_categorical_no_integer_snapping(domain, one_hot_points)
     for categorical_point in categorical_points:
       assert domain.check_point_satisfies_constraints(categorical_point)
 
@@ -383,25 +367,18 @@ class TestNeighborsFeasibility(object):
         },
       ],
     )
-    one_hot_points = domain_borderline.snap_one_hot_points_to_integer_feasible(
-      one_hot_next_points
-    )
+    one_hot_points = domain_borderline.snap_one_hot_points_to_integer_feasible(one_hot_next_points)
     assert len(one_hot_points) == 2
     for point in one_hot_points:
       assert domain_borderline.one_hot_domain.check_point_satisfies_constraints(point)
-    categorical_points = map_one_hot_points_to_categorical_no_integer_snapping(
-      domain, one_hot_points
-    )
+    categorical_points = map_one_hot_points_to_categorical_no_integer_snapping(domain, one_hot_points)
     for categorical_point in categorical_points:
       assert domain.check_point_satisfies_constraints(categorical_point)
 
     # test snap one hot using random instead of grid
     d = MAX_GRID_DIM + 1
     domain = CategoricalDomain(
-      domain_components=[
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [1, 10]}
-        for _ in range(d)
-      ],
+      domain_components=[{"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [1, 10]} for _ in range(d)],
       constraint_list=[
         {"weights": [1] * d, "rhs": d, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
       ],
@@ -418,8 +395,6 @@ class TestNeighborsFeasibility(object):
     assert len(one_hot_points) == len(one_hot_next_points)
     for point in one_hot_points:
       assert domain.one_hot_domain.check_point_satisfies_constraints(point)
-    categorical_points = map_one_hot_points_to_categorical_no_integer_snapping(
-      domain, one_hot_points
-    )
+    categorical_points = map_one_hot_points_to_categorical_no_integer_snapping(domain, one_hot_points)
     for categorical_point in categorical_points:
       assert domain.check_point_satisfies_constraints(categorical_point)

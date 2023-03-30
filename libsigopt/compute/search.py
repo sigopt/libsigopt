@@ -49,9 +49,7 @@ class SearchAcquisitionFunction(AcquisitionFunction):
     return self.failure_model.dim
 
   def _evaluate_at_point_list(self, points_to_evaluate):
-    return self._evaluate_at_point_list_normalized(
-      self.compute_core_components(points_to_evaluate, "func")
-    )
+    return self._evaluate_at_point_list_normalized(self.compute_core_components(points_to_evaluate, "func"))
 
   def _evaluate_at_point_list_normalized(self, core_components):
     raise NotImplementedError()
@@ -59,18 +57,14 @@ class SearchAcquisitionFunction(AcquisitionFunction):
   def add_normalized_repulsor_point(self, one_hot_points):
     assert len(one_hot_points.shape) == 2
     assert one_hot_points.shape[1] == self.dim
-    search_points = convert_one_hot_to_search_hypercube_points(
-      self.domain, one_hot_points
-    )
+    search_points = convert_one_hot_to_search_hypercube_points(self.domain, one_hot_points)
     self.repulsor_points = numpy.append(self.repulsor_points, search_points, axis=0)
 
   def compute_core_components(self, points_to_evaluate, option):
     assert option == "func"
     eval_shape = points_to_evaluate.shape
     assert len(eval_shape) == 2 and eval_shape[1] == self.dim
-    search_points_to_evaluate = convert_one_hot_to_search_hypercube_points(
-      self.domain, points_to_evaluate
-    )
+    search_points_to_evaluate = convert_one_hot_to_search_hypercube_points(self.domain, points_to_evaluate)
     pi_grad = None
     if option in ("func",):
       pi = self.failure_model.compute_probability_of_success(points_to_evaluate)
@@ -94,9 +88,7 @@ class ProbabilityOfImprovementSearch(SearchAcquisitionFunction):
 
   def _evaluate_at_point_list_normalized(self, core_components):
     probability_of_improvement = core_components.pi
-    distance = compute_distance_matrix_squared(
-      self.repulsor_points, core_components.search_points_to_evaluate
-    )
+    distance = compute_distance_matrix_squared(self.repulsor_points, core_components.search_points_to_evaluate)
     similar_indices = numpy.any(distance < self.distance_parameter, axis=0)
     probability_of_improvement[similar_indices] = 0
     return probability_of_improvement
@@ -111,9 +103,7 @@ def round_one_hot_points_categorical_values_to_target(domain, one_hot_points, ta
     cat_indices = list(categorical_component_mapping["input_ind_value_map"])
     best_categories = numpy.argmax(one_hot_points[:, cat_indices], axis=1)
     one_hot_points[:, cat_indices] = 0
-    one_hot_points[
-      range(len(one_hot_points)), cat_indices[0] + best_categories
-    ] = target
+    one_hot_points[range(len(one_hot_points)), cat_indices[0] + best_categories] = target
   return one_hot_points
 
 
@@ -137,10 +127,6 @@ def map_non_categorical_points_from_unit_hypercube(one_hot_domain, unit_search_p
 # The goal is to make points with different categories far from each other
 def convert_one_hot_to_search_hypercube_points(domain, one_hot_points):
   assert isinstance(domain, CategoricalDomain)
-  unit_one_hot_points = map_non_categorical_points_to_unit_hypercube(
-    domain.one_hot_domain, one_hot_points
-  )
+  unit_one_hot_points = map_non_categorical_points_to_unit_hypercube(domain.one_hot_domain, one_hot_points)
   largest_distance = numpy.sqrt(domain.one_hot_dim)
-  return round_one_hot_points_categorical_values_to_target(
-    domain, unit_one_hot_points, largest_distance
-  )
+  return round_one_hot_points_categorical_values_to_target(domain, unit_one_hot_points, largest_distance)

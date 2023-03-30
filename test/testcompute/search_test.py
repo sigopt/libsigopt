@@ -24,56 +24,34 @@ from testcompute.zigopt_input_utils import form_random_unconstrained_categorical
 
 
 class TestSearch(GaussianProcessTestCase):
-  def test_pi_search_grad_fail(
-    self, domain_list, product_of_list_probabilistic_failures_list
-  ):
-    for domain, prod_of_pfs in zip(
-      domain_list, product_of_list_probabilistic_failures_list
-    ):
+  def test_pi_search_grad_fail(self, domain_list, product_of_list_probabilistic_failures_list):
+    for domain, prod_of_pfs in zip(domain_list, product_of_list_probabilistic_failures_list):
       random_distance = numpy.random.random()
       pi_search = ProbabilityOfImprovementSearch(domain, prod_of_pfs, random_distance)
 
       random_distance = numpy.random.random()
       pi_search = ProbabilityOfImprovementSearch(domain, prod_of_pfs, random_distance)
-      points_to_evaluate = domain.one_hot_domain.generate_quasi_random_points_in_domain(
-        100
-      )
+      points_to_evaluate = domain.one_hot_domain.generate_quasi_random_points_in_domain(100)
       with pytest.raises(AssertionError):
         pi_search.evaluate_grad_at_point_list(points_to_evaluate)
 
-  def test_pi_search_no_repulsor(
-    self, domain_list, product_of_list_probabilistic_failures_list
-  ):
-    for domain, prod_of_pfs in zip(
-      domain_list, product_of_list_probabilistic_failures_list
-    ):
+  def test_pi_search_no_repulsor(self, domain_list, product_of_list_probabilistic_failures_list):
+    for domain, prod_of_pfs in zip(domain_list, product_of_list_probabilistic_failures_list):
       random_distance = numpy.random.random()
       pi_search = ProbabilityOfImprovementSearch(domain, prod_of_pfs, random_distance)
 
-      points_to_evaluate = domain.one_hot_domain.generate_quasi_random_points_in_domain(
-        100
-      )
+      points_to_evaluate = domain.one_hot_domain.generate_quasi_random_points_in_domain(100)
       product_pv = prod_of_pfs.compute_probability_of_success(points_to_evaluate)
       pi = pi_search.evaluate_at_point_list(points_to_evaluate)
       self.assert_vector_within_relative_norm(pi, product_pv, 1e-15)
       assert numpy.all((pi >= 0) * (pi <= 1))
 
-  def test_pi_search_with_repulsor_points(
-    self, domain_list, product_of_list_probabilistic_failures_list
-  ):
-    for domain, prod_of_pfs in zip(
-      domain_list, product_of_list_probabilistic_failures_list
-    ):
+  def test_pi_search_with_repulsor_points(self, domain_list, product_of_list_probabilistic_failures_list):
+    for domain, prod_of_pfs in zip(domain_list, product_of_list_probabilistic_failures_list):
       random_distance = numpy.random.random()
-      gp_points = numpy.copy(
-        prod_of_pfs.list_of_probabilistic_failures[0].predictor.points_sampled
-      )
-      pi_search = ProbabilityOfImprovementSearch(
-        domain, prod_of_pfs, random_distance, gp_points
-      )
-      points_to_evaluate = domain.one_hot_domain.generate_quasi_random_points_in_domain(
-        100
-      )
+      gp_points = numpy.copy(prod_of_pfs.list_of_probabilistic_failures[0].predictor.points_sampled)
+      pi_search = ProbabilityOfImprovementSearch(domain, prod_of_pfs, random_distance, gp_points)
+      points_to_evaluate = domain.one_hot_domain.generate_quasi_random_points_in_domain(100)
       pi = pi_search.evaluate_at_point_list(points_to_evaluate)
       assert numpy.all((pi >= 0) * (pi <= 1))
 
@@ -99,9 +77,7 @@ class TestSearch(GaussianProcessTestCase):
       num_sampled=10,
       noise_per_point=1e-5,
     )
-    threshold = 0.5 * (
-      numpy.max(gp.points_sampled_value) - numpy.min(gp.points_sampled_value)
-    )
+    threshold = 0.5 * (numpy.max(gp.points_sampled_value) - numpy.min(gp.points_sampled_value))
     pf = ProbabilisticFailuresCDF(gp, threshold)
     distance = 0.25
     pi_search = ProbabilityOfImprovementSearch(domain, pf, distance)
@@ -133,20 +109,14 @@ class TestSearch(GaussianProcessTestCase):
 
   @pytest.mark.parametrize("dim", [2, 5])
   def test_map_non_categorical_points_to_unit_hypercube(self, dim):
-    domain = form_random_unconstrained_categorical_domain(
-      dim, categoricals_allowed=False
-    )
+    domain = form_random_unconstrained_categorical_domain(dim, categoricals_allowed=False)
     num_points = 301
     one_hot_domain = domain.one_hot_domain
     one_hot_points = one_hot_domain.generate_quasi_random_points_in_domain(num_points)
-    unit_points = map_non_categorical_points_to_unit_hypercube(
-      one_hot_domain, one_hot_points
-    )
+    unit_points = map_non_categorical_points_to_unit_hypercube(one_hot_domain, one_hot_points)
     assert numpy.all(numpy.logical_and(unit_points > 0, unit_points < 1))
 
-    coverted_points = map_non_categorical_points_from_unit_hypercube(
-      one_hot_domain, unit_points
-    )
+    coverted_points = map_non_categorical_points_from_unit_hypercube(one_hot_domain, unit_points)
     assert numpy.allclose(one_hot_points, coverted_points)
 
   def test_round_one_hot_points_categorical_values_to_target(self):
@@ -174,17 +144,11 @@ class TestSearch(GaussianProcessTestCase):
     target_value = 89.9
     one_hot_domain = domain.one_hot_domain
     one_hot_points = one_hot_domain.generate_quasi_random_points_in_domain(num_points)
-    rounded_to_target_points = round_one_hot_points_categorical_values_to_target(
-      domain, one_hot_points, target_value
-    )
-    sum_first_categorical = numpy.sum(
-      rounded_to_target_points[:, first_categorical_indices], axis=1
-    )
+    rounded_to_target_points = round_one_hot_points_categorical_values_to_target(domain, one_hot_points, target_value)
+    sum_first_categorical = numpy.sum(rounded_to_target_points[:, first_categorical_indices], axis=1)
     assert numpy.all(sum_first_categorical == target_value)
 
-    sum_second_categorical = numpy.sum(
-      rounded_to_target_points[:, second_categorical_indices], axis=1
-    )
+    sum_second_categorical = numpy.sum(rounded_to_target_points[:, second_categorical_indices], axis=1)
     assert numpy.all(sum_second_categorical == target_value)
 
   def test_convert_one_hot_to_search_hypercube_points_distances(self):
@@ -217,17 +181,11 @@ class TestSearch(GaussianProcessTestCase):
       [-5, 10, 3, -2, -5, 50],  # 7 - min values 3 and '50'
       [-1, 20, 3, -1, 5, 100],  # 8 - max values 3 and '100'
     ]
-    one_hot_points = numpy.array(
-      [domain.map_categorical_point_to_one_hot(p) for p in points]
-    )
-    search_unit_points = convert_one_hot_to_search_hypercube_points(
-      domain, one_hot_points
-    )
+    one_hot_points = numpy.array([domain.map_categorical_point_to_one_hot(p) for p in points])
+    search_unit_points = convert_one_hot_to_search_hypercube_points(domain, one_hot_points)
 
     first_search_point = numpy.atleast_2d(search_unit_points[0])
-    distance = numpy.sqrt(
-      compute_distance_matrix_squared(first_search_point, search_unit_points)
-    )[0]
+    distance = numpy.sqrt(compute_distance_matrix_squared(first_search_point, search_unit_points))[0]
     assert distance[0] == 0
     assert distance[1] > distance[2]
     assert distance[3] > distance[1]
@@ -242,18 +200,12 @@ class TestSearch(GaussianProcessTestCase):
     one_hot_domain = domain.one_hot_domain
     one_hot_points = one_hot_domain.generate_quasi_random_points_in_domain(num_points)
 
-    search_unit_points = convert_one_hot_to_search_hypercube_points(
-      domain, one_hot_points
-    )
+    search_unit_points = convert_one_hot_to_search_hypercube_points(domain, one_hot_points)
 
     categorical_indices = []
     for categorical_component_mapping in domain.get_categorical_component_mappings():
-      categorical_indices.extend(
-        list(categorical_component_mapping["input_ind_value_map"])
-      )
-    non_categorical_indices = list(
-      set(numpy.arange(one_hot_domain.dim)) - set(categorical_indices)
-    )
+      categorical_indices.extend(list(categorical_component_mapping["input_ind_value_map"]))
+    non_categorical_indices = list(set(numpy.arange(one_hot_domain.dim)) - set(categorical_indices))
     non_categorical_indices.sort()
 
     def check_all_elements_are_present(domain, one_hot_points):
@@ -276,17 +228,11 @@ class TestSearch(GaussianProcessTestCase):
     target_value = numpy.sqrt(one_hot_domain.dim)
     num_categories = len(domain.get_categorical_component_mappings())
 
-    sum_categorical_values = numpy.sum(
-      search_unit_points[:, categorical_indices], axis=1
-    )
+    sum_categorical_values = numpy.sum(search_unit_points[:, categorical_indices], axis=1)
     assert numpy.allclose(sum_categorical_values, num_categories * target_value)
 
     lower, upper = one_hot_domain.get_lower_upper_bounds()
-    search_lower = convert_one_hot_to_search_hypercube_points(
-      domain, numpy.atleast_2d(lower)
-    )
-    search_upper = convert_one_hot_to_search_hypercube_points(
-      domain, numpy.atleast_2d(upper)
-    )
+    search_lower = convert_one_hot_to_search_hypercube_points(domain, numpy.atleast_2d(lower))
+    search_upper = convert_one_hot_to_search_hypercube_points(domain, numpy.atleast_2d(upper))
     assert numpy.all(search_lower[0, non_categorical_indices] == 0)
     assert numpy.all(search_upper[0, non_categorical_indices] == 1)

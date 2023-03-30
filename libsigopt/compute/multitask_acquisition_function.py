@@ -28,9 +28,7 @@ class MultitaskAcquisitionFunction(AcquisitionFunction):
     return af_vals / task_costs
 
   def joint_function_gradient_eval(self, points_to_evaluate):
-    af_vals, af_val_grad = self.underlying.joint_function_gradient_eval(
-      points_to_evaluate
-    )
+    af_vals, af_val_grad = self.underlying.joint_function_gradient_eval(points_to_evaluate)
     task_costs = points_to_evaluate[:, -1]
 
     af_per_cost = af_vals / task_costs

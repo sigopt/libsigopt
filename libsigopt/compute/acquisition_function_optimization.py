@@ -62,9 +62,7 @@ Finally we also return the expected optimization time for this maxiter.
 """
 
 
-def find_optimizer_maxiter(
-  domain, acquisition_function, num_multistarts, optimizer_name
-):
+def find_optimizer_maxiter(domain, acquisition_function, num_multistarts, optimizer_name):
   num_points_sampled_interval = 40
   # TODO(RTL-27): Revisit these iterations tables to improve efficiency.
   es_iteration_table = [
@@ -123,20 +121,11 @@ def find_optimizer_maxiter(
   dim = domain.dim
   num_points_sampled = len(acquisition_function.predictor.points_sampled)
 
-  if (
-    dim > len(iteration_table)
-    or num_points_sampled > len(iteration_table[0]) * num_points_sampled_interval
-  ):
-    maxiter = (
-      GD_ITERATIONS_BEYOND_TABLE
-      if optimizer_name in GRADIENT_BASED_OPTIMIZERS
-      else ES_ITERATIONS_BEYOND_TABLE
-    )
+  if dim > len(iteration_table) or num_points_sampled > len(iteration_table[0]) * num_points_sampled_interval:
+    maxiter = GD_ITERATIONS_BEYOND_TABLE if optimizer_name in GRADIENT_BASED_OPTIMIZERS else ES_ITERATIONS_BEYOND_TABLE
   else:
     # dim and num_points_sampled are 1 indexed.
-    maxiter = iteration_table[dim - 1][
-      (num_points_sampled - 1) // num_points_sampled_interval
-    ]
+    maxiter = iteration_table[dim - 1][(num_points_sampled - 1) // num_points_sampled_interval]
 
   return maxiter
 
@@ -196,9 +185,7 @@ def constant_liar_acquisition_function_optimization(
       optimizer_parameters=DEFAULT_NEXT_POINTS_GB_OPTIMIZER_INFO.parameters,
       maxiter=gd_maxiter,
     )
-    next_point = vectorized_acquisition_optimization(
-      es_af_optimizer, gd_af_optimizer, pretest_locations
-    )
+    next_point = vectorized_acquisition_optimization(es_af_optimizer, gd_af_optimizer, pretest_locations)
     assert next_point.shape == (af.dim,)
     af.append_lie_locations(numpy.atleast_2d(next_point))
     next_points.append(next_point)
@@ -209,9 +196,7 @@ def constant_liar_acquisition_function_optimization(
   return numpy.array(next_points), optimizer_info_dict
 
 
-def vectorized_acquisition_optimization(
-  es_af_optimizer, gd_af_optimizer, pretest_locations
-):
+def vectorized_acquisition_optimization(es_af_optimizer, gd_af_optimizer, pretest_locations):
   random_af_values = es_af_optimizer.af.evaluate_at_point_list(
     pretest_locations,
     batch_size=DEFAULT_MAX_SIMULTANEOUS_EI_POINTS,
@@ -219,9 +204,7 @@ def vectorized_acquisition_optimization(
   best_af_location = pretest_locations[numpy.argmax(random_af_values), :]
   best_observed_location = es_af_optimizer.af.best_location
 
-  best_es_result, all_es_results = es_af_optimizer.optimize(
-    numpy.vstack((best_af_location, best_observed_location))
-  )
+  best_es_result, all_es_results = es_af_optimizer.optimize(numpy.vstack((best_af_location, best_observed_location)))
   random_near_best_es_result = es_af_optimizer.domain.generate_random_points_near_point(
     DEFAULT_NEXT_POINTS_GB_OPTIMIZER_INFO.num_random_samples,
     best_es_result,

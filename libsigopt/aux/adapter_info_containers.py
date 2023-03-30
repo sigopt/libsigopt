@@ -48,10 +48,7 @@ class MetricsInfo:
   def has_optimized_metric_thresholds(self):
     if len(self.optimized_metrics_index) == 0:
       return False
-    return any(
-      self.user_specified_thresholds[i] is not None
-      for i in self.optimized_metrics_index
-    )
+    return any(self.user_specified_thresholds[i] is not None for i in self.optimized_metrics_index)
 
 
 @dataclass(slots=True)

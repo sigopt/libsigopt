@@ -29,19 +29,11 @@ class TestExpectedImprovement(GaussianProcessTestCase):
   def _check_ei_symmetry(cls, ei_eval, point_to_sample, shifts):
     """Compute ei at each ``[point_to_sample +/- shift for shift in shifts]`` and check for equality."""
     for shift in shifts:
-      left_ei = ei_eval.evaluate_at_point_list(
-        numpy.atleast_2d(point_to_sample - shift)
-      )[0]
-      left_grad_ei = ei_eval.evaluate_grad_at_point_list(
-        numpy.atleast_2d(point_to_sample - shift)
-      )[0]
+      left_ei = ei_eval.evaluate_at_point_list(numpy.atleast_2d(point_to_sample - shift))[0]
+      left_grad_ei = ei_eval.evaluate_grad_at_point_list(numpy.atleast_2d(point_to_sample - shift))[0]
 
-      right_ei = ei_eval.evaluate_at_point_list(
-        numpy.atleast_2d(point_to_sample + shift)
-      )[0]
-      right_grad_ei = ei_eval.evaluate_grad_at_point_list(
-        numpy.atleast_2d(point_to_sample + shift)
-      )[0]
+      right_ei = ei_eval.evaluate_at_point_list(numpy.atleast_2d(point_to_sample + shift))[0]
+      right_grad_ei = ei_eval.evaluate_grad_at_point_list(numpy.atleast_2d(point_to_sample + shift))[0]
 
       cls.assert_scalar_within_relative(left_ei, right_ei, 5.0e-15)
       cls.assert_vector_within_relative(left_grad_ei, -right_grad_ei, 5.0e-15)
@@ -86,16 +78,10 @@ class TestExpectedImprovement(GaussianProcessTestCase):
   def test_best_value_and_location(self, gaussian_process_list):
     for gaussian_process in gaussian_process_list:
       ei = ExpectedImprovement(gaussian_process)
-      self.assert_scalar_within_relative(
-        ei.best_value, gaussian_process.best_observed_value, 1.0e-14
-      )
-      self.assert_vector_within_relative(
-        ei.best_location, gaussian_process.best_observed_location, 1.0e-14
-      )
+      self.assert_scalar_within_relative(ei.best_value, gaussian_process.best_observed_value, 1.0e-14)
+      self.assert_vector_within_relative(ei.best_location, gaussian_process.best_observed_location, 1.0e-14)
 
-  def test_evaluate_ei_at_points_for_base_ei(
-    self, one_hot_domain_list, gaussian_process_list
-  ):
+  def test_evaluate_ei_at_points_for_base_ei(self, one_hot_domain_list, gaussian_process_list):
     domain, gaussian_process = one_hot_domain_list[-1], gaussian_process_list[-1]
 
     ei_eval = ExpectedImprovement(gaussian_process)
@@ -123,9 +109,7 @@ class TestExpectedImprovement(GaussianProcessTestCase):
         )
         assert (
           ei_eval.evaluate_at_point_list(
-            numpy.reshape(
-              points_to_sample, (1, ei_eval.num_points_to_sample, ei_eval.dim)
-            )
+            numpy.reshape(points_to_sample, (1, ei_eval.num_points_to_sample, ei_eval.dim))
           )[0]
           >= 0
         )
@@ -133,12 +117,8 @@ class TestExpectedImprovement(GaussianProcessTestCase):
       num_points_to_sample = 3
       num_points_to_evaluate = 6
       points_being_sampled = all_points[:4]
-      points_to_sample = domain.generate_quasi_random_points_in_domain(
-        num_points_to_sample * num_points_to_evaluate
-      )
-      points_to_sample = points_to_sample.reshape(
-        num_points_to_evaluate, num_points_to_sample, domain.dim
-      )
+      points_to_sample = domain.generate_quasi_random_points_in_domain(num_points_to_sample * num_points_to_evaluate)
+      points_to_sample = points_to_sample.reshape(num_points_to_evaluate, num_points_to_sample, domain.dim)
       ei_eval = ExpectedParallelImprovement(
         gaussian_process,
         num_points_to_sample,
@@ -158,12 +138,8 @@ class TestExpectedImprovement(GaussianProcessTestCase):
     for domain, gaussian_process in zip(
       one_hot_domain_list[:1], gaussian_process_list[:1]
     ):  # Can do more, time permitting
-      points_being_sampled = domain.generate_quasi_random_points_in_domain(
-        num_points_being_sampled
-      )
-      points_to_sample = domain.generate_quasi_random_points_in_domain(
-        num_points_to_sample
-      )
+      points_being_sampled = domain.generate_quasi_random_points_in_domain(num_points_being_sampled)
+      points_to_sample = domain.generate_quasi_random_points_in_domain(num_points_to_sample)
 
       ei_eval = ExpectedParallelImprovement(
         gaussian_process,
@@ -180,9 +156,7 @@ class TestExpectedImprovement(GaussianProcessTestCase):
 
         mc_results = [
           ei_eval.evaluate_at_point_list(
-            numpy.reshape(
-              points_to_sample, (1, ei_eval.num_points_to_sample, ei_eval.dim)
-            )
+            numpy.reshape(points_to_sample, (1, ei_eval.num_points_to_sample, ei_eval.dim))
           )[0]
           for _ in range(num_random_tests)
         ]
@@ -190,9 +164,7 @@ class TestExpectedImprovement(GaussianProcessTestCase):
 
         mc_results = [
           ei_eval.evaluate_at_point_list(
-            numpy.reshape(
-              points_to_sample, (1, ei_eval.num_points_to_sample, ei_eval.dim)
-            )
+            numpy.reshape(points_to_sample, (1, ei_eval.num_points_to_sample, ei_eval.dim))
           )[0]
           for _ in range(num_random_tests)
         ]
@@ -210,12 +182,8 @@ class TestExpectedImprovement(GaussianProcessTestCase):
         """
     numpy.random.seed(3148)
     dim = 3
-    domain = self.form_continous_and_uniform_domain(
-      dim=dim, lower_element=-2, higher_element=2
-    )
-    gaussian_process = self.form_gaussian_process_and_data(
-      domain=domain, num_sampled=50, noise_per_point=0.002
-    )
+    domain = self.form_continous_and_uniform_domain(dim=dim, lower_element=-2, higher_element=2)
+    gaussian_process = self.form_gaussian_process_and_data(domain=domain, num_sampled=50, noise_per_point=0.002)
 
     tolerance = 1.0e-6
 
@@ -234,9 +202,7 @@ class TestExpectedImprovement(GaussianProcessTestCase):
     # Check that gradients are small or that the answer is on a boundary
     gradient = ei_eval.evaluate_grad_at_point_list(numpy.atleast_2d(best_point))
     if not expanded_domain.check_point_on_boundary(best_point, tol=1e-3):
-      self.assert_vector_within_relative(
-        gradient, numpy.zeros(gradient.shape), tolerance
-      )
+      self.assert_vector_within_relative(gradient, numpy.zeros(gradient.shape), tolerance)
 
     # Check that output is in the domain
     assert expanded_domain.check_point_acceptable(best_point) is True
@@ -249,9 +215,7 @@ class TestExpectedImprovementWithFailures(GaussianProcessTestCase):
     gaussian_process_list,
     probabilistic_failures_list,
   ):
-    for domain, gp, pf in zip(
-      one_hot_domain_list, gaussian_process_list, probabilistic_failures_list
-    ):
+    for domain, gp, pf in zip(one_hot_domain_list, gaussian_process_list, probabilistic_failures_list):
       ei = ExpectedImprovement(gp)
       eif = ExpectedImprovementWithFailures(gp, pf)
       pts = domain.generate_quasi_random_points_in_domain(50)
@@ -268,9 +232,7 @@ class TestExpectedImprovementWithFailures(GaussianProcessTestCase):
   ):
     h = 1e-6
     n_test = 50
-    for domain, gp, pf in zip(
-      one_hot_domain_list, gaussian_process_list, probabilistic_failures_list
-    ):
+    for domain, gp, pf in zip(one_hot_domain_list, gaussian_process_list, probabilistic_failures_list):
       eif = ExpectedImprovementWithFailures(gp, pf)
       pts = domain.generate_quasi_random_points_in_domain(n_test)
       self.check_gradient_with_finite_difference(

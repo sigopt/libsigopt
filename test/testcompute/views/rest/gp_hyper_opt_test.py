@@ -71,9 +71,7 @@ class TestCategoricalTools(NumericalTestCase):
     for db in hp_domain.domain_bounds[2:5]:
       assert db[0] == discrete_lower_limit
     assert hp_domain.domain_bounds[6][0] >= discrete_lower_limit
-    assert hp_domain.domain_bounds[-1][0] == QUANTIZED_LENGTH_SCALE_LOWER_FACTOR * (
-      5 - 3
-    )
+    assert hp_domain.domain_bounds[-1][0] == QUANTIZED_LENGTH_SCALE_LOWER_FACTOR * (5 - 3)
 
     hp_domain_log = form_one_hot_hyperparameter_domain(
       categorical_domain=domain,
@@ -97,9 +95,7 @@ class TestCategoricalTools(NumericalTestCase):
       select_hyper_opt_in_log_domain=False,
     )
     assert hp_domain_tikhonov.dim == 10
-    for db, db_tik in zip(
-      hp_domain.domain_bounds, hp_domain_tikhonov.domain_bounds[:-1]
-    ):
+    for db, db_tik in zip(hp_domain.domain_bounds, hp_domain_tikhonov.domain_bounds[:-1]):
       assert db[0] == db_tik[0] and db[1] == db_tik[1]
 
     hp_domain_tikhonov_task = form_one_hot_hyperparameter_domain(
@@ -111,9 +107,7 @@ class TestCategoricalTools(NumericalTestCase):
       select_hyper_opt_in_log_domain=False,
     )
     assert hp_domain_tikhonov_task.dim == 11
-    for db, db_tt in zip(
-      hp_domain.domain_bounds, hp_domain_tikhonov_task.domain_bounds[:-2]
-    ):
+    for db, db_tt in zip(hp_domain.domain_bounds, hp_domain_tikhonov_task.domain_bounds[:-2]):
       assert db[0] == db_tt[0] and db[1] == db_tt[1]
     db_tik = hp_domain_tikhonov.domain_bounds[-1]
     db_tt = hp_domain_tikhonov_task.domain_bounds[-1]
@@ -341,9 +335,7 @@ class TestCategoricalTools(NumericalTestCase):
       num_tasks=0,
     )
     view_input, domain = zs.form_gp_hyper_opt_categorical_inputs()
-    view_input["points_sampled"].values = 3.14 * numpy.ones_like(
-      view_input["points_sampled"].values
-    )
+    view_input["points_sampled"].values = 3.14 * numpy.ones_like(view_input["points_sampled"].values)
     old_hyperparameter_dict = deepcopy(view_input["model_info"].hyperparameters)
 
     response = GpHyperOptMultimetricView(view_input).call()

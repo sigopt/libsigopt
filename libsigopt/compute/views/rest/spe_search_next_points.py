@@ -29,13 +29,9 @@ class SPESearchNextPoints(View):
   def initilization_sequence(self):
     num_to_sample = self.params["num_to_sample"]
     if self.domain.priors and not self.domain.constraint_list:
-      suggested_points = self.domain.generate_random_points_according_to_priors(
-        num_to_sample
-      )
+      suggested_points = self.domain.generate_random_points_according_to_priors(num_to_sample)
     else:
-      suggested_points = self.domain.generate_quasi_random_points_in_domain(
-        num_to_sample
-      )
+      suggested_points = self.domain.generate_quasi_random_points_in_domain(num_to_sample)
     results = {
       "endpoint": self.view_name,
       "points_to_sample": suggested_points,
@@ -54,11 +50,7 @@ class SPESearchNextPoints(View):
     if len(self.constraint_metrics_index) == 1:
       return self.single_metric_spe_next_points()
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
-    constraint_metrics = [
-      i
-      for i in self.params["metrics_info"].constraint_metrics_index
-      if i != optimized_metric
-    ]
+    constraint_metrics = [i for i in self.params["metrics_info"].constraint_metrics_index if i != optimized_metric]
     view_input = deepcopy(self.params)
     view_input["metrics_info"].optimized_metrics_index = [optimized_metric]
     view_input["metrics_info"].constraint_metrics_index = constraint_metrics
@@ -82,20 +74,16 @@ class SPESearchNextPoints(View):
       gamma=gamma,
       forget_factor=0,
     )
-    metric_constraints_violations = (
-      identify_scaled_values_exceeding_scaled_upper_thresholds(
-        self.points_sampled_for_pf_values,
-        self.constraint_thresholds,
-      )
+    metric_constraints_violations = identify_scaled_values_exceeding_scaled_upper_thresholds(
+      self.points_sampled_for_pf_values,
+      self.constraint_thresholds,
     )
     # HACK: Manually force the split of lower and greater points based on user thresholds
     observation_count, dim = one_hot_points_sampled_points.shape
     if observation_count - sum(metric_constraints_violations) > dim:
       spe.lower_points = one_hot_points_sampled_points[~metric_constraints_violations]
       spe.greater_points = one_hot_points_sampled_points[metric_constraints_violations]
-      spe.gamma = sum(metric_constraints_violations) / len(
-        metric_constraints_violations
-      )
+      spe.gamma = sum(metric_constraints_violations) / len(metric_constraints_violations)
     lower_covariance = SPENextPoints.form_one_hot_covariance(
       C4RadialMatern,
       self.domain,
@@ -126,9 +114,7 @@ class SPESearchNextPoints(View):
       self.domain,
       proposal_std=0.1,
     )
-    suggested_points = self.domain.map_one_hot_points_to_categorical(
-      oh_suggested_points
-    )
+    suggested_points = self.domain.map_one_hot_points_to_categorical(oh_suggested_points)
     return suggested_points
 
   def get_search_phase(self):

@@ -62,9 +62,7 @@ def generate_disclaimer(filetype):
   )
 
 
-DISCLAIMERS_BY_FILETYPE = {
-  filetype: generate_disclaimer(filetype) for filetype in FILETYPES
-}
+DISCLAIMERS_BY_FILETYPE = {filetype: generate_disclaimer(filetype) for filetype in FILETYPES}
 
 
 def file_has_disclaimer(filename, filetype, verbose=False):
@@ -148,10 +146,7 @@ if __name__ == "__main__":
   if args.fix_in_place:
     missing = fix_all(missing, verbose=args.verbose)
   if missing:
-    print(
-      "\nThe following files failed the copyright + license check:\n\t"
-      + "\n\t".join(f for f in missing)
-    )
+    print("\nThe following files failed the copyright + license check:\n\t" + "\n\t".join(f for f in missing))
     sys.exit(1)
   else:
     if args.verbose:

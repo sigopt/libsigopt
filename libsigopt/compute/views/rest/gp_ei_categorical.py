@@ -13,9 +13,7 @@ class GpEiCategoricalView(GPView):
   view_name = "gp_ei_categorical"
 
   def view(self):
-    assert (
-      self.has_optimization_metrics
-    ), f"{self.view_name} must have optimization metrics"
+    assert self.has_optimization_metrics, f"{self.view_name} must have optimization metrics"
     max_simultaneous_af_points = self.params["model_info"].max_simultaneous_af_points
     parallelism = self.params["parallelism"]
 
@@ -29,14 +27,10 @@ class GpEiCategoricalView(GPView):
       use_parallel_ei=use_parallel_ei,
     )
     if self.task_cost_populated:
-      expected_improvement_evaluator = MultitaskAcquisitionFunction(
-        expected_improvement_evaluator
-      )
+      expected_improvement_evaluator = MultitaskAcquisitionFunction(expected_improvement_evaluator)
 
     if use_parallel_ei:
-      max_simultaneous_af_points = min(
-        max_simultaneous_af_points, DEFAULT_MAX_SIMULTANEOUS_QEI_POINTS
-      )
+      max_simultaneous_af_points = min(max_simultaneous_af_points, DEFAULT_MAX_SIMULTANEOUS_QEI_POINTS)
     expected_improvement = expected_improvement_evaluator.evaluate_at_point_list(
       self.one_hot_points_to_evaluate_points,
       batch_size=max_simultaneous_af_points,

@@ -12,18 +12,14 @@ from libsigopt.aux.constant import (
 from libsigopt.compute.domain import CategoricalDomain
 
 
-def form_random_unconstrained_categorical_domain(
-  dim, categoricals_allowed=True, quantized_allowed=True
-):
+def form_random_unconstrained_categorical_domain(dim, categoricals_allowed=True, quantized_allowed=True):
   domain_components = []
   for _ in range(dim):
     if numpy.random.random() < 0.1 and quantized_allowed:
       domain_components.append(
         {
           "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
-          "elements": list(
-            sorted(numpy.random.choice(50, 4, replace=False) / 10 - 2.2)
-          ),
+          "elements": list(sorted(numpy.random.choice(50, 4, replace=False) / 10 - 2.2)),
         }
       )
     elif numpy.random.random() < 0.25 and categoricals_allowed:
@@ -35,9 +31,7 @@ def form_random_unconstrained_categorical_domain(
       )
     elif numpy.random.random() < 0.5:
       bounds = [numpy.random.randint(-10, 0), numpy.random.randint(0, 10)]
-      domain_components.append(
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": bounds}
-      )
+      domain_components.append({"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": bounds})
     else:
       random_number = numpy.random.random()
       if random_number < 0.333:
@@ -55,9 +49,7 @@ def form_random_unconstrained_categorical_domain(
   return CategoricalDomain(domain_components)
 
 
-def form_random_constrained_categorical_domain(
-  n_double_param=5, n_int_param=5, n_cat_param=1, n_quantized_param=1
-):
+def form_random_constrained_categorical_domain(n_double_param=5, n_int_param=5, n_cat_param=1, n_quantized_param=1):
   assert n_double_param >= 5
   assert n_int_param >= 5
   assert n_cat_param >= 1
@@ -67,9 +59,7 @@ def form_random_constrained_categorical_domain(
   numpy.random.shuffle(idx_shuffled)
   idx_double = idx_shuffled[0:n_double_param]
   idx_int = idx_shuffled[n_double_param : n_double_param + n_int_param]
-  idx_cat = idx_shuffled[
-    n_double_param + n_int_param : n_double_param + n_int_param + n_cat_param
-  ]
+  idx_cat = idx_shuffled[n_double_param + n_int_param : n_double_param + n_int_param + n_cat_param]
   idx_quantized = idx_shuffled[n_double_param + n_int_param + n_cat_param :]
 
   # Form domain components

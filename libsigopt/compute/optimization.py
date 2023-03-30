@@ -68,9 +68,7 @@ class MultistartOptimizer(Optimizer):
         """
     if selected_starts is None:
       if self.num_multistarts < 1:
-        raise ValueError(
-          "You must either specify starting locations or how many to create randomly."
-        )
+        raise ValueError("You must either specify starting locations or how many to create randomly.")
       selected_starts = numpy.empty((0, self.optimizer.dim))
     num_extra_starts = self.num_multistarts - len(selected_starts)
     if num_extra_starts <= 0:
@@ -83,9 +81,7 @@ class MultistartOptimizer(Optimizer):
       try:
         initial_starts = numpy.concatenate((selected_starts, extra_starts), axis=0)
       except ValueError as e:
-        raise ValueError(
-          f"selected_starts {selected_starts}\n extra_starts {extra_starts}"
-        ) from e
+        raise ValueError(f"selected_starts {selected_starts}\n extra_starts {extra_starts}") from e
     backup_starts = self.optimizer.domain.generate_quasi_random_points_in_domain(
       NUM_BACKUP_MULTISTARTS,
       self.log_sample,
@@ -128,9 +124,7 @@ class MultistartOptimizer(Optimizer):
           best_point = point
           continue
         best_point = end_point
-        best_function_value = (
-          function_value if not numpy.isnan(function_value) else best_function_value
-        )
+        best_function_value = function_value if not numpy.isnan(function_value) else best_function_value
 
       if self.num_multistarts == 0:
         if len(function_value_list) == len(selected_starts):
@@ -173,9 +167,7 @@ class _ScipyOptimizerWrapper(Optimizer):
     self.optimization_results = None
 
     if optimizer_parameters is None:
-      optimizer_parameters = OPTIMIZATION_PARAMETERS_TO_DEFAULTS[
-        self.optimizer_parameters_type
-      ]
+      optimizer_parameters = OPTIMIZATION_PARAMETERS_TO_DEFAULTS[self.optimizer_parameters_type]
     if not isinstance(optimizer_parameters, self.optimizer_parameters_type):
       raise TypeError(
         f"optimization_paramters is of type: {optimizer_parameters.__class__},"
@@ -224,21 +216,15 @@ class LBFGSBOptimizer(_ScipyOptimizerWrapper):
 
   def __init__(self, domain, optimizable, optimizer_parameters=None):
     super().__init__(domain, optimizable, optimizer_parameters)
-    if not (
-      self.objective_function.differentiable or self.optimizer_parameters.approx_grad
-    ):
-      raise AttributeError(
-        "For L-BFGS-B you must either provide the gradient, or request an approximation"
-      )
+    if not (self.objective_function.differentiable or self.optimizer_parameters.approx_grad):
+      raise AttributeError("For L-BFGS-B you must either provide the gradient, or request an approximation")
 
   def _optimize(self, **kwargs):
     options = self.optimizer_parameters.scipy_kwargs()
     approx_grad = options.pop("approx_grad")
     if approx_grad:
       return scipy.optimize.minimize(
-        fun=self._scipy_decorator(
-          self.objective_function.compute_objective_function, **kwargs
-        ),
+        fun=self._scipy_decorator(self.objective_function.compute_objective_function, **kwargs),
         x0=self.objective_function.current_point.flatten(),
         method="L-BFGS-B",
         bounds=self.domain.domain_bounds,
@@ -262,21 +248,15 @@ class SLSQPOptimizer(_ScipyOptimizerWrapper):
 
   def __init__(self, domain, optimizable, optimizer_parameters=None):
     super().__init__(domain, optimizable, optimizer_parameters)
-    if not (
-      self.objective_function.differentiable or self.optimizer_parameters.approx_grad
-    ):
-      raise AttributeError(
-        "For SLSQP you must either provide the gradient, or request an approximation"
-      )
+    if not (self.objective_function.differentiable or self.optimizer_parameters.approx_grad):
+      raise AttributeError("For SLSQP you must either provide the gradient, or request an approximation")
 
   def _optimize(self, **kwargs):
     options = self.optimizer_parameters.scipy_kwargs()
     approx_grad = options.pop("approx_grad")
     if approx_grad:
       return scipy.optimize.minimize(
-        fun=self._scipy_decorator(
-          self.objective_function.compute_objective_function, **kwargs
-        ),
+        fun=self._scipy_decorator(self.objective_function.compute_objective_function, **kwargs),
         x0=self.objective_function.current_point.flatten(),
         method="SLSQP",
         bounds=self.domain.domain_bounds,

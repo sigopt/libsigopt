@@ -97,9 +97,7 @@ class TestNumericalTestCase(NumericalTestCase):
       (6.11198633e-07, 6.11197879e-07, 1e-6, True),
     ],
   )
-  def test_assert_vector_row_wise_norm_is_close(
-    self, value, truth, tol, expected_to_pass
-  ):
+  def test_assert_vector_row_wise_norm_is_close(self, value, truth, tol, expected_to_pass):
     n = 12
     dim = 5
     random_vector = numpy.zeros((n, dim))
@@ -112,6 +110,4 @@ class TestNumericalTestCase(NumericalTestCase):
       self.assert_vector_row_wise_norm_is_close(value_vector, truth_vector, tol, norm=1)
     else:
       with pytest.raises(AssertionError):
-        self.assert_vector_row_wise_norm_is_close(
-          value_vector, truth_vector, tol, norm=1
-        )
+        self.assert_vector_row_wise_norm_is_close(value_vector, truth_vector, tol, norm=1)

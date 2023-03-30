@@ -27,7 +27,7 @@ repos:
     hooks:
       - id: pylint
         name: pylint
-        entry: pylint
+        entry: env PYTHONPATH=./test pylint
         language: system
         types: [python]
         args: ["-rn", "-sn"]

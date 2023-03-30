@@ -1,3 +1,5 @@
+ci:
+  skip: [detect-aws-credentials, pylint]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
     rev: v4.4.0
@@ -23,7 +25,19 @@ repos:
     rev: sigopt-22.10.0
     hooks:
       - id: black
-  - repo: https://github.com/sigopt/libsigopt.git
-    rev: pre-commit-0.0.0
+  - repo: local
     hooks:
+      - id: pylint
+        name: pylint
+        entry: env PYTHONPATH=./test pylint
+        language: system
+        types: [python]
+        args: ["-rn", "-sn"]
       - id: apply-copyright-notice
+        name: Apply the copywright notice
+        description: This hook applies the copyright notice and license disclaimer to all files.
+        entry: tools/check_copyright_and_license_disclaimers.py --fix-in-place
+        language: python
+        types_or:
+          - markdown
+          - python

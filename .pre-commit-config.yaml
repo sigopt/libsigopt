@@ -9,3 +9,7 @@ repos:
     rev: sigopt-22.10.0
     hooks:
       - id: black
+  - repo: https://github.com/sigopt/libsigopt.git
+    rev: pre-commit-0.0.0
+    hooks:
+      - id: apply-copyright-notice

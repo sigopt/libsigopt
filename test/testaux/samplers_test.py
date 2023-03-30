@@ -16,7 +16,8 @@ class TestGridSampler(object):
     grid = generate_grid_points(points_per_dimension, domain_bounds)
 
     per_axis_grid = [
-      numpy.linspace(bounds[0], bounds[1], points_per_dimension[i]) for i, bounds in enumerate(domain_bounds)
+      numpy.linspace(bounds[0], bounds[1], points_per_dimension[i])
+      for i, bounds in enumerate(domain_bounds)
     ]
 
     # Loop ordering assumes the output is ordered a certain way.
@@ -24,7 +25,11 @@ class TestGridSampler(object):
       for j, x_coord in enumerate(per_axis_grid[0]):
         for k, z_coord in enumerate(per_axis_grid[2]):
           truth = numpy.array([x_coord, y_coord, z_coord])
-          index = i * per_axis_grid[2].size * per_axis_grid[0].size + j * per_axis_grid[2].size + k
+          index = (
+            i * per_axis_grid[2].size * per_axis_grid[0].size
+            + j * per_axis_grid[2].size
+            + k
+          )
           test = grid[index, ...]
           assert numpy.all(test == truth)
 
@@ -59,16 +64,22 @@ class TestLatinHypercubeSampler(object):
     points = generate_latin_hypercube_points(num_points, domain_bounds)
 
     for point in points:
-      assert numpy.all(point >= domain_bounds[:, 0]) and numpy.all(point <= domain_bounds[:, 1])
+      assert numpy.all(point >= domain_bounds[:, 0]) and numpy.all(
+        point <= domain_bounds[:, 1]
+      )
 
-    untunable_indexes = [i for i, interval in enumerate(domain_bounds) if interval[0] == interval[1]]
+    untunable_indexes = [
+      i for i, interval in enumerate(domain_bounds) if interval[0] == interval[1]
+    ]
     for index in untunable_indexes:
       assert points[-1][index] == domain_bounds[index][0]
       assert points[-1][index] == domain_bounds[index][1]
 
     for dim in range(len(domain_bounds)):
       # This size of each slice
-      sub_domain_width = (domain_bounds[dim, 1] - domain_bounds[dim, 0]) / float(num_points)
+      sub_domain_width = (domain_bounds[dim, 1] - domain_bounds[dim, 0]) / float(
+        num_points
+      )
       # Sort in dim dimension
       points = sorted(points, key=lambda points: points[dim])
       for i, point in enumerate(points):
@@ -102,21 +113,29 @@ class TestRandomSampler(object):
       generate_sobol_points,
     ],
   )
-  def test_random_points_within_domain(self, domain_bounds, num_points, random_generator):
+  def test_random_points_within_domain(
+    self, domain_bounds, num_points, random_generator
+  ):
     domain_bounds = numpy.asarray(domain_bounds)
     points = random_generator(num_points, domain_bounds)
 
     for point in points:
-      assert numpy.all(point >= domain_bounds[:, 0]) and numpy.all(point <= domain_bounds[:, 1])
+      assert numpy.all(point >= domain_bounds[:, 0]) and numpy.all(
+        point <= domain_bounds[:, 1]
+      )
 
-      untunable_indexes = [i for i, interval in enumerate(domain_bounds) if interval[0] == interval[1]]
+      untunable_indexes = [
+        i for i, interval in enumerate(domain_bounds) if interval[0] == interval[1]
+      ]
       for index in untunable_indexes:
         assert points[-1][index] == domain_bounds[index][0]
         assert points[-1][index] == domain_bounds[index][1]
 
 
 class TestConstrainedSamplers(object):
-  halfspaces = numpy.array([[1, 1, -1e-5], [-1, -0, 0], [1, 0, -1e2], [-0, -1, 0], [0, 1, -1e2]])
+  halfspaces = numpy.array(
+    [[1, 1, -1e-5], [-1, -0, 0], [1, 0, -1e2], [-0, -1, 0], [0, 1, -1e2]]
+  )
   A = halfspaces[:, :-1]
   b = -halfspaces[:, -1]
   x0, _, _ = find_interior_point(halfspaces)
@@ -139,7 +158,10 @@ class TestConstrainedSamplers(object):
 
   def test_rejection_with_padding_sampler(self):
     num_points = 100
-    samples, success = generate_uniform_random_points_rejection_sampling_with_hitandrun_padding(
+    (
+      samples,
+      success,
+    ) = generate_uniform_random_points_rejection_sampling_with_hitandrun_padding(
       num_points,
       self.domain_bounds,
       self.A,

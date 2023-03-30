@@ -14,9 +14,13 @@ from testcompute.zigopt_input_utils import ZigoptSimulator
 class TestSearchNextPoints(object):
   def assert_call_successful(self, zigopt_simulator, parallelism_method, domain=None):
     if domain:
-      view_input = zigopt_simulator.form_search_next_points_view_input_from_domain(domain, parallelism_method)
+      view_input = zigopt_simulator.form_search_next_points_view_input_from_domain(
+        domain, parallelism_method
+      )
     else:
-      view_input, domain = zigopt_simulator.form_search_next_points_categorical_inputs(parallelism_method)
+      view_input, domain = zigopt_simulator.form_search_next_points_categorical_inputs(
+        parallelism_method
+      )
 
     response = SearchNextPoints(view_input).call()
 
@@ -119,18 +123,31 @@ class TestSearchNextPoints(object):
     parallelism_method = PARALLEL_CONSTANT_LIAR
     view_input, _ = zs.form_search_next_points_categorical_inputs(parallelism_method)
 
-    with patch("libsigopt.compute.views.rest.search_next_points.GpNextPointsCategorical") as mock_gp_next_point:
+    with patch(
+      "libsigopt.compute.views.rest.search_next_points.GpNextPointsCategorical"
+    ) as mock_gp_next_point:
       search_next_point = SearchNextPoints(view_input)
       search_next_point.search_next_points_expected_improvement_with_failures()
 
       mock_gp_next_point_args, _ = mock_gp_next_point.call_args
 
-      gp_optimized_metrics_index = mock_gp_next_point_args[0]["metrics_info"].optimized_metrics_index
-      gp_constraint_metrics_index = mock_gp_next_point_args[0]["metrics_info"].constraint_metrics_index
-      gp_has_constraint_metrics = mock_gp_next_point_args[0]["metrics_info"].has_constraint_metrics
-      gp_has_optimization_metrics = mock_gp_next_point_args[0]["metrics_info"].has_optimization_metrics
+      gp_optimized_metrics_index = mock_gp_next_point_args[0][
+        "metrics_info"
+      ].optimized_metrics_index
+      gp_constraint_metrics_index = mock_gp_next_point_args[0][
+        "metrics_info"
+      ].constraint_metrics_index
+      gp_has_constraint_metrics = mock_gp_next_point_args[0][
+        "metrics_info"
+      ].has_constraint_metrics
+      gp_has_optimization_metrics = mock_gp_next_point_args[0][
+        "metrics_info"
+      ].has_optimization_metrics
 
-      assert gp_optimized_metrics_index not in view_input["metrics_info"].optimized_metrics_index
+      assert (
+        gp_optimized_metrics_index
+        not in view_input["metrics_info"].optimized_metrics_index
+      )
       assert len(gp_optimized_metrics_index) == 1
       assert len(gp_constraint_metrics_index) == num_constraint_metrics - 1
       expected_has_constraint_metrics = num_constraint_metrics > 1
@@ -182,18 +199,31 @@ class TestSearchNextPoints(object):
     parallelism_method = PARALLEL_CONSTANT_LIAR
     view_input, _ = zs.form_search_next_points_categorical_inputs(parallelism_method)
 
-    with patch("libsigopt.compute.views.rest.search_next_points.GpNextPointsCategorical") as mock_gp_next_point:
+    with patch(
+      "libsigopt.compute.views.rest.search_next_points.GpNextPointsCategorical"
+    ) as mock_gp_next_point:
       search_next_point = SearchNextPoints(view_input)
       search_next_point.search_next_points_expected_improvement()
 
       mock_gp_next_point_args, _ = mock_gp_next_point.call_args
 
-      gp_optimized_metrics_index = mock_gp_next_point_args[0]["metrics_info"].optimized_metrics_index
-      gp_constraint_metrics_index = mock_gp_next_point_args[0]["metrics_info"].constraint_metrics_index
-      gp_has_constraint_metrics = mock_gp_next_point_args[0]["metrics_info"].has_constraint_metrics
-      gp_has_optimization_metrics = mock_gp_next_point_args[0]["metrics_info"].has_optimization_metrics
+      gp_optimized_metrics_index = mock_gp_next_point_args[0][
+        "metrics_info"
+      ].optimized_metrics_index
+      gp_constraint_metrics_index = mock_gp_next_point_args[0][
+        "metrics_info"
+      ].constraint_metrics_index
+      gp_has_constraint_metrics = mock_gp_next_point_args[0][
+        "metrics_info"
+      ].has_constraint_metrics
+      gp_has_optimization_metrics = mock_gp_next_point_args[0][
+        "metrics_info"
+      ].has_optimization_metrics
 
-      assert gp_optimized_metrics_index not in view_input["metrics_info"].optimized_metrics_index
+      assert (
+        gp_optimized_metrics_index
+        not in view_input["metrics_info"].optimized_metrics_index
+      )
       assert len(gp_optimized_metrics_index) == 1
       assert len(gp_constraint_metrics_index) == 0
       assert gp_has_constraint_metrics is False
@@ -202,7 +232,9 @@ class TestSearchNextPoints(object):
 
   @pytest.mark.parametrize("num_optimized_metrics", [1, 2, 5])
   @pytest.mark.parametrize("num_constraint_metrics", [1, 2])
-  def test_invalid_num_optimized_metric(self, num_optimized_metrics, num_constraint_metrics):
+  def test_invalid_num_optimized_metric(
+    self, num_optimized_metrics, num_constraint_metrics
+  ):
     zs = ZigoptSimulator(
       dim=2,
       num_sampled=15,

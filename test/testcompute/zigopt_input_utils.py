@@ -3,10 +3,21 @@
 # SPDX-License-Identifier: Apache License 2.0
 import numpy
 
-from libsigopt.aux.adapter_info_containers import DomainInfo, GPModelInfo, MetricsInfo, PointsContainer
-from libsigopt.aux.constant import CATEGORICAL_EXPERIMENT_PARAMETER_NAME, TASK_SELECTION_STRATEGY_A_PRIORI
+from libsigopt.aux.adapter_info_containers import (
+  DomainInfo,
+  GPModelInfo,
+  MetricsInfo,
+  PointsContainer,
+)
+from libsigopt.aux.constant import (
+  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+  TASK_SELECTION_STRATEGY_A_PRIORI,
+)
 from libsigopt.compute.domain import ContinuousDomain
-from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE, NONZERO_MEAN_CUSTOM_MEAN_TYPE
+from libsigopt.compute.misc.constant import (
+  NONZERO_MEAN_CONSTANT_MEAN_TYPE,
+  NONZERO_MEAN_CUSTOM_MEAN_TYPE,
+)
 from testaux.utils import form_random_unconstrained_categorical_domain
 
 
@@ -15,7 +26,9 @@ TEST_FAILURE_PROB = 0.1
 
 
 # TODO(RTL-96): Clean this up to have a minimum number of points in the domain
-def form_random_hyperparameter_dict(domain, use_tikhonov=False, add_task_length=False, num_metrics=1):
+def form_random_hyperparameter_dict(
+  domain, use_tikhonov=False, add_task_length=False, num_metrics=1
+):
   list_of_hyperparameter_dict = []
   for _ in range(num_metrics):
     alpha = numpy.random.gamma(1, 0.1)
@@ -24,9 +37,13 @@ def form_random_hyperparameter_dict(domain, use_tikhonov=False, add_task_length=
     length_scales = []
     for dc in domain:
       if dc["var_type"] == CATEGORICAL_EXPERIMENT_PARAMETER_NAME:
-        length_scales.append(numpy.random.uniform(0.5, 2.0, len(dc["elements"])).tolist())
+        length_scales.append(
+          numpy.random.uniform(0.5, 2.0, len(dc["elements"])).tolist()
+        )
       else:
-        length_scales.append([numpy.random.gamma(1, 0.1) * (dc["elements"][1] - dc["elements"][0])])
+        length_scales.append(
+          [numpy.random.gamma(1, 0.1) * (dc["elements"][1] - dc["elements"][0])]
+        )
     list_of_hyperparameter_dict.append(
       {
         "alpha": alpha,
@@ -63,7 +80,9 @@ def form_model_info(
     ),
     max_simultaneous_af_points=5432,
     nonzero_mean_info=form_nonzero_mean_data(domain.dim, nonzero_mean_type),
-    task_selection_strategy=TASK_SELECTION_STRATEGY_A_PRIORI if task_options.size else None,
+    task_selection_strategy=TASK_SELECTION_STRATEGY_A_PRIORI
+    if task_options.size
+    else None,
   )
 
 
@@ -97,14 +116,18 @@ def form_points_sampled(
     values=values,
     value_vars=numpy.full_like(values, noise_per_point),
     failures=failures,
-    task_costs=numpy.random.choice(task_options, size=failures.shape) if task_options.size else None,
+    task_costs=numpy.random.choice(task_options, size=failures.shape)
+    if task_options.size
+    else None,
   )
 
 
 def form_points_being_sampled(domain, num_points_being_sampled, task_options=None):
   return PointsContainer(
     points=domain.generate_quasi_random_points_in_domain(num_points_being_sampled),
-    task_costs=numpy.random.choice(task_options, size=num_points_being_sampled) if task_options.size else None,
+    task_costs=numpy.random.choice(task_options, size=num_points_being_sampled)
+    if task_options.size
+    else None,
   )
 
 
@@ -122,11 +145,17 @@ def form_metrics_info(
   num_metrics = num_optimized_metrics + num_constraint_metrics + num_stored_metrics
   shuffled_index = numpy.random.permutation(numpy.arange(num_metrics, dtype=int))
   optimized_metrics_index = shuffled_index[:num_optimized_metrics]
-  constraint_metrics_index = shuffled_index[num_optimized_metrics : num_optimized_metrics + num_constraint_metrics]
+  constraint_metrics_index = shuffled_index[
+    num_optimized_metrics : num_optimized_metrics + num_constraint_metrics
+  ]
 
   user_specified_thresholds = numpy.full(num_metrics, numpy.nan)
-  assert optimized_metric_thresholds is None or num_optimized_metrics == len(optimized_metric_thresholds)
-  assert constraint_metric_thresholds is None or num_constraint_metrics == len(constraint_metric_thresholds)
+  assert optimized_metric_thresholds is None or num_optimized_metrics == len(
+    optimized_metric_thresholds
+  )
+  assert constraint_metric_thresholds is None or num_constraint_metrics == len(
+    constraint_metric_thresholds
+  )
   if optimized_metric_thresholds is not None:
     user_specified_thresholds[optimized_metrics_index] = optimized_metric_thresholds
   if constraint_metric_thresholds is not None:
@@ -173,7 +202,9 @@ class ZigoptSimulator(object):
     self.num_being_sampled = num_being_sampled
     self.nonzero_mean_type = nonzero_mean_type
     self.noise_per_point = noise_per_point
-    self.num_metrics = num_optimized_metrics + num_constraint_metrics + num_stored_metrics
+    self.num_metrics = (
+      num_optimized_metrics + num_constraint_metrics + num_stored_metrics
+    )
     self.use_tikhonov = use_tikhonov
     self.failure_prob = failure_prob
     self.metric_objectives = metric_objectives
@@ -185,7 +216,9 @@ class ZigoptSimulator(object):
     self.num_tasks = num_tasks
 
   def form_gp_ei_categorical_inputs(self, parallelism_method):
-    task_options = numpy.sort(numpy.random.random(self.num_tasks) if self.num_tasks else [])
+    task_options = numpy.sort(
+      numpy.random.random(self.num_tasks) if self.num_tasks else []
+    )
     domain = form_random_unconstrained_categorical_domain(self.dim)
     points_sampled = form_points_sampled(
       domain,
@@ -195,7 +228,9 @@ class ZigoptSimulator(object):
       task_options,
       failure_prob=self.failure_prob,
     )
-    points_to_evaluate = form_points_to_evaluate(domain, self.num_to_sample, task_options=task_options)
+    points_to_evaluate = form_points_to_evaluate(
+      domain, self.num_to_sample, task_options=task_options
+    )
     points_being_sampled = form_points_being_sampled(
       domain,
       self.num_being_sampled,
@@ -231,7 +266,9 @@ class ZigoptSimulator(object):
     return view_input
 
   def form_gp_next_points_view_input_from_domain(self, domain, parallelism_method):
-    task_options = numpy.sort(numpy.random.random(self.num_tasks) if self.num_tasks else [])
+    task_options = numpy.sort(
+      numpy.random.random(self.num_tasks) if self.num_tasks else []
+    )
     points_sampled = form_points_sampled(
       domain,
       self.num_sampled,
@@ -275,20 +312,28 @@ class ZigoptSimulator(object):
 
   def form_gp_next_points_categorical_inputs(self, parallelism_method):
     domain = form_random_unconstrained_categorical_domain(self.dim)
-    view_input = self.form_gp_next_points_view_input_from_domain(domain, parallelism_method)
+    view_input = self.form_gp_next_points_view_input_from_domain(
+      domain, parallelism_method
+    )
     return view_input, domain
 
   def form_search_next_points_view_input_from_domain(self, domain, parallelism_method):
-    view_input = self.form_gp_next_points_view_input_from_domain(domain, parallelism_method)
+    view_input = self.form_gp_next_points_view_input_from_domain(
+      domain, parallelism_method
+    )
     return view_input, domain
 
   def form_search_next_points_categorical_inputs(self, parallelism_method):
     domain = form_random_unconstrained_categorical_domain(self.dim)
-    view_input = self.form_gp_next_points_view_input_from_domain(domain, parallelism_method)
+    view_input = self.form_gp_next_points_view_input_from_domain(
+      domain, parallelism_method
+    )
     return view_input, domain
 
   def form_spe_next_points_view_input_from_domain(self, domain):
-    task_options = numpy.sort(numpy.random.random(self.num_tasks) if self.num_tasks else [])
+    task_options = numpy.sort(
+      numpy.random.random(self.num_tasks) if self.num_tasks else []
+    )
     points_sampled = form_points_sampled(
       domain,
       self.num_sampled,
@@ -335,7 +380,9 @@ class ZigoptSimulator(object):
     return view_input, domain
 
   def form_gp_hyper_opt_categorical_inputs(self):
-    task_options = numpy.sort(numpy.random.random(self.num_tasks) if self.num_tasks else [])
+    task_options = numpy.sort(
+      numpy.random.random(self.num_tasks) if self.num_tasks else []
+    )
     domain = form_random_unconstrained_categorical_domain(self.dim)
     points_sampled = form_points_sampled(
       domain,

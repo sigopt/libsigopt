@@ -17,7 +17,9 @@ from libsigopt.aux.constant import (
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import HistoricalData
-from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
+from libsigopt.compute.multitask_acquisition_function import (
+  MultitaskAcquisitionFunction,
+)
 from libsigopt.compute.views.rest.gp_next_points_categorical import (
   GpNextPointsCategorical,
   convert_from_one_hot,
@@ -29,7 +31,10 @@ from libsigopt.compute.views.rest.gp_next_points_categorical import (
 )
 from testaux.numerical_test_case import NumericalTestCase
 from testcompute.domain_test import domains_approximately_equal
-from testcompute.zigopt_input_utils import ZigoptSimulator, form_random_unconstrained_categorical_domain
+from testcompute.zigopt_input_utils import (
+  ZigoptSimulator,
+  form_random_unconstrained_categorical_domain,
+)
 
 
 class TestCategoricalNextPoints(NumericalTestCase):
@@ -41,15 +46,22 @@ class TestCategoricalNextPoints(NumericalTestCase):
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [11, 22]},
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 6, 9]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.1, 0.2, 0.5, 9.0]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.1, 0.2, 0.5, 9.0],
+      },
     ]
   )
 
   def assert_call_successful(self, zigopt_simulator, parallelism_method, domain=None):
     if domain:
-      view_input = zigopt_simulator.form_gp_next_points_view_input_from_domain(domain, parallelism_method)
+      view_input = zigopt_simulator.form_gp_next_points_view_input_from_domain(
+        domain, parallelism_method
+      )
     else:
-      view_input, domain = zigopt_simulator.form_gp_next_points_categorical_inputs(parallelism_method)
+      view_input, domain = zigopt_simulator.form_gp_next_points_categorical_inputs(
+        parallelism_method
+      )
     response = GpNextPointsCategorical(view_input).call()
 
     points_to_sample = response["points_to_sample"]
@@ -171,8 +183,16 @@ class TestCategoricalNextPoints(NumericalTestCase):
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 3, 5]},
     ]
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [1, 1, 1, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [1, 1, 1, 0, 0],
+        "rhs": 2,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
     zs = ZigoptSimulator(
@@ -193,7 +213,9 @@ class TestCategoricalNextPoints(NumericalTestCase):
   @pytest.mark.parametrize("num_being_sampled", [1])
   @pytest.mark.parametrize("nonzero_mean_type", [NONZERO_MEAN_CONSTANT_MEAN_TYPE])
   @pytest.mark.parametrize("use_tikhonov", [False])
-  @pytest.mark.parametrize("optimized_metric_thresholds", [[None, None], [None, -0.01234], [0.1234, 0.05678]])
+  @pytest.mark.parametrize(
+    "optimized_metric_thresholds", [[None, None], [None, -0.01234], [0.1234, 0.05678]]
+  )
   def test_constant_liar_metric_thresholds(
     self,
     dim,
@@ -315,14 +337,19 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [11, 22]},
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 6, 9]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.1, 0.2, 0.5, 9.0]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.1, 0.2, 0.5, 9.0],
+      },
     ]
   )
 
   def test_neighboring_integer_recognition(self):
     one_hot_point = [0.4, 0.5, 0.6, 2.3, -0.5, 17.2, -5.2, 0.1, 0.9, 0.5, 0.3, 2.3]
     assert self.mixed_domain.one_hot_domain.check_point_acceptable(one_hot_point)
-    neighboring_integer_points = generate_neighboring_integer_points(one_hot_point, self.mixed_domain)
+    neighboring_integer_points = generate_neighboring_integer_points(
+      one_hot_point, self.mixed_domain
+    )
     known_neighbors = numpy.array(
       [
         [0.4, 0.5, 0.6, 2.0, -0.5, 17.0, -5.2, 0.1, 0.9, 0.5, 0.3, 2.3],
@@ -332,7 +359,10 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
       ]
     )
     self.assert_vector_within_relative(neighboring_integer_points, known_neighbors, 0)
-    assert all(self.mixed_domain.one_hot_domain.check_point_acceptable(p) for p in neighboring_integer_points)
+    assert all(
+      self.mixed_domain.one_hot_domain.check_point_acceptable(p)
+      for p in neighboring_integer_points
+    )
 
   def test_neighboring_categories_recognition(self):
     one_hot_point = [0.4, 0.5, 0.6, 2.3, -0.5, 17.2, -5.2, 0.1, 0.9, 0.5, 0.3, 0.5]
@@ -357,8 +387,13 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
         [0.0, 0.0, 1.0, 2.3, -0.5, 17.2, -5.2, 0.0, 0.0, 0.0, 1.0, 0.5],
       ]
     )
-    self.assert_vector_within_relative(neighboring_categorical_points, known_neighbors, 0)
-    assert all(self.mixed_domain.one_hot_domain.check_point_acceptable(p) for p in neighboring_categorical_points)
+    self.assert_vector_within_relative(
+      neighboring_categorical_points, known_neighbors, 0
+    )
+    assert all(
+      self.mixed_domain.one_hot_domain.check_point_acceptable(p)
+      for p in neighboring_categorical_points
+    )
 
   def test_discrete_conversion_option(self):
     continuous_component = [
@@ -375,19 +410,27 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
     option = get_discrete_conversion_option(continuous_only_domain)
     assert option == "none"
 
-    continuous_and_small_int_domain = CategoricalDomain(continuous_component * 5 + int_component * 3)
+    continuous_and_small_int_domain = CategoricalDomain(
+      continuous_component * 5 + int_component * 3
+    )
     option = get_discrete_conversion_option(continuous_and_small_int_domain)
     assert option == INT_EXPERIMENT_PARAMETER_NAME
 
-    continuous_and_big_int_domain = CategoricalDomain(continuous_component * 5 + int_component * 20)
+    continuous_and_big_int_domain = CategoricalDomain(
+      continuous_component * 5 + int_component * 20
+    )
     option = get_discrete_conversion_option(continuous_and_big_int_domain)
     assert option == "none"
 
-    continuous_and_small_cat_domain = CategoricalDomain(continuous_component * 5 + cat_component * 3)
+    continuous_and_small_cat_domain = CategoricalDomain(
+      continuous_component * 5 + cat_component * 3
+    )
     option = get_discrete_conversion_option(continuous_and_small_cat_domain)
     assert option == "cat"
 
-    continuous_and_big_cat_domain = CategoricalDomain(continuous_component * 5 + cat_component * 8)
+    continuous_and_big_cat_domain = CategoricalDomain(
+      continuous_component * 5 + cat_component * 8
+    )
     option = get_discrete_conversion_option(continuous_and_big_cat_domain)
     assert option == "none"
 
@@ -403,11 +446,15 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
     option = get_discrete_conversion_option(big_int_big_cat_domain)
     assert option == "none"
 
-    small_int_small_cat_domain = CategoricalDomain(int_component * 2 + cat_component * 2)
+    small_int_small_cat_domain = CategoricalDomain(
+      int_component * 2 + cat_component * 2
+    )
     option = get_discrete_conversion_option(small_int_small_cat_domain)
     assert option == "both"
 
-    small_int_small_cat_big_product_domain = CategoricalDomain(int_component * 13 + cat_component * 6)
+    small_int_small_cat_big_product_domain = CategoricalDomain(
+      int_component * 13 + cat_component * 6
+    )
     option = get_discrete_conversion_option(small_int_small_cat_big_product_domain)
     assert option == INT_EXPERIMENT_PARAMETER_NAME
 
@@ -443,7 +490,9 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
         [1.0, 0.0, 0.0, 5.0, -0.1, 20.0, 2.2, 0.0, 0.0, 1.0, 0.0, -0.1],
       ]
     )
-    assert numpy.all(int_best_one_hot_neighbors == correct_answers_int_best_one_hot_neighbors)
+    assert numpy.all(
+      int_best_one_hot_neighbors == correct_answers_int_best_one_hot_neighbors
+    )
 
     cat_best_one_hot_neighbors = find_best_one_hot_neighbor_by_af(
       one_hot_points,
@@ -457,7 +506,9 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
         [0.0, 0.0, 1.0, 4.0, -0.1, 20.0, 2.2, 0.0, 0.0, 0.0, 1.0, -0.1],
       ]
     )
-    assert numpy.all(cat_best_one_hot_neighbors == correct_answers_cat_best_one_hot_neighbors)
+    assert numpy.all(
+      cat_best_one_hot_neighbors == correct_answers_cat_best_one_hot_neighbors
+    )
 
     both_best_one_hot_neighbors = find_best_one_hot_neighbor_by_af(
       one_hot_points,
@@ -471,7 +522,9 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
         [0.0, 0.0, 1.0, 5.0, -0.1, 20.0, 2.2, 0.0, 0.0, 0.0, 1.0, -0.1],
       ]
     )
-    assert numpy.all(both_best_one_hot_neighbors == correct_answers_both_best_one_hot_neighbors)
+    assert numpy.all(
+      both_best_one_hot_neighbors == correct_answers_both_best_one_hot_neighbors
+    )
 
     correct_cat_domain_points_given_dummy_acquisition_function = [
       [5, 3.0, -0.5, 18.0, -5.2, 9.0, 0.2],
@@ -485,14 +538,18 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
     )
 
     # This comparison is necessary because of the non_numerical categorical in the domain
-    for p, true_p in zip(converted_points, correct_cat_domain_points_given_dummy_acquisition_function):
+    for p, true_p in zip(
+      converted_points, correct_cat_domain_points_given_dummy_acquisition_function
+    ):
       assert tuple(p) == tuple(true_p)
 
   # NOTE: The use of tuples makes checking points easier
   # NOTE: This takes advantage of a known ordering of points during replacement that may not always be the case
   def test_replacing_non_unique_points(self):
     data = HistoricalData(self.mixed_domain.one_hot_dim)
-    data.append_lies(self.mixed_domain.one_hot_domain.generate_quasi_random_points_in_domain(10), 0, 0)
+    data.append_lies(
+      self.mixed_domain.one_hot_domain.generate_quasi_random_points_in_domain(10), 0, 0
+    )
     categorical_points = numpy.array(
       [
         (5.0, 3.0, -0.5, 18.0, -5.2, 2.0, 0.2),
@@ -503,18 +560,29 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
         (-1.0, 2.0, 3.2, 12.0, 2.8, 9.0, 9),
       ]
     )
-    data.append_lies([self.mixed_domain.map_categorical_point_to_one_hot(categorical_points[-1])], 0, 0)
-    categorical_points_historical = self.mixed_domain.map_one_hot_points_to_categorical(data.points_sampled)
+    data.append_lies(
+      [self.mixed_domain.map_categorical_point_to_one_hot(categorical_points[-1])], 0, 0
+    )
+    categorical_points_historical = self.mixed_domain.map_one_hot_points_to_categorical(
+      data.points_sampled
+    )
     unique_no_tol = [
-      tuple(p) for p in self.mixed_domain.replace_duplicate_points(categorical_points, categorical_points_historical, 0)
+      tuple(p)
+      for p in self.mixed_domain.replace_duplicate_points(
+        categorical_points, categorical_points_historical, 0
+      )
     ]
     assert len(unique_no_tol) == 6
     assert all(p in unique_no_tol for p in [tuple(q) for q in categorical_points[:4]])
-    assert not any(p in [tuple(q) for q in categorical_points] for p in unique_no_tol[4:])
+    assert not any(
+      p in [tuple(q) for q in categorical_points] for p in unique_no_tol[4:]
+    )
 
     unique_tol = [
       tuple(p)
-      for p in self.mixed_domain.replace_duplicate_points(categorical_points, categorical_points_historical, 1e-3)
+      for p in self.mixed_domain.replace_duplicate_points(
+        categorical_points, categorical_points_historical, 1e-3
+      )
     ]
     assert len(unique_tol) == 6
     assert all(p in unique_tol for p in [tuple(q) for q in categorical_points[:2]])
@@ -525,7 +593,9 @@ class TestAugmentedDomain:
   tasks = numpy.array([0.5, 0.2, 1.0])
 
   def test_no_acquisition_function(self):
-    domain = CategoricalDomain([{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 3.3]}])
+    domain = CategoricalDomain(
+      [{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 3.3]}]
+    )
     computed_domain = form_augmented_domain(domain)
     assert domains_approximately_equal(domain, computed_domain)
 
@@ -535,7 +605,9 @@ class TestAugmentedDomain:
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0.2, 1]},
       ]
     )
-    computed_domain = form_augmented_domain(domain, task_cost_populated=True, task_options=self.tasks)
+    computed_domain = form_augmented_domain(
+      domain, task_cost_populated=True, task_options=self.tasks
+    )
     assert domains_approximately_equal(augmented_domain_with_tasks, computed_domain)
 
     domain_with_constraint = CategoricalDomain(
@@ -546,8 +618,16 @@ class TestAugmentedDomain:
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [5, 10]},
       ],
       constraint_list=[
-        {"weights": [1.0, -0.5, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 1.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, -0.5, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 1.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     computed_domain = form_augmented_domain(domain_with_constraint)
@@ -562,12 +642,24 @@ class TestAugmentedDomain:
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0.2, 1]},
       ],
       constraint_list=[
-        {"weights": [1.0, -0.5, 0.0, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 1.0, 1.0, 0.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, -0.5, 0.0, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 1.0, 1.0, 0.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
-    computed_domain = form_augmented_domain(domain_with_constraint, task_cost_populated=True, task_options=self.tasks)
-    assert domains_approximately_equal(augmented_domain_with_constraint_with_tasks, computed_domain)
+    computed_domain = form_augmented_domain(
+      domain_with_constraint, task_cost_populated=True, task_options=self.tasks
+    )
+    assert domains_approximately_equal(
+      augmented_domain_with_constraint_with_tasks, computed_domain
+    )
 
   def test_with_acquisition_function(self):
     domain = CategoricalDomain(
@@ -580,7 +672,9 @@ class TestAugmentedDomain:
     )
 
     af = Mock(dim=6, num_points_to_sample=1)
-    assert domains_approximately_equal(domain, form_augmented_domain(domain, acquisition_function=af))
+    assert domains_approximately_equal(
+      domain, form_augmented_domain(domain, acquisition_function=af)
+    )
     af.dim = 5
     with pytest.raises(AssertionError):
       form_augmented_domain(domain, acquisition_function=af)
@@ -615,10 +709,26 @@ class TestAugmentedDomain:
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 6]},
       ],
       constraint_list=[
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     computed_domain = form_augmented_domain(domain_with_constraints)
@@ -634,10 +744,26 @@ class TestAugmentedDomain:
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 6]},
       ],
       constraint_list=[
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
       force_hitandrun_sampling=True,
     )
@@ -681,15 +807,35 @@ class TestAugmentedDomain:
           "rhs": 1.3,
           "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
         },
-        {"weights": [0, 0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0, 0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     af = Mock(dim=8, num_points_to_sample=2)
-    computed_domain = form_augmented_domain(domain=domain_with_constraints, acquisition_function=af)
-    assert domains_approximately_equal(domain_with_two_points_with_constraints, computed_domain)
+    computed_domain = form_augmented_domain(
+      domain=domain_with_constraints, acquisition_function=af
+    )
+    assert domains_approximately_equal(
+      domain_with_two_points_with_constraints, computed_domain
+    )
 
     domain_with_constraints_and_tasks = CategoricalDomain(
       domain_components=[
@@ -702,10 +848,26 @@ class TestAugmentedDomain:
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0.2, 1.0]},
       ],
       constraint_list=[
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     af = Mock(dim=9, num_points_to_sample=1)
@@ -716,4 +878,6 @@ class TestAugmentedDomain:
       task_cost_populated=True,
       task_options=self.tasks,
     )
-    assert domains_approximately_equal(domain_with_constraints_and_tasks, computed_domain)
+    assert domains_approximately_equal(
+      domain_with_constraints_and_tasks, computed_domain
+    )

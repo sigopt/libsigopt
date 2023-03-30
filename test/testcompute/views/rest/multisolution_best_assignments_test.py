@@ -12,7 +12,9 @@ from libsigopt.aux.constant import (
 from libsigopt.aux.geometry_utils import compute_distance_matrix_squared
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.search import convert_one_hot_to_search_hypercube_points
-from libsigopt.compute.views.rest.multisolution_best_assignments import k_center_clustering
+from libsigopt.compute.views.rest.multisolution_best_assignments import (
+  k_center_clustering,
+)
 from testcompute.zigopt_input_utils import form_random_unconstrained_categorical_domain
 
 
@@ -46,22 +48,30 @@ class TestMultisolutionBestAssignments(object):
 
     num_points_a = 13
     center_cluster_a = numpy.array([1.9, 7.4, 0.1, 0.9])
-    points_a = domain.one_hot_domain.generate_random_points_near_point(num_points_a, center_cluster_a, std_dev=0.01)
+    points_a = domain.one_hot_domain.generate_random_points_near_point(
+      num_points_a, center_cluster_a, std_dev=0.01
+    )
 
     num_points_b = 21
     center_cluster_b = numpy.array([0.1, 4, 0.9, 0.1])
-    points_b = domain.one_hot_domain.generate_random_points_near_point(num_points_b, center_cluster_b, std_dev=0.01)
+    points_b = domain.one_hot_domain.generate_random_points_near_point(
+      num_points_b, center_cluster_b, std_dev=0.01
+    )
 
     points = numpy.concatenate((points_a, points_b))
     first_center_index = 3
     k = 2
     search_points = convert_one_hot_to_search_hypercube_points(domain, points)
-    centers_indices, partition = k_center_clustering(search_points, first_center_index, k)
+    centers_indices, partition = k_center_clustering(
+      search_points, first_center_index, k
+    )
 
     assert len(centers_indices) == k
     assert centers_indices[0] < num_points_a  # indices of points a
     assert centers_indices[1] >= num_points_a  # indices of points b
-    assert numpy.all(points[centers_indices[0], :] == points[first_center_index, :])  # must be the first center index
+    assert numpy.all(
+      points[centers_indices[0], :] == points[first_center_index, :]
+    )  # must be the first center index
     assert numpy.all(partition[:num_points_a] == 0)
     assert numpy.all(partition[num_points_a:] == 1)
 
@@ -86,7 +96,9 @@ class TestMultisolutionBestAssignments(object):
     assert len(numpy.unique(partition)) == k
     assert numpy.all(partition[centers_indices] == range(k))
 
-    distance_matrix_squared = compute_distance_matrix_squared(points[centers_indices], points)
+    distance_matrix_squared = compute_distance_matrix_squared(
+      points[centers_indices], points
+    )
     expected_partition = numpy.argmin(distance_matrix_squared, axis=0)
     assert numpy.all(expected_partition == partition)
     for i, c in enumerate(centers_indices):
@@ -109,7 +121,9 @@ class TestMultisolutionBestAssignments(object):
     assert partition[index_far_away] == 1  # second cluster
     assert partition[0] == 2  # third cluster
     assert partition[1] == 3  # forth cluster
-    remaining_repeated_elements = [i for i in range(num_points) if i not in centers_indices]
+    remaining_repeated_elements = [
+      i for i in range(num_points) if i not in centers_indices
+    ]
     assert all(partition[i] == 0 for i in remaining_repeated_elements)
 
   @pytest.mark.parametrize("dim", [1, 2, 5, 7, 25])
@@ -139,9 +153,13 @@ class TestMultisolutionBestAssignments(object):
   @pytest.mark.parametrize("num_clusters", [1, 2, 4, 13])
   @pytest.mark.parametrize("num_points_per_clusters", [1, 3, 5, 11, 16])
   @pytest.mark.parametrize("sigma", [1e-5, 1e-1, 1, 1e2])
-  def test_k_center_clustering_optimality(self, categorical_dim, num_clusters, num_points_per_clusters, sigma):
+  def test_k_center_clustering_optimality(
+    self, categorical_dim, num_clusters, num_points_per_clusters, sigma
+  ):
     domain = form_random_unconstrained_categorical_domain(categorical_dim)
-    cluster_centers = domain.one_hot_domain.generate_quasi_random_points_in_domain(num_clusters)
+    cluster_centers = domain.one_hot_domain.generate_quasi_random_points_in_domain(
+      num_clusters
+    )
     dim = domain.one_hot_domain.dim
 
     points = numpy.copy(cluster_centers)
@@ -155,18 +173,24 @@ class TestMultisolutionBestAssignments(object):
     assert points.shape == (num_clusters * num_points_per_clusters + num_clusters, dim)
 
     shuffle_indices = numpy.random.permutation(len(points))
-    optimal_centers_indices = [numpy.flatnonzero(shuffle_indices == i)[0] for i in range(num_clusters)]
+    optimal_centers_indices = [
+      numpy.flatnonzero(shuffle_indices == i)[0] for i in range(num_clusters)
+    ]
     shuffled_points = points[shuffle_indices, :]
     assert numpy.allclose(shuffled_points[optimal_centers_indices, :], cluster_centers)
 
     first_center_index = numpy.random.randint(shuffled_points.shape[0])
-    centers_indices, partition = k_center_clustering(shuffled_points, first_center_index, num_clusters)
+    centers_indices, partition = k_center_clustering(
+      shuffled_points, first_center_index, num_clusters
+    )
     assert centers_indices[0] == first_center_index
     assert len(centers_indices) == num_clusters
     assert len(numpy.unique(partition)) == num_clusters
     assert numpy.all(partition[centers_indices] == range(num_clusters))
 
-    distance_matrix_squared = compute_distance_matrix_squared(shuffled_points[centers_indices], shuffled_points)
+    distance_matrix_squared = compute_distance_matrix_squared(
+      shuffled_points[centers_indices], shuffled_points
+    )
     expected_partition = numpy.argmin(distance_matrix_squared, axis=0)
     assert numpy.allclose(expected_partition, partition)
 
@@ -176,5 +200,7 @@ class TestMultisolutionBestAssignments(object):
       shuffled_points[optimal_centers_indices],
       shuffled_points,
     )
-    optimal_r = numpy.sqrt(numpy.max(numpy.min(optimal_distance_matrix_squared, axis=0)))
+    optimal_r = numpy.sqrt(
+      numpy.max(numpy.min(optimal_distance_matrix_squared, axis=0))
+    )
     assert largest_radius <= 2 * optimal_r

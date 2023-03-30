@@ -20,7 +20,9 @@ class GaussianProcessSum(Predictor):
 
   def __init__(self, gaussian_process_list, weights):
     assert len(gaussian_process_list) > 1, "We need more than one GP"
-    assert len(gaussian_process_list) == len(weights), "Number of GPs and weights should match"
+    assert len(gaussian_process_list) == len(
+      weights
+    ), "Number of GPs and weights should match"
     first_gp = gaussian_process_list[0]
     for gp in gaussian_process_list:
       assert isinstance(gp, GaussianProcess)
@@ -78,7 +80,9 @@ class GaussianProcessSum(Predictor):
   @property
   def points_sampled_noise_variance(self):
     if self._points_sampled_noise_variance_sum is None:
-      self._points_sampled_noise_variance_sum = self._compute_points_sampled_noise_variance_sum()
+      self._points_sampled_noise_variance_sum = (
+        self._compute_points_sampled_noise_variance_sum()
+      )
     return self._points_sampled_noise_variance_sum
 
   def _compute_points_sampled_value_sum(self):
@@ -90,7 +94,9 @@ class GaussianProcessSum(Predictor):
   def _compute_points_sampled_noise_variance_sum(self):
     points_sampled_noise_variance = numpy.zeros(self.num_sampled)
     for w, gp in zip(self.weights, self.gaussian_process_list):
-      points_sampled_noise_variance = points_sampled_noise_variance + (w**2) * gp.points_sampled_noise_variance
+      points_sampled_noise_variance = (
+        points_sampled_noise_variance + (w**2) * gp.points_sampled_noise_variance
+      )
     return points_sampled_noise_variance
 
   def append_lie_data(self, lie_locations, lie_method=CONSTANT_LIAR_MIN):
@@ -115,7 +121,9 @@ class GaussianProcessSum(Predictor):
     num_points = points_to_sample.shape[0]
     covariance = numpy.zeros((num_points, num_points))
     for w, gp in zip(self.weights, self.gaussian_process_list):
-      covariance = covariance + (w**2) * gp.compute_covariance_of_points(points_to_sample)
+      covariance = covariance + (w**2) * gp.compute_covariance_of_points(
+        points_to_sample
+      )
     return covariance
 
   def compute_mean_and_variance_of_points(self, points_to_sample):
@@ -139,7 +147,9 @@ class GaussianProcessSum(Predictor):
     num_points, dim = points_to_sample.shape
     grad_var = numpy.zeros((num_points, dim))
     for w, gp in zip(self.weights, self.gaussian_process_list):
-      grad_var = grad_var + (w**2) * gp.compute_grad_variance_of_points(points_to_sample)
+      grad_var = grad_var + (w**2) * gp.compute_grad_variance_of_points(
+        points_to_sample
+      )
     return grad_var
 
   def compute_mean_variance_grad_of_points(self, points_to_sample):
@@ -149,7 +159,12 @@ class GaussianProcessSum(Predictor):
     grad_mean = numpy.zeros((num_points, dim))
     grad_var = numpy.zeros((num_points, dim))
     for w, gp in zip(self.weights, self.gaussian_process_list):
-      gp_mean, gp_var, gp_grad_mean, gp_grad_var = gp.compute_mean_variance_grad_of_points(points_to_sample)
+      (
+        gp_mean,
+        gp_var,
+        gp_grad_mean,
+        gp_grad_var,
+      ) = gp.compute_mean_variance_grad_of_points(points_to_sample)
       mean = mean + w * gp_mean
       var = var + (w**2) * gp_var
       grad_mean = grad_mean + w * gp_grad_mean
@@ -160,5 +175,7 @@ class GaussianProcessSum(Predictor):
     num_points = points_to_sample.shape[0]
     samples = numpy.zeros((num_samples, num_points))
     for w, gp in zip(self.weights, self.gaussian_process_list):
-      samples = samples + w * gp.draw_posterior_samples_of_points(num_samples, points_to_sample)
+      samples = samples + w * gp.draw_posterior_samples_of_points(
+        num_samples, points_to_sample
+      )
     return samples

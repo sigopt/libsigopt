@@ -16,12 +16,21 @@ from libsigopt.aux.constant import (
   ParameterPriorNames,
 )
 from libsigopt.aux.geometry_utils import find_interior_point
-from libsigopt.compute.domain import CategoricalDomain, ContinuousDomain, FixedIndicesOnContinuousDomain
-from testaux.utils import form_random_constrained_categorical_domain, form_random_unconstrained_categorical_domain
+from libsigopt.compute.domain import (
+  CategoricalDomain,
+  ContinuousDomain,
+  FixedIndicesOnContinuousDomain,
+)
+from testaux.utils import (
+  form_random_constrained_categorical_domain,
+  form_random_unconstrained_categorical_domain,
+)
 
 
 def domains_approximately_equal(domain1, domain2, inequality_tolerance=1e-14):
-  assert isinstance(domain1, CategoricalDomain) and isinstance(domain2, CategoricalDomain)
+  assert isinstance(domain1, CategoricalDomain) and isinstance(
+    domain2, CategoricalDomain
+  )
 
   # Content can go from being a list to numpy, so this can fail ... if it does, what happens below will work
   try:
@@ -39,7 +48,10 @@ def domains_approximately_equal(domain1, domain2, inequality_tolerance=1e-14):
   if domain1.dim != domain2.dim:
     return False
 
-  if domain1.one_hot_domain.force_hitandrun_sampling != domain2.one_hot_domain.force_hitandrun_sampling:
+  if (
+    domain1.one_hot_domain.force_hitandrun_sampling
+    != domain2.one_hot_domain.force_hitandrun_sampling
+  ):
     return False
 
   if len(domain1.constraint_list) != len(domain2.constraint_list):
@@ -55,10 +67,14 @@ def domains_approximately_equal(domain1, domain2, inequality_tolerance=1e-14):
         return False
 
   for our_dc, their_dc in zip(domain1.domain_components, domain2.domain_components):
-    if our_dc["var_type"] != their_dc["var_type"] or len(our_dc["elements"]) != len(their_dc["elements"]):
+    if our_dc["var_type"] != their_dc["var_type"] or len(our_dc["elements"]) != len(
+      their_dc["elements"]
+    ):
       return False
     for our_element, their_element in zip(our_dc["elements"], their_dc["elements"]):
-      if abs(our_element - their_element) > inequality_tolerance:  # Any sort of number near machine precision
+      if (
+        abs(our_element - their_element) > inequality_tolerance
+      ):  # Any sort of number near machine precision
         return False
 
   for our_cl, their_cl in zip(domain1.constraint_list, domain2.constraint_list):
@@ -111,17 +127,27 @@ class TestContinuousDomain(object):
   # NOTE: other_domain is hard-coded outside domain by looking at form_random_domain
   def test_point_generation(self):
     dim = numpy.random.randint(2, 6)
-    domain = form_random_unconstrained_categorical_domain(dim, categoricals_allowed=False).one_hot_domain
+    domain = form_random_unconstrained_categorical_domain(
+      dim, categoricals_allowed=False
+    ).one_hot_domain
     num_points = numpy.random.randint(10, 1000)
     random_points = domain.generate_quasi_random_points_in_domain(num_points)
     assert tuple(random_points.shape) == (num_points, domain.dim)
     assert all(domain.check_point_acceptable(p) for p in random_points)
-    assert tuple(domain.generate_grid_points_in_domain(6).shape) == (6**domain.dim, domain.dim)
+    assert tuple(domain.generate_grid_points_in_domain(6).shape) == (
+      6**domain.dim,
+      domain.dim,
+    )
     other_domain = ContinuousDomain([[20000, 30000]] * domain.dim)
     outside_points = other_domain.generate_quasi_random_points_in_domain(num_points)
     assert all(not domain.check_point_acceptable(p) for p in outside_points)
-    assert all(domain.check_point_on_boundary(p) for p in domain.restrict_points_to_domain(outside_points))
-    inner_points = domain.generate_random_points_near_point(num_points, domain.midpoint, numpy.random.gamma(1, 1))
+    assert all(
+      domain.check_point_on_boundary(p)
+      for p in domain.restrict_points_to_domain(outside_points)
+    )
+    inner_points = domain.generate_random_points_near_point(
+      num_points, domain.midpoint, numpy.random.gamma(1, 1)
+    )
     assert all(domain.check_point_acceptable(p) for p in inner_points)
 
   def test_constraints(self):
@@ -138,19 +164,29 @@ class TestContinuousDomain(object):
 
     unconstrained_points = domain.generate_quasi_random_points_in_domain(num_points)
     unconstrained_points[-1, :] = [0, 0, 0]  # Does not satisfy the constraints
-    constrained_points = domain_with_constraints.generate_quasi_random_points_in_domain(num_points)
+    constrained_points = domain_with_constraints.generate_quasi_random_points_in_domain(
+      num_points
+    )
     assert not all(unconstrained_points[:, 0] + unconstrained_points[:, 2] > 1)
     assert all(constrained_points[:, 0] + constrained_points[:, 2] > 1)
-    assert all(domain_with_constraints.check_point_satisfies_constraints(p) for p in constrained_points)
     assert all(
-      domain_with_constraints.check_point_satisfies_constraints(p) == (p[0] + p[2] > 1) for p in unconstrained_points
+      domain_with_constraints.check_point_satisfies_constraints(p)
+      for p in constrained_points
+    )
+    assert all(
+      domain_with_constraints.check_point_satisfies_constraints(p) == (p[0] + p[2] > 1)
+      for p in unconstrained_points
     )
 
     for p in unconstrained_points:
       if not domain_with_constraints.check_point_satisfies_constraints(p):
         assert domain_with_constraints.check_point_inside(p)
-    assert all(domain_with_constraints.check_point_acceptable(p) for p in constrained_points)
-    assert not all(domain_with_constraints.check_point_acceptable(p) for p in unconstrained_points)
+    assert all(
+      domain_with_constraints.check_point_acceptable(p) for p in constrained_points
+    )
+    assert not all(
+      domain_with_constraints.check_point_acceptable(p) for p in unconstrained_points
+    )
     assert not domain.get_constraints_for_scipy()
     scipy_constraints = domain_with_constraints.get_constraints_for_scipy()
     for sc, cons in zip(scipy_constraints, constraint_list):
@@ -165,7 +201,9 @@ class TestContinuousDomain(object):
       }
     ]
     with pytest.raises(AssertionError):
-      domain_with_constraints.set_constraint_list(constraint_list=infeasible_constraint_list)
+      domain_with_constraints.set_constraint_list(
+        constraint_list=infeasible_constraint_list
+      )
 
   def test_restrict_points_to_domain(self):
     num_points = 1000
@@ -181,13 +219,19 @@ class TestContinuousDomain(object):
 
     unconstrained_points = domain.generate_quasi_random_points_in_domain(num_points)
     unconstrained_points[-1, :] = [0, 0, 0]  # Does not satisfy the constraints
-    constrained_points = domain_with_constraints.restrict_points_to_domain(unconstrained_points)
+    constrained_points = domain_with_constraints.restrict_points_to_domain(
+      unconstrained_points
+    )
     assert not numpy.allclose(unconstrained_points, constrained_points)
     assert not all(unconstrained_points[:, 0] + unconstrained_points[:, 2] > 1)
     assert all(constrained_points[:, 0] + constrained_points[:, 2] > 1)
-    assert all(domain_with_constraints.check_point_satisfies_constraints(p) for p in constrained_points)
     assert all(
-      domain_with_constraints.check_point_satisfies_constraints(p) == (p[0] + p[2] > 1) for p in unconstrained_points
+      domain_with_constraints.check_point_satisfies_constraints(p)
+      for p in constrained_points
+    )
+    assert all(
+      domain_with_constraints.check_point_satisfies_constraints(p) == (p[0] + p[2] > 1)
+      for p in unconstrained_points
     )
 
     constrained_points_on = domain_with_constraints.restrict_points_to_domain(
@@ -210,7 +254,11 @@ class TestContinuousDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 100]},
       ],
       constraint_list=[
-        {"weights": coeff_vector, "rhs": rhs, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": coeff_vector,
+          "rhs": rhs,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
 
@@ -220,7 +268,9 @@ class TestContinuousDomain(object):
     assert domain.one_hot_domain.check_point_on_boundary(viable_point, 1e-10)
 
     violate_point = numpy.array([99.0, 2.0])
-    restricted_point = domain.one_hot_domain.restrict_points_to_domain(numpy.atleast_2d(violate_point))
+    restricted_point = domain.one_hot_domain.restrict_points_to_domain(
+      numpy.atleast_2d(violate_point)
+    )
     assert domain.one_hot_domain.check_point_acceptable(restricted_point[0])
 
   def test_restrict_points_to_domain_multiple_constraints(self):
@@ -231,12 +281,27 @@ class TestContinuousDomain(object):
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 3]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
     ]
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [1, 1, 1, 0, 0, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [0, 0, 0, 1, 1, 0, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [1, 1, 1, 0, 0, 0, 0],
+        "rhs": 2,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [0, 0, 0, 1, 1, 0, 0],
+        "rhs": 2,
+        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
     one_hot_domain = domain.one_hot_domain
@@ -245,7 +310,9 @@ class TestContinuousDomain(object):
     # Do not satisfy the constraints
     one_hot_points[-2, [0, 1, 2]] = [0.5, -1, -2]
     one_hot_points[-1, [0, 1, 2]] = [0, 0, 0]
-    assert all(one_hot_domain.check_point_acceptable(p) for p in one_hot_points) is False
+    assert (
+      all(one_hot_domain.check_point_acceptable(p) for p in one_hot_points) is False
+    )
 
     restricted_points = one_hot_domain.restrict_points_to_domain(one_hot_points)
     assert not numpy.allclose(one_hot_points, restricted_points)
@@ -258,14 +325,23 @@ class TestContinuousDomain(object):
     tolerance = 1e-12
     larger_domain = ContinuousDomain([[-1.2, 1.2]] * dim)
     domain = CategoricalDomain(
-      domain_components=[{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]}] * dim,
+      domain_components=[
+        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]}
+      ]
+      * dim,
       constraint_list=[
-        {"weights": [1.0] * dim, "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0] * dim,
+          "rhs": -1,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     domain = domain.one_hot_domain
 
-    unconstrained_points = larger_domain.generate_quasi_random_points_in_domain(num_points)
+    unconstrained_points = larger_domain.generate_quasi_random_points_in_domain(
+      num_points
+    )
     unconstrained_points[-1, :] = [0] * dim  # Does not satisfy the constraints
 
     # viable point is outside the domain
@@ -288,13 +364,17 @@ class TestContinuousDomain(object):
       )
       assert not numpy.allclose(unconstrained_points, constrained_points)
       assert all(
-        domain.check_point_on_boundary(p, tolerance) for p in constrained_points if not domain.check_point_acceptable(p)
+        domain.check_point_on_boundary(p, tolerance)
+        for p in constrained_points
+        if not domain.check_point_acceptable(p)
       )
       assert all(sum(p) <= (dim + tolerance) for p in constrained_points)
 
   @pytest.mark.parametrize("on_constraint", [True, False])
   @pytest.mark.parametrize("point", [None, [0.5, 0, 0], [0.5, 0.5, 0.5]])
-  def test_generate_random_points_near_point_with_constraints(self, on_constraint, point):
+  def test_generate_random_points_near_point_with_constraints(
+    self, on_constraint, point
+  ):
     num_points = 1000
     domain = ContinuousDomain([[0, 1], [-2, 3], [-1, 2]])
     constraint_list = [
@@ -325,7 +405,9 @@ class TestContinuousDomain(object):
     if on_constraint:
       assert numpy.all(inner_points[:, 0] + inner_points[:, 2] >= 1 - 1e8)
     else:
-      assert all(domain_with_constraints.check_point_acceptable(p) for p in inner_points)
+      assert all(
+        domain_with_constraints.check_point_acceptable(p) for p in inner_points
+      )
 
   @pytest.mark.parametrize("on_constraint", [True, False])
   def test_generate_points_near_domain_edges(self, on_constraint):
@@ -334,9 +416,16 @@ class TestContinuousDomain(object):
     tolerance = 1e-12
     std_dev = 0.1
     domain = CategoricalDomain(
-      domain_components=[{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]}] * dim,
+      domain_components=[
+        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]}
+      ]
+      * dim,
       constraint_list=[
-        {"weights": [1.0] * dim, "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0] * dim,
+          "rhs": 1,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     domain = domain.one_hot_domain
@@ -349,7 +438,9 @@ class TestContinuousDomain(object):
         num_points, point, std_dev, on_constraint=on_constraint
       )
       assert all(
-        domain.check_point_on_boundary(p, tolerance) for p in random_near_points if not domain.check_point_acceptable(p)
+        domain.check_point_on_boundary(p, tolerance)
+        for p in random_near_points
+        if not domain.check_point_acceptable(p)
       )
       assert all(sum(p) >= (1 - tolerance) for p in random_near_points)
 
@@ -390,8 +481,12 @@ class TestCategoricalDomain(object):
     with pytest.raises(AssertionError):
       assert domain.check_point_acceptable([0.3, 4.5, 3, 0.2])
 
-    assert domain.identify_unique_points(numpy.array([[1, 3, 3, 2], [1, 3, 3, 2]])).shape == (1, 4)
-    assert domain.identify_unique_points(numpy.array([[1, 3, 3, -0.1], [1 + 1e-3, 3, 3, -0.1]])).shape == (2, 4)
+    assert domain.identify_unique_points(
+      numpy.array([[1, 3, 3, 2], [1, 3, 3, 2]])
+    ).shape == (1, 4)
+    assert domain.identify_unique_points(
+      numpy.array([[1, 3, 3, -0.1], [1 + 1e-3, 3, 3, -0.1]])
+    ).shape == (2, 4)
     assert domain.identify_unique_points(
       numpy.array([[1, 3, 3, 0.2], [1 + 1e-3, 3, 3, 0.2]]), tolerance=1e-2
     ).shape == (1, 4)
@@ -402,7 +497,9 @@ class TestCategoricalDomain(object):
     test_points = numpy.array([[1 + 1e-3, 3, 3, 0.2]])
     assert domain.identify_unique_points(test_points, reference_points).shape == (1, 4)
     test_points = numpy.array([[1 + 1e-3, 3, 3, 0.2]])
-    assert domain.identify_unique_points(test_points, reference_points, tolerance=1e-2).shape == (0, 4)
+    assert domain.identify_unique_points(
+      test_points, reference_points, tolerance=1e-2
+    ).shape == (0, 4)
 
   def test_domain_equality(self):
     domain = CategoricalDomain(
@@ -412,13 +509,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert domains_approximately_equal(domain, domain)
@@ -437,9 +549,21 @@ class TestCategoricalDomain(object):
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -451,13 +575,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -469,13 +608,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 2.6, 0.2, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 2.6, 0.2, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -487,13 +641,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [0.0, 1.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 1.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0.0, 1.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 1.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -505,13 +674,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -523,13 +707,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.4, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.4, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -541,13 +740,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.2,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -560,17 +774,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
         {
           "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
           "rhs": 1.3 + 1e-15,
           "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
         },
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert domains_approximately_equal(domain, other_domain)
@@ -582,7 +807,11 @@ class TestCategoricalDomain(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
     ]
     constraint_list = [
-      {"weights": [-1, -1, -1], "rhs": -10, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [-1, -1, -1],
+        "rhs": -10,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list=constraint_list)
     domain.one_hot_domain.set_constraint_list([])
@@ -590,22 +819,37 @@ class TestCategoricalDomain(object):
     assert domain.one_hot_domain.one_hot_unconstrained_indices == list(range(3))
 
   def test_quantized_domain(self):
-    inf_quantized_comp = {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, 0.2, numpy.inf]}
+    inf_quantized_comp = {
+      "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      "elements": [-0.2, 0.2, numpy.inf],
+    }
     with pytest.raises(AssertionError):
       assert CategoricalDomain(domain_components=[inf_quantized_comp])
 
-    same_quantized_comp = {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.2, 0.2]}
+    same_quantized_comp = {
+      "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      "elements": [0.2, 0.2],
+    }
     with pytest.raises(AssertionError):
       assert CategoricalDomain(domain_components=[same_quantized_comp])
 
-    one_quantized_comp = {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.2]}
+    one_quantized_comp = {
+      "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      "elements": [0.2],
+    }
     with pytest.raises(AssertionError):
       assert CategoricalDomain(domain_components=[one_quantized_comp])
 
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 26, 1e3]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.31, 0, -2, -5]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 26, 1e3],
+        },
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.31, 0, -2, -5],
+        },
       ]
     )
 
@@ -631,13 +875,24 @@ class TestCategoricalDomain(object):
       ]
     )
 
-    assert numpy.all(domain.round_one_hot_points_quantized_values(one_hot_points) == quantized_points)
-    assert numpy.all(domain.map_one_hot_points_to_categorical(one_hot_points) == quantized_points)
-    assert numpy.all(domain.map_categorical_point_to_one_hot(one_hot_points) == one_hot_points)
+    assert numpy.all(
+      domain.round_one_hot_points_quantized_values(one_hot_points) == quantized_points
+    )
+    assert numpy.all(
+      domain.map_one_hot_points_to_categorical(one_hot_points) == quantized_points
+    )
+    assert numpy.all(
+      domain.map_categorical_point_to_one_hot(one_hot_points) == one_hot_points
+    )
 
   def test_quantized_unique(self):
     domain = CategoricalDomain(
-      [{"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1e-5, 1.1e-5, 1.11e-5, 1.111e-5, 1]}]
+      [
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0, 1e-5, 1.1e-5, 1.11e-5, 1.111e-5, 1],
+        }
+      ]
     )
     points = numpy.array([[1e-5], [1.1e-5], [1.11e-5], [1.111e-5]])
     unique_points = domain.identify_unique_points(points)
@@ -653,7 +908,12 @@ class TestCategoricalDomain(object):
     assert numpy.all(points[:3] == unique_points)
 
     domain = CategoricalDomain(
-      [{"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1e-5, 1.1e-5, 1.11e-5, 1.111e-5, 1e-4]}]
+      [
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0, 1e-5, 1.1e-5, 1.11e-5, 1.111e-5, 1e-4],
+        }
+      ]
     )
     unique_points = domain.identify_unique_points(points)
     assert len(unique_points) == 4
@@ -674,16 +934,29 @@ class TestCategoricalDomain(object):
     points = domain.generate_quasi_random_points_in_domain(num_points)
     assert tuple(points.shape) == (num_points, domain.dim)
     assert all(domain.check_point_acceptable(point) for point in points)
-    one_hot_points = numpy.array([domain.map_categorical_point_to_one_hot(p) for p in points])
-    remapped_categorical_points = domain.map_one_hot_points_to_categorical(one_hot_points, temperature=1e-2)
+    one_hot_points = numpy.array(
+      [domain.map_categorical_point_to_one_hot(p) for p in points]
+    )
+    remapped_categorical_points = domain.map_one_hot_points_to_categorical(
+      one_hot_points, temperature=1e-2
+    )
     assert numpy.all(points == remapped_categorical_points)
 
-    one_hot_points = domain.one_hot_domain.generate_quasi_random_points_in_domain(num_points)
-    categorical_points = domain.map_one_hot_points_to_categorical(one_hot_points, temperature=1e-2)
-    remapped_one_hot_points = numpy.array([domain.map_categorical_point_to_one_hot(p) for p in categorical_points])
+    one_hot_points = domain.one_hot_domain.generate_quasi_random_points_in_domain(
+      num_points
+    )
+    categorical_points = domain.map_one_hot_points_to_categorical(
+      one_hot_points, temperature=1e-2
+    )
+    remapped_one_hot_points = numpy.array(
+      [domain.map_categorical_point_to_one_hot(p) for p in categorical_points]
+    )
     for mapping in domain.one_hot_to_categorical_mapping:
       if mapping["var_type"] == DOUBLE_EXPERIMENT_PARAMETER_NAME:
-        assert numpy.all(one_hot_points[:, mapping["input_ind"]] == remapped_one_hot_points[:, mapping["input_ind"]])
+        assert numpy.all(
+          one_hot_points[:, mapping["input_ind"]]
+          == remapped_one_hot_points[:, mapping["input_ind"]]
+        )
 
   def test_constrained_point_generation(self):
     domain = form_random_constrained_categorical_domain(
@@ -697,10 +970,17 @@ class TestCategoricalDomain(object):
     assert all(domain.check_point_acceptable(point) for point in categorical_points)
 
     # Check points in one_hot domain
-    one_hot_points = domain.one_hot_domain.generate_quasi_random_points_in_domain(num_points)
+    one_hot_points = domain.one_hot_domain.generate_quasi_random_points_in_domain(
+      num_points
+    )
     assert tuple(one_hot_points.shape) == (num_points, domain.one_hot_dim)
-    assert all(domain.one_hot_domain.check_point_inside(point) for point in one_hot_points)
-    assert all(domain.one_hot_domain.check_point_satisfies_constraints(point) for point in one_hot_points)
+    assert all(
+      domain.one_hot_domain.check_point_inside(point) for point in one_hot_points
+    )
+    assert all(
+      domain.one_hot_domain.check_point_satisfies_constraints(point)
+      for point in one_hot_points
+    )
 
   def test_integer_constraint_samples_satisfy_equality(self):
     # Check ability to return points that satisfy not just strict less than inequality but also equality
@@ -778,7 +1058,10 @@ class TestCategoricalDomain(object):
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [1, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
         {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": all_cats},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.1, 0, 0.1, 2]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [-0.1, 0, 0.1, 2],
+        },
       ]
     )
 
@@ -787,41 +1070,63 @@ class TestCategoricalDomain(object):
       for nonzero_value in [0.03, 0.2, 1.0]:
         cat_vals = [0] * len(all_cats)
         cat_vals[winning_cat_index] = nonzero_value
-        one_hot_points = numpy.array([[3, 2.2] + cat_vals + [0.1]]) * numpy.ones((num_conversions, 1))
+        one_hot_points = numpy.array([[3, 2.2] + cat_vals + [0.1]]) * numpy.ones(
+          (num_conversions, 1)
+        )
         for temperature in [1e-2, 1e-1, 1e0]:
-          categorical_points = domain.map_one_hot_points_to_categorical(one_hot_points, temperature=temperature)
+          categorical_points = domain.map_one_hot_points_to_categorical(
+            one_hot_points, temperature=temperature
+          )
           chosen_categories = categorical_points[:, 2]
           assert all(chosen_categories == all_cats[winning_cat_index])
 
     # In these settings, all categories are equally desired, so we should randomly yield results
     for zero_or_nonzero_value in [0, 0.3, 1.0]:
       cat_vals = [zero_or_nonzero_value] * len(all_cats)
-      one_hot_points = numpy.array([[3, 2.2] + cat_vals + [2]]) * numpy.ones((num_conversions, 1))
+      one_hot_points = numpy.array([[3, 2.2] + cat_vals + [2]]) * numpy.ones(
+        (num_conversions, 1)
+      )
       uniform_proportion = 1.0 / len(all_cats)
       for temperature in [1e-2, 1e-1, 1e0]:
-        categorical_points = domain.map_one_hot_points_to_categorical(one_hot_points, temperature=temperature)
+        categorical_points = domain.map_one_hot_points_to_categorical(
+          one_hot_points, temperature=temperature
+        )
         chosen_categories = categorical_points[:, 2]
-        proportions = numpy.array([sum(c == chosen_categories) for c in all_cats]) / float(num_conversions)
+        proportions = numpy.array(
+          [sum(c == chosen_categories) for c in all_cats]
+        ) / float(num_conversions)
         assert all(abs(proportions - uniform_proportion) < 0.06)
 
     # Check that if the first and the second categories match in value they are returned equally often
     cat_vals = [0.54321, 0.54321] + [0] * (len(all_cats) - 2)
-    one_hot_points = numpy.array([[3, 2.2] + cat_vals + [0]]) * numpy.ones((num_conversions, 1))
+    one_hot_points = numpy.array([[3, 2.2] + cat_vals + [0]]) * numpy.ones(
+      (num_conversions, 1)
+    )
     for temperature in [1e-2, 1e-1, 1e0]:
-      categorical_points = domain.map_one_hot_points_to_categorical(one_hot_points, temperature=temperature)
+      categorical_points = domain.map_one_hot_points_to_categorical(
+        one_hot_points, temperature=temperature
+      )
       chosen_categories = categorical_points[:, 2]
-      proportions = numpy.array([sum(c == chosen_categories) for c in all_cats]) / float(num_conversions)
+      proportions = numpy.array(
+        [sum(c == chosen_categories) for c in all_cats]
+      ) / float(num_conversions)
       assert all(abs(proportions[:2] - 0.5) < 0.06)
       assert all(proportions[2:] == 0)
 
     # Check that if two categories are nearly equally prominent that increasing the temperature balances them out
     cat_vals = [0.63, 0.37] + [0] * (len(all_cats) - 2)
-    one_hot_points = numpy.array([[3, 2.2] + cat_vals + [-0.1]]) * numpy.ones((num_conversions, 1))
+    one_hot_points = numpy.array([[3, 2.2] + cat_vals + [-0.1]]) * numpy.ones(
+      (num_conversions, 1)
+    )
     sampling_gap = []
     for temperature in [1e-2, 2e-1, 1e0, 1e1]:
-      categorical_points = domain.map_one_hot_points_to_categorical(one_hot_points, temperature=temperature)
+      categorical_points = domain.map_one_hot_points_to_categorical(
+        one_hot_points, temperature=temperature
+      )
       chosen_categories = categorical_points[:, 2]
-      proportions = numpy.array([sum(c == chosen_categories) for c in all_cats]) / float(num_conversions)
+      proportions = numpy.array(
+        [sum(c == chosen_categories) for c in all_cats]
+      ) / float(num_conversions)
       sampling_gap.append(proportions[0] - proportions[1])
     assert all(numpy.diff(sampling_gap) < 0)
 
@@ -847,7 +1152,10 @@ class TestCategoricalDomain(object):
     domain_components = [
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 3, 7]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.4, 4.8, 23]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [0.1, 0.2, 2.4, 4.8, 23],
+      },
     ]
     domain = CategoricalDomain(domain_components)
     discrete_elements = [
@@ -868,10 +1176,14 @@ class TestCategoricalDomain(object):
 
     all_unique_points = domain.generate_distinct_random_points(total_unique_points)
     assert len(all_unique_points) >= len(unique_random_points)
-    assert len(domain.identify_unique_points(all_unique_points)) == len(all_unique_points)
+    assert len(domain.identify_unique_points(all_unique_points)) == len(
+      all_unique_points
+    )
     with pytest.raises(ValueError):
       # pylint: disable=protected-access
-      domain._analyze_discrete_elements(discrete_elements, total_unique_points + 1, 0, 0)
+      domain._analyze_discrete_elements(
+        discrete_elements, total_unique_points + 1, 0, 0
+      )
       # pylint: enable=protected-access
     only_unique_points = domain.generate_distinct_random_points(total_unique_points + 1)
     assert len(all_unique_points) == len(only_unique_points) == total_unique_points
@@ -888,7 +1200,9 @@ class TestCategoricalDomain(object):
       excluded_points=points_already_sampled,
     )
     assert len(all_unique_points) >= len(remaining_unique_points)
-    assert len(domain.identify_unique_points(remaining_unique_points)) == len(remaining_unique_points)
+    assert len(domain.identify_unique_points(remaining_unique_points)) == len(
+      remaining_unique_points
+    )
     with pytest.raises(ValueError):
       # pylint: disable=protected-access
       domain._analyze_discrete_elements(
@@ -902,12 +1216,18 @@ class TestCategoricalDomain(object):
     # Confirm that having points outside the domain doesn't break this computation
     points_including_outside_domain = domain.generate_quasi_random_points_in_domain(6)
     points_including_outside_domain[0, :] = [0, 0, 0]
-    assert len(domain.remove_points_outside_domain(points_including_outside_domain)) == 5
-    distinct_points = domain.generate_distinct_random_points(10, excluded_points=points_including_outside_domain)
+    assert (
+      len(domain.remove_points_outside_domain(points_including_outside_domain)) == 5
+    )
+    distinct_points = domain.generate_distinct_random_points(
+      10, excluded_points=points_including_outside_domain
+    )
     assert len(distinct_points) == 10
 
     # This has previously given us issues with overflow
-    domain_components = [{"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10000]}] * 10
+    domain_components = [
+      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10000]}
+    ] * 10
     domain = CategoricalDomain(domain_components)
     unique_random_points = domain.generate_distinct_random_points(num_points)
     assert len(unique_random_points) == num_points
@@ -920,12 +1240,17 @@ class TestCategoricalDomain(object):
     domain = CategoricalDomain(domain_components)
     assert domain.product_of_categories == 24
 
-  @pytest.mark.parametrize("non_enum_elements", [[0.1, 0.5], ["a1", "b2"], ["1", "2"], [1.0, 2.0]])
+  @pytest.mark.parametrize(
+    "non_enum_elements", [[0.1, 0.5], ["a1", "b2"], ["1", "2"], [1.0, 2.0]]
+  )
   def test_non_enum_categoricals(self, non_enum_elements):
     domain_components = [
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": non_enum_elements},
+      {
+        "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+        "elements": non_enum_elements,
+      },
     ]
     with pytest.raises(AssertionError):
       CategoricalDomain(domain_components)
@@ -945,13 +1270,21 @@ class TestCategoricalDomain(object):
     assert numpy.all(points == domain.map_categorical_points_to_enumeration(points))
     assert numpy.all(points == domain.identify_unique_points(points))
 
-    one_hot_points = numpy.array([domain.map_categorical_point_to_one_hot(p) for p in points])
-    remapped_categorical_points = numpy.array(domain.map_one_hot_points_to_categorical(one_hot_points))
+    one_hot_points = numpy.array(
+      [domain.map_categorical_point_to_one_hot(p) for p in points]
+    )
+    remapped_categorical_points = numpy.array(
+      domain.map_one_hot_points_to_categorical(one_hot_points)
+    )
     assert numpy.all(points == remapped_categorical_points)
 
-    one_hot_points = domain.one_hot_domain.generate_quasi_random_points_in_domain(num_points)
+    one_hot_points = domain.one_hot_domain.generate_quasi_random_points_in_domain(
+      num_points
+    )
     categorical_points = domain.map_one_hot_points_to_categorical(one_hot_points)
-    remapped_one_hot_points = numpy.array([domain.map_categorical_point_to_one_hot(p) for p in categorical_points])
+    remapped_one_hot_points = numpy.array(
+      [domain.map_categorical_point_to_one_hot(p) for p in categorical_points]
+    )
     assert numpy.all(one_hot_points == remapped_one_hot_points)
 
   def test_constraints(self):
@@ -961,12 +1294,21 @@ class TestCategoricalDomain(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 1]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 3]},
     ]
 
     # Can't have categorical weights which are nonzero
-    constraint_list = [{"weights": [1, 0, 0, 0, 2, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME}]
+    constraint_list = [
+      {
+        "weights": [1, 0, 0, 0, 2, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      }
+    ]
     with pytest.raises(AssertionError):
       CategoricalDomain(domain_components, constraint_list)
 
@@ -981,8 +1323,16 @@ class TestCategoricalDomain(object):
       CategoricalDomain(domain_components, constraint_list)
 
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [1, 1, 1, 0, 0, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [1, 1, 1, 0, 0, 0, 0],
+        "rhs": 2,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
 
@@ -1009,13 +1359,24 @@ class TestCategoricalDomain(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2.1, 2.1]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
     ]
     constraint_list = [
-      {"weights": [1, 0, 0, 1, 0, 0, 0], "rhs": 1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [0, 0, 0, 1, 0, 0, 1], "rhs": 1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 0, 0, 1, 0, 0, 0],
+        "rhs": 1,
+        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [0, 0, 0, 1, 0, 0, 1],
+        "rhs": 1,
+        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(integer_domain, constraint_list)
     assert domain.is_integer_constrained
@@ -1055,7 +1416,11 @@ class TestCategoricalDomain(object):
           {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2.1, 2.1]},
         ],
         constraint_list=[
-          {"weights": [1.0, 1.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [1.0, 1.0],
+            "rhs": 0.3,
+            "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
       )
     with pytest.raises(AssertionError):
@@ -1065,7 +1430,11 @@ class TestCategoricalDomain(object):
           {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
         ],
         constraint_list=[
-          {"weights": [1.0, 1.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [1.0, 1.0],
+            "rhs": 0.3,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
       )
 
@@ -1077,7 +1446,11 @@ class TestCategoricalDomain(object):
           {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2.1, 2.1]},
         ],
         constraint_list=[
-          {"weights": [1.0, 1.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [1.0, 1.0],
+            "rhs": 0.3,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
       )
 
@@ -1102,24 +1475,45 @@ class TestCategoricalDomain(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2.1, 2.1]},
     ]
-    domain_with_priors = CategoricalDomain(domain_components=domain_components, priors=priors)
+    domain_with_priors = CategoricalDomain(
+      domain_components=domain_components, priors=priors
+    )
     assert domains_approximately_equal(domain_with_priors, domain_with_priors)
 
     priors_unchanged = copy.deepcopy(priors)
-    priors_unchanged[0] = {"name": ParameterPriorNames.NORMAL, "params": {"mean": 1.0, "scale": 2.0}}
-    priors_unchanged[1] = {"name": ParameterPriorNames.BETA, "params": {"shape_a": 3.0, "shape_b": 4.0}}
-    domain_with_priors_unchanged = CategoricalDomain(domain_components=domain_components, priors=priors_unchanged)
+    priors_unchanged[0] = {
+      "name": ParameterPriorNames.NORMAL,
+      "params": {"mean": 1.0, "scale": 2.0},
+    }
+    priors_unchanged[1] = {
+      "name": ParameterPriorNames.BETA,
+      "params": {"shape_a": 3.0, "shape_b": 4.0},
+    }
+    domain_with_priors_unchanged = CategoricalDomain(
+      domain_components=domain_components, priors=priors_unchanged
+    )
     assert domains_approximately_equal(domain_with_priors, domain_with_priors_unchanged)
 
     priors_changed = copy.deepcopy(priors)
-    priors_changed[0] = {"name": ParameterPriorNames.BETA, "params": {"shape_a": 1, "shape_b": 2}}
-    domain_with_priors_changed = CategoricalDomain(domain_components=domain_components, priors=priors_changed)
-    assert not domains_approximately_equal(domain_with_priors, domain_with_priors_changed)
+    priors_changed[0] = {
+      "name": ParameterPriorNames.BETA,
+      "params": {"shape_a": 1, "shape_b": 2},
+    }
+    domain_with_priors_changed = CategoricalDomain(
+      domain_components=domain_components, priors=priors_changed
+    )
+    assert not domains_approximately_equal(
+      domain_with_priors, domain_with_priors_changed
+    )
 
     priors_changed = copy.deepcopy(priors)
     priors_changed[1]["params"]["shape_a"] = 3.1
-    domain_with_priors_changed = CategoricalDomain(domain_components=domain_components, priors=priors_changed)
-    assert not domains_approximately_equal(domain_with_priors, domain_with_priors_changed)
+    domain_with_priors_changed = CategoricalDomain(
+      domain_components=domain_components, priors=priors_changed
+    )
+    assert not domains_approximately_equal(
+      domain_with_priors, domain_with_priors_changed
+    )
 
 
 class TestPriorSamplers(object):
@@ -1136,7 +1530,11 @@ class TestPriorSamplers(object):
 
   @pytest.mark.parametrize(
     "var_type",
-    [INT_EXPERIMENT_PARAMETER_NAME, CATEGORICAL_EXPERIMENT_PARAMETER_NAME, QUANTIZED_EXPERIMENT_PARAMETER_NAME],
+    [
+      INT_EXPERIMENT_PARAMETER_NAME,
+      CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+      QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+    ],
   )
   def test_non_double_var_types_raise_assertion_error(self, var_type):
     domain_components = [
@@ -1157,7 +1555,10 @@ class TestPriorSamplers(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 2]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [4, 5, 6]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
     ]
@@ -1186,7 +1587,9 @@ class TestPriorSamplers(object):
     ],
   )
   # The observed failure rate seems to be less than 1/10000
-  def test_check_normal_prior_satisfies_distribution(self, mean, scale, domain_components):
+  def test_check_normal_prior_satisfies_distribution(
+    self, mean, scale, domain_components
+  ):
     domain_components = [
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": domain_components},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
@@ -1198,7 +1601,9 @@ class TestPriorSamplers(object):
     ]
     domain = CategoricalDomain(domain_components=domain_components, priors=priors)
     samples = domain.generate_random_points_according_to_priors(n_samples)
-    assert samples_satisfy_kolmogorov_smirnov_test(samples[:, 0], domain_components[0], priors[0])
+    assert samples_satisfy_kolmogorov_smirnov_test(
+      samples[:, 0], domain_components[0], priors[0]
+    )
 
   @flaky(max_runs=2)
   @pytest.mark.parametrize(
@@ -1210,19 +1615,26 @@ class TestPriorSamplers(object):
     ],
   )
   # The observed failure rate seems to be less than 1/10000
-  def test_check_unit_beta_prior_satisfies_distribution(self, shape_a, shape_b, domain_components):
+  def test_check_unit_beta_prior_satisfies_distribution(
+    self, shape_a, shape_b, domain_components
+  ):
     domain_components = [
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": domain_components},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
     ]
     n_samples = 200
     priors = [
-      {"name": ParameterPriorNames.BETA, "params": {"shape_a": shape_a, "shape_b": shape_b}},
+      {
+        "name": ParameterPriorNames.BETA,
+        "params": {"shape_a": shape_a, "shape_b": shape_b},
+      },
       {"name": None, "params": None},
     ]
     domain = CategoricalDomain(domain_components=domain_components, priors=priors)
     samples = domain.generate_random_points_according_to_priors(n_samples)
-    assert samples_satisfy_kolmogorov_smirnov_test(samples[:, 0], domain_components[0], priors[0])
+    assert samples_satisfy_kolmogorov_smirnov_test(
+      samples[:, 0], domain_components[0], priors[0]
+    )
 
 
 class TestInferUnconstrainedIndicesHalfspace(object):
@@ -1241,38 +1653,80 @@ class TestInferUnconstrainedIndicesHalfspace(object):
     [
       (
         [
-          {"weights": [-1, -1, 0, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [-1, -1, 0, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
         [2, 3, 4, 5, 6, 7, 8],
       ),
       (
         [
-          {"weights": [0, 0, 0, 0, 0, 1, 1], "rhs": -1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [-1, -1, 0, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [0, 0, 0, 0, 0, 1, 1],
+            "rhs": -1,
+            "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [-1, -1, 0, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
         [2, 3, 4, 5, 6],
       ),
       (
         [
-          {"weights": [-1, -1, 0, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [0, 0, 0, 0, 0, 1, 1], "rhs": -1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [1, 1, 1, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [-1, -1, 0, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [0, 0, 0, 0, 0, 1, 1],
+            "rhs": -1,
+            "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [1, 1, 1, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
         [3, 4, 5, 6],
       ),
       (
         [
-          {"weights": [-1, -1, 0, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [0, 0, 0, 0, 0, 1, 1], "rhs": -1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [1, 0, 0, 0, 1, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [0, 1, 1, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [-1, -1, 0, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [0, 0, 0, 0, 0, 1, 1],
+            "rhs": -1,
+            "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [1, 0, 0, 0, 1, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [0, 1, 1, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
         [3, 4, 5],
       ),
     ],
   )
   def test_unconstrained_indices(self, constraint_list, true_nonzero_one_hot_indices):
-    one_hot_domain = CategoricalDomain(self.domain_components, constraint_list=constraint_list).one_hot_domain
+    one_hot_domain = CategoricalDomain(
+      self.domain_components, constraint_list=constraint_list
+    ).one_hot_domain
     one_hot_indices = one_hot_domain.one_hot_unconstrained_indices
     assert one_hot_indices == true_nonzero_one_hot_indices
 
@@ -1283,10 +1737,19 @@ class TestInferUnconstrainedIndicesHalfspace(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]},
     ]
     constraint_list = [
-      {"type": "ineq", "weights": [-1, -1, -1], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME}
+      {
+        "type": "ineq",
+        "weights": [-1, -1, -1],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      }
     ]
-    constraint_list = [{"weights": [-1, -1, -1], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME}]
-    one_hot_domain = CategoricalDomain(domain_components, constraint_list=constraint_list).one_hot_domain
+    constraint_list = [
+      {"weights": [-1, -1, -1], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME}
+    ]
+    one_hot_domain = CategoricalDomain(
+      domain_components, constraint_list=constraint_list
+    ).one_hot_domain
     one_hot_indices = one_hot_domain.one_hot_unconstrained_indices
     assert one_hot_indices == []
 
@@ -1306,7 +1769,9 @@ class TestHitandRunSampling(object):
     constraint_list = [
       {"weights": [1, 1, 1], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
     ]
-    domain = CategoricalDomain(domain_components, constraint_list=constraint_list, force_hitandrun_sampling=True)
+    domain = CategoricalDomain(
+      domain_components, constraint_list=constraint_list, force_hitandrun_sampling=True
+    )
     samples = domain.generate_quasi_random_points_in_domain(10)
     assert all(domain.check_point_acceptable(point) for point in samples)
 
@@ -1315,14 +1780,23 @@ class TestHitandRunSampling(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 0]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-20, 2]},
     ]
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
-    domain = CategoricalDomain(domain_components, constraint_list=constraint_list, force_hitandrun_sampling=True)
+    domain = CategoricalDomain(
+      domain_components, constraint_list=constraint_list, force_hitandrun_sampling=True
+    )
     samples = domain.generate_quasi_random_points_in_domain(10)
     assert all(domain.check_point_acceptable(point) for point in samples)
 
@@ -1331,14 +1805,23 @@ class TestHitandRunSampling(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 0]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-20, 2]},
     ]
     constraint_list = [
-      {"weights": [0, 0, 0, 0, 1, 1], "rhs": 5, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [0, 0, 0, 0, 1, 1],
+        "rhs": 5,
+        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
-    domain = CategoricalDomain(domain_components, constraint_list=constraint_list, force_hitandrun_sampling=True)
+    domain = CategoricalDomain(
+      domain_components, constraint_list=constraint_list, force_hitandrun_sampling=True
+    )
     samples = domain.generate_quasi_random_points_in_domain(10)
     assert all(domain.check_point_acceptable(point) for point in samples)
 
@@ -1372,7 +1855,9 @@ class TestFixedIndicesOnContinuousDomain(object):
 
   def test_point_generation(self):
     dim = numpy.random.randint(3, 6)
-    cn_domain = form_random_unconstrained_categorical_domain(dim, categoricals_allowed=False).one_hot_domain
+    cn_domain = form_random_unconstrained_categorical_domain(
+      dim, categoricals_allowed=False
+    ).one_hot_domain
     midpoint = cn_domain.midpoint
     fixed_indices = {0: midpoint[0], 2: cn_domain.domain_bounds[2, 1]}
     domain = FixedIndicesOnContinuousDomain(cn_domain, fixed_indices)
@@ -1386,7 +1871,9 @@ class TestFixedIndicesOnContinuousDomain(object):
 
     ref_point = midpoint
     ref_point[2] = cn_domain.domain_bounds[2, 1]
-    inner_points = domain.generate_random_points_near_point(num_points, ref_point, numpy.random.gamma(1, 1))
+    inner_points = domain.generate_random_points_near_point(
+      num_points, ref_point, numpy.random.gamma(1, 1)
+    )
     assert all(cn_domain.check_point_acceptable(p) for p in inner_points)
     assert numpy.all(inner_points[:, 0] == midpoint[0])
     assert numpy.all(inner_points[:, 2] == cn_domain.domain_bounds[2, 1])
@@ -1409,10 +1896,14 @@ class TestFixedIndicesOnContinuousDomain(object):
     domain_with_constraints = FixedIndicesOnContinuousDomain(cn_domain, fixed_indices)
 
     num_points = 1000
-    constrained_points = domain_with_constraints.generate_quasi_random_points_in_domain(num_points)
+    constrained_points = domain_with_constraints.generate_quasi_random_points_in_domain(
+      num_points
+    )
     assert all(constrained_points[:, 0] + constrained_points[:, 2] > 1)
     assert all(constrained_points[:, 1] == 0.25)
-    assert all(cn_domain.check_point_satisfies_constraints(p) for p in constrained_points)
+    assert all(
+      cn_domain.check_point_satisfies_constraints(p) for p in constrained_points
+    )
     assert all(cn_domain.check_point_acceptable(p) for p in constrained_points)
 
   def test_restrict_points_to_constrained_domain(self):
@@ -1435,12 +1926,19 @@ class TestFixedIndicesOnContinuousDomain(object):
 
     unconstrained_points = domain.generate_quasi_random_points_in_domain(num_points)
     unconstrained_points[-1, :] = [0, 0, 0]  # Does not satisfy the constraints
-    constrained_points = domain_with_constraints.restrict_points_to_domain(unconstrained_points)
+    constrained_points = domain_with_constraints.restrict_points_to_domain(
+      unconstrained_points
+    )
     assert not numpy.allclose(unconstrained_points, constrained_points)
     assert any(unconstrained_points[:, 0] + unconstrained_points[:, 2] <= 1)
     assert all(constrained_points[:, 0] + constrained_points[:, 2] > 1)
-    assert all(cn_domain.check_point_satisfies_constraints(p) for p in constrained_points)
-    assert all(cn_domain.check_point_satisfies_constraints(p) == (p[0] + p[2] > 1) for p in unconstrained_points)
+    assert all(
+      cn_domain.check_point_satisfies_constraints(p) for p in constrained_points
+    )
+    assert all(
+      cn_domain.check_point_satisfies_constraints(p) == (p[0] + p[2] > 1)
+      for p in unconstrained_points
+    )
 
     constrained_points_on = domain_with_constraints.restrict_points_to_domain(
       unconstrained_points,

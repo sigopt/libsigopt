@@ -33,7 +33,9 @@ class ProbabilisticFailuresBase(object):
   def verify_points_to_evaluate(self, points_to_evaluate):
     eval_shape = points_to_evaluate.shape
     assert len(eval_shape) == 2
-    assert eval_shape[1] == self.dim, f"dim of point: {eval_shape[1]} != dim of the model: {self.dim}"
+    assert (
+      eval_shape[1] == self.dim
+    ), f"dim of point: {eval_shape[1]} != dim of the model: {self.dim}"
 
   @property
   def dim(self):
@@ -51,14 +53,18 @@ class ProbabilisticFailuresBase(object):
 
   def compute_probability_of_success(self, points_to_evaluate):
     self.verify_points_to_evaluate(points_to_evaluate)
-    return self._compute_probability_of_success(self.compute_failure_components(points_to_evaluate, "func"))
+    return self._compute_probability_of_success(
+      self.compute_failure_components(points_to_evaluate, "func")
+    )
 
   def _compute_probability_of_success(self, failure_components):
     raise NotImplementedError()
 
   def compute_grad_probability_of_success(self, points_to_evaluate):
     self.verify_points_to_evaluate(points_to_evaluate)
-    return self._compute_grad_probability_of_success(self.compute_failure_components(points_to_evaluate, "grad"))
+    return self._compute_grad_probability_of_success(
+      self.compute_failure_components(points_to_evaluate, "grad")
+    )
 
   def _compute_grad_probability_of_success(self, failure_components):
     raise NotImplementedError()
@@ -84,7 +90,9 @@ class ProbabilisticFailures(HasPredictor, ProbabilisticFailuresBase):
       self.kappa = numpy.log(9) / (0.1 * points_sampled_values_range)
 
   def __repr__(self):
-    return f"Logistic function: (1.0 + exp({self.kappa} * (mu(x) - {self.threshold})))^-1"
+    return (
+      f"Logistic function: (1.0 + exp({self.kappa} * (mu(x) - {self.threshold})))^-1"
+    )
 
   def __len__(self):
     return 1
@@ -94,14 +102,20 @@ class ProbabilisticFailures(HasPredictor, ProbabilisticFailuresBase):
     return {
       "threshold": self.threshold,
       "num_points": self.predictor.num_sampled,
-      "num_points_beyond_threshold": sum(self.predictor.points_sampled_value < self.threshold),
+      "num_points_beyond_threshold": sum(
+        self.predictor.points_sampled_value < self.threshold
+      ),
     }
 
   # We upper bound the exponent for numerical stability
   def compute_failure_components(self, points_to_evaluate, option):
     self.verify_points_to_evaluate(points_to_evaluate)
     core_components = self.compute_core_components(points_to_evaluate, option)
-    exponential = numpy.exp(numpy.fmin(self.kappa * (core_components.mean - self.threshold), POSITIVE_EXPONENT_CAP))
+    exponential = numpy.exp(
+      numpy.fmin(
+        self.kappa * (core_components.mean - self.threshold), POSITIVE_EXPONENT_CAP
+      )
+    )
     denominator = 1 + exponential
     return FailureComponents(exponential, denominator, core_components)
 
@@ -113,7 +127,9 @@ class ProbabilisticFailures(HasPredictor, ProbabilisticFailuresBase):
     assert isinstance(failure_components, FailureComponents)
     if failure_components.core_components.grad_mean is None:
       return None
-    chain_rule = -self.kappa * failure_components.exponential / failure_components.denominator**2
+    chain_rule = (
+      -self.kappa * failure_components.exponential / failure_components.denominator**2
+    )
     return chain_rule[:, None] * failure_components.core_components.grad_mean
 
 
@@ -139,7 +155,9 @@ class ProbabilisticFailuresCDF(HasPredictor, ProbabilisticFailuresBase):
     return {
       "threshold": self.threshold,
       "num_points": self.predictor.num_sampled,
-      "num_points_beyond_threshold": sum(self.predictor.points_sampled_value < self.threshold),
+      "num_points_beyond_threshold": sum(
+        self.predictor.points_sampled_value < self.threshold
+      ),
     }
 
   def compute_failure_components(self, points_to_evaluate, option):
@@ -154,7 +172,9 @@ class ProbabilisticFailuresCDF(HasPredictor, ProbabilisticFailuresBase):
   def _compute_grad_probability_of_success(self, failure_components):
     assert isinstance(failure_components, FailureComponents)
     cc = failure_components.core_components
-    return -(cc.pdf_z / cc.sqrt_var)[:, None] * (cc.grad_mean + cc.z[:, None] * cc.grad_sqrt_var)
+    return -(cc.pdf_z / cc.sqrt_var)[:, None] * (
+      cc.grad_mean + cc.z[:, None] * cc.grad_sqrt_var
+    )
 
 
 class ProductOfListOfProbabilisticFailures(ProbabilisticFailuresBase):
@@ -175,7 +195,10 @@ class ProductOfListOfProbabilisticFailures(ProbabilisticFailuresBase):
 
   @property
   def info_for_logs(self):
-    return {f"failure_model_{i}: {pf.info_for_logs}" for i, pf in enumerate(self.list_of_probabilistic_failures)}
+    return {
+      f"failure_model_{i}: {pf.info_for_logs}"
+      for i, pf in enumerate(self.list_of_probabilistic_failures)
+    }
 
   @property
   def dim(self):

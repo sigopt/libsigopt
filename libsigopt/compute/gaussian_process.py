@@ -43,7 +43,9 @@ class GaussianProcess(Predictor):
 
     """
 
-  def __init__(self, covariance, historical_data, mean_poly_indices=None, tikhonov_param=None):
+  def __init__(
+    self, covariance, historical_data, mean_poly_indices=None, tikhonov_param=None
+  ):
     assert isinstance(covariance, CovarianceBase)
     assert isinstance(historical_data, HistoricalData)
     assert covariance.dim == historical_data.dim
@@ -156,7 +158,9 @@ class GaussianProcess(Predictor):
         TODO(RTL-39): We have come up with an additional consideration in posterior variance
 
         """
-    self.mean_poly_indices = polynomial_index_point_check(self.mean_poly_indices, self.dim)
+    self.mean_poly_indices = polynomial_index_point_check(
+      self.mean_poly_indices, self.dim
+    )
 
     if self.has_zero_mean:
       self.poly_coef = numpy.array([0.0])
@@ -166,7 +170,9 @@ class GaussianProcess(Predictor):
       m = len(self.points_sampled)
       n = len(self.mean_poly_indices)
       if m < n:
-        raise ValueError(f"{m} points cannot fit a polynomial with {n} terms because {m}<{n}")
+        raise ValueError(
+          f"{m} points cannot fit a polynomial with {n} terms because {m}<{n}"
+        )
 
       self.P = build_polynomial_matrix(self.mean_poly_indices, self.points_sampled)
       self.K_inv_P = cho_solve(self.K_chol, self.P)
@@ -180,12 +186,18 @@ class GaussianProcess(Predictor):
   def _compute_core_posterior_components(self, points_to_sample, option):
     K_eval = grad_K_eval = cardinal_functions_at_points_to_sample = None
     if option in ("K_eval", "all"):
-      K_eval = self.covariance.build_kernel_matrix(self.points_sampled, points_to_sample=points_to_sample)
+      K_eval = self.covariance.build_kernel_matrix(
+        self.points_sampled, points_to_sample=points_to_sample
+      )
       if option == "all":
         cardinal_functions_at_points_to_sample = cho_solve(self.K_chol, K_eval.T).T
     if option in ("grad_K_eval", "all"):
-      grad_K_eval = self.covariance.build_kernel_grad_tensor(self.points_sampled, points_to_sample=points_to_sample)
-    return PosteriorCoreComponents(K_eval, grad_K_eval, cardinal_functions_at_points_to_sample)
+      grad_K_eval = self.covariance.build_kernel_grad_tensor(
+        self.points_sampled, points_to_sample=points_to_sample
+      )
+    return PosteriorCoreComponents(
+      K_eval, grad_K_eval, cardinal_functions_at_points_to_sample
+    )
 
   def compute_mean_of_points(self, points_to_sample):
     r"""Compute the mean of this GP at each of point of ``Xs`` (``points_to_sample``).
@@ -194,8 +206,12 @@ class GaussianProcess(Predictor):
         Subtract out the mean and add it back in after the zero mean GP is computed
 
         """
-    posterior_core_components = self._compute_core_posterior_components(points_to_sample, "K_eval")
-    return self._compute_mean_of_points(points_to_sample, posterior_core_components.K_eval)
+    posterior_core_components = self._compute_core_posterior_components(
+      points_to_sample, "K_eval"
+    )
+    return self._compute_mean_of_points(
+      points_to_sample, posterior_core_components.K_eval
+    )
 
   def _compute_mean_of_points(self, points_to_sample, K_eval):
     P_eval = build_polynomial_matrix(self.mean_poly_indices, points_to_sample)
@@ -209,10 +225,16 @@ class GaussianProcess(Predictor):
         It uses K = L * L^T which we have already computed; we call this V = inv(L) * (k(x1) ... k(xm))
 
         """
-    posterior_core_components = self._compute_core_posterior_components(points_to_sample, "K_eval")
-    return self._compute_variance_of_points(points_to_sample, posterior_core_components.K_eval)
+    posterior_core_components = self._compute_core_posterior_components(
+      points_to_sample, "K_eval"
+    )
+    return self._compute_variance_of_points(
+      points_to_sample, posterior_core_components.K_eval
+    )
 
-  def _compute_variance_of_points(self, points_to_sample, K_eval, cardinal_functions_at_points_to_sample=None):
+  def _compute_variance_of_points(
+    self, points_to_sample, K_eval, cardinal_functions_at_points_to_sample=None
+  ):
     K_x_x_array = self.covariance.covariance(points_to_sample, points_to_sample)
     if cardinal_functions_at_points_to_sample is None:
       V = solve_triangular(
@@ -223,49 +245,74 @@ class GaussianProcess(Predictor):
       )
       schur_complement_component = numpy.sum(V**2, axis=0)
     else:
-      schur_complement_component = numpy.sum(K_eval * cardinal_functions_at_points_to_sample, axis=1)
-    return numpy.fmax(MINIMUM_KRIGING_VARIANCE, K_x_x_array - schur_complement_component)
+      schur_complement_component = numpy.sum(
+        K_eval * cardinal_functions_at_points_to_sample, axis=1
+      )
+    return numpy.fmax(
+      MINIMUM_KRIGING_VARIANCE, K_x_x_array - schur_complement_component
+    )
 
   def compute_mean_and_variance_of_points(self, points_to_sample):
-    posterior_core_components = self._compute_core_posterior_components(points_to_sample, "K_eval")
-    mean = self._compute_mean_of_points(points_to_sample, posterior_core_components.K_eval)
-    var = self._compute_variance_of_points(points_to_sample, posterior_core_components.K_eval)
+    posterior_core_components = self._compute_core_posterior_components(
+      points_to_sample, "K_eval"
+    )
+    mean = self._compute_mean_of_points(
+      points_to_sample, posterior_core_components.K_eval
+    )
+    var = self._compute_variance_of_points(
+      points_to_sample, posterior_core_components.K_eval
+    )
     return mean, var
 
   def compute_grad_mean_of_points(self, points_to_sample):
     r"""Compute the gradient of the mean of this GP at each of point of ``Xs`` (``points_to_sample``) wrt ``Xs``."""
-    posterior_core_components = self._compute_core_posterior_components(points_to_sample, "grad_K_eval")
-    return self._compute_grad_mean_of_points(points_to_sample, posterior_core_components.grad_K_eval)
+    posterior_core_components = self._compute_core_posterior_components(
+      points_to_sample, "grad_K_eval"
+    )
+    return self._compute_grad_mean_of_points(
+      points_to_sample, posterior_core_components.grad_K_eval
+    )
 
   def _compute_grad_mean_of_points(self, points_to_sample, grad_K_eval):
-    grad_P_eval = build_grad_polynomial_tensor(self.mean_poly_indices, points=points_to_sample)
-    return (
-      numpy.einsum("ijk, j", grad_K_eval, self.K_inv_demeaned_y)
-      + numpy.einsum("ijk, j", grad_P_eval, self.poly_coef)
+    grad_P_eval = build_grad_polynomial_tensor(
+      self.mean_poly_indices, points=points_to_sample
+    )
+    return numpy.einsum("ijk, j", grad_K_eval, self.K_inv_demeaned_y) + numpy.einsum(
+      "ijk, j", grad_P_eval, self.poly_coef
     )
 
   # NOTE: An aspect of computation required in compute_variance is copied here for efficiency.
   #       Also, technically, some of the covariance computation is being repeated unnecessarily.
   def compute_grad_variance_of_points(self, points_to_sample):
-    posterior_core_components = self._compute_core_posterior_components(points_to_sample, "all")
+    posterior_core_components = self._compute_core_posterior_components(
+      points_to_sample, "all"
+    )
     return self._compute_grad_variance_of_points(
       posterior_core_components.grad_K_eval,
       posterior_core_components.cardinal_functions_at_points_to_sample,
     )
 
-  def _compute_grad_variance_of_points(self, grad_K_eval, cardinal_functions_at_points_to_sample):
+  def _compute_grad_variance_of_points(
+    self, grad_K_eval, cardinal_functions_at_points_to_sample
+  ):
     if not self.covariance.translation_invariant:
       raise NotImplementedError("Not yet ready for general kernels.")
 
-    return -2 * numpy.sum(grad_K_eval * cardinal_functions_at_points_to_sample[:, :, None], axis=1)
+    return -2 * numpy.sum(
+      grad_K_eval * cardinal_functions_at_points_to_sample[:, :, None], axis=1
+    )
 
   def compute_mean_variance_grad_of_points(self, points_to_sample):
     pcc = self._compute_core_posterior_components(points_to_sample, "all")
 
     mean = self._compute_mean_of_points(points_to_sample, pcc.K_eval)
-    var = self._compute_variance_of_points(points_to_sample, pcc.K_eval, pcc.cardinal_functions_at_points_to_sample)
+    var = self._compute_variance_of_points(
+      points_to_sample, pcc.K_eval, pcc.cardinal_functions_at_points_to_sample
+    )
     grad_mean = self._compute_grad_mean_of_points(points_to_sample, pcc.grad_K_eval)
-    grad_var = self._compute_grad_variance_of_points(pcc.grad_K_eval, pcc.cardinal_functions_at_points_to_sample)
+    grad_var = self._compute_grad_variance_of_points(
+      pcc.grad_K_eval, pcc.cardinal_functions_at_points_to_sample
+    )
 
     return mean, var, grad_mean, grad_var
 
@@ -281,7 +328,9 @@ class GaussianProcess(Predictor):
     if self.num_sampled == 0:
       return numpy.diag(numpy.diag(K_eval_var))
 
-    K_eval = self.covariance.build_kernel_matrix(self.points_sampled, points_to_sample=points_to_sample)
+    K_eval = self.covariance.build_kernel_matrix(
+      self.points_sampled, points_to_sample=points_to_sample
+    )
     V = solve_triangular(
       self.K_chol[0],
       K_eval.T,

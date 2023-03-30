@@ -37,7 +37,10 @@ class TestNonzeroMean(NumericalTestCase):
     assert indices_represent_zero_mean([[]]) and not indices_represent_zero_mean([[0]])
     for d in self.num_dim_list:
       assert indices_represent_constant_mean([[0] * d], d)
-      assert not (indices_represent_constant_mean([[1] * d], d) or indices_represent_constant_mean([[0] * d], d + 1))
+      assert not (
+        indices_represent_constant_mean([[1] * d], d)
+        or indices_represent_constant_mean([[0] * d], d + 1)
+      )
       assert indices_represent_zero_mean(polynomial_index_point_check(None, d))
     with pytest.raises(ValueError):
       polynomial_index_point_check([[0, 0], [1, 1]], 3)
@@ -48,9 +51,13 @@ class TestNonzeroMean(NumericalTestCase):
     with pytest.raises(ValueError):
       polynomial_index_point_check([1, 1.3, 1], 3)
 
-    for num_points, poly_length, dim in zip(self.num_points_list, self.num_poly_indices_list, self.num_dim_list):
+    for num_points, poly_length, dim in zip(
+      self.num_points_list, self.num_poly_indices_list, self.num_dim_list
+    ):
       indices_list = numpy.random.randint(0, num_points, (poly_length, dim))
-      assert numpy.array_equal(polynomial_index_point_check(indices_list, dim), indices_list)
+      assert numpy.array_equal(
+        polynomial_index_point_check(indices_list, dim), indices_list
+      )
 
   def polynomial_matrix_test(self, num_points, poly_length, dim):
     """Testing the accuracy of the polynomial matrix construction function.
@@ -69,9 +76,13 @@ class TestNonzeroMean(NumericalTestCase):
     indices_list = numpy.random.randint(0, num_points, (poly_length, dim))
 
     p = build_polynomial_matrix(indices_list, points)
-    p_prod = numpy.prod([pow(points[:, d][:, None], indices_list[:, d]) for d in range(dim)], 0)
+    p_prod = numpy.prod(
+      [pow(points[:, d][:, None], indices_list[:, d]) for d in range(dim)], 0
+    )
 
-    self.assert_vector_within_relative(p_prod, p, numpy.linalg.norm(p) * numpy.finfo(float).eps)
+    self.assert_vector_within_relative(
+      p_prod, p, numpy.linalg.norm(p) * numpy.finfo(float).eps
+    )
 
   def gradient_polynomial_tensor_test(self, num_points, poly_length, dim):
     """Testing the accuracy of the gradient polynomial tensor construction function.
@@ -104,19 +115,28 @@ class TestNonzeroMean(NumericalTestCase):
     for d in range(dim):
       for d_der in range(dim):
         if d != d_der:
-          gpt_each_dim[:, :, d, d_der] = pow(points[:, d_der][:, None], indices_list[:, d_der])
+          gpt_each_dim[:, :, d, d_der] = pow(
+            points[:, d_der][:, None], indices_list[:, d_der]
+          )
         else:
           gpt_each_dim[:, :, d, d] = (
-            pow(points[:, d][:, None], (indices_list[:, d] - 1) * (indices_list[:, d] > 0)) * indices_list[:, d]
+            pow(
+              points[:, d][:, None], (indices_list[:, d] - 1) * (indices_list[:, d] > 0)
+            )
+            * indices_list[:, d]
           )
     gpt_prod = numpy.prod(gpt_each_dim, 3)
 
-    self.assert_vector_within_relative(gpt_prod, gpt, numpy.linalg.norm(gpt) * numpy.finfo(float).eps)
+    self.assert_vector_within_relative(
+      gpt_prod, gpt, numpy.linalg.norm(gpt) * numpy.finfo(float).eps
+    )
 
   # Constant mean gets its own set of tests because it's our standard workflow for right now
   def constant_mean_components_test(self, num_points, dim):
     constant_indices = numpy.zeros((1, dim))
-    self.assert_vector_within_relative(constant_indices, polynomial_index_point_check(constant_indices, dim), 0)
+    self.assert_vector_within_relative(
+      constant_indices, polynomial_index_point_check(constant_indices, dim), 0
+    )
     assert indices_represent_constant_mean(constant_indices, dim)
     test_points = numpy.random.random((num_points, dim))
     self.assert_vector_within_relative(
@@ -162,13 +182,17 @@ class TestNonzeroMean(NumericalTestCase):
 
     ov = numpy.full(n, obs_var)
     historical_data = HistoricalData(dim=dim)
-    historical_data.append_historical_data(points_sampled=x, points_sampled_value=y, points_sampled_noise_variance=ov)
+    historical_data.append_historical_data(
+      points_sampled=x, points_sampled_value=y, points_sampled_noise_variance=ov
+    )
     return historical_data, domain
 
   def test_polynomial_computations(self):
     """Run tests on polynomial function computation with a range of sizes."""
 
-    for i, j, k in zip(self.num_points_list, self.num_poly_indices_list, self.num_dim_list):
+    for i, j, k in zip(
+      self.num_points_list, self.num_poly_indices_list, self.num_dim_list
+    ):
       self.polynomial_matrix_test(i, j, k)
       self.gradient_polynomial_tensor_test(i, j, k)
 
@@ -214,7 +238,9 @@ class TestNonzeroMean(NumericalTestCase):
 
       gp_linear_mean = GaussianProcess(kernel, historical_data, mean_indices)
       test_coef = numpy.concatenate((test_const_coef, test_lin_coef), axis=0)
-      self.assert_vector_within_relative_norm(gp_linear_mean.poly_coef, test_coef, 10 * dim * n * true_var)
+      self.assert_vector_within_relative_norm(
+        gp_linear_mean.poly_coef, test_coef, 10 * dim * n * true_var
+      )
 
 
 class TestCholeskyFactorization(NumericalTestCase):

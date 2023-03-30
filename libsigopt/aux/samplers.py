@@ -13,7 +13,9 @@ REJECTION_SAMPLING_BLOCK_SIZE = 10000
 
 def _verify_bounds(domain_bounds):
   return (
-    len(domain_bounds.shape) == 2 and domain_bounds.shape[1] == 2 and numpy.all(numpy.diff(domain_bounds, axis=1) >= 0)
+    len(domain_bounds.shape) == 2
+    and domain_bounds.shape[1] == 2
+    and numpy.all(numpy.diff(domain_bounds, axis=1) >= 0)
   )
 
 
@@ -36,7 +38,9 @@ def generate_uniform_random_points(num_points, dimension, skip, seed):
   return numpy.random.random((num_points, dimension))
 
 
-def generate_uniform_random_points_rejection_sampling(num_points, domain_bounds, A, b, rejection_count=None):
+def generate_uniform_random_points_rejection_sampling(
+  num_points, domain_bounds, A, b, rejection_count=None
+):
   """Compute a set of uniform random points inside some linear constrained domain. Returns a set of feasible points and
     a bool, which is true if rejection sampling succeeded and false if it failed to find the sufficient points"""
   assert _verify_bounds(domain_bounds)
@@ -48,7 +52,9 @@ def generate_uniform_random_points_rejection_sampling(num_points, domain_bounds,
     left_points = num_points
 
     while (left_points > 0) and (rejection_count > 0):
-      test_points = generate_uniform_random_points(REJECTION_SAMPLING_BLOCK_SIZE, domain_bounds)
+      test_points = generate_uniform_random_points(
+        REJECTION_SAMPLING_BLOCK_SIZE, domain_bounds
+      )
       indexes = numpy.all(numpy.dot(A, test_points.T) <= b[:, None], axis=0)
       points = numpy.vstack((points, test_points[indexes, :]))
       left_points -= numpy.sum(indexes)
@@ -62,8 +68,12 @@ def generate_uniform_random_points_rejection_sampling(num_points, domain_bounds,
     return numpy.empty((0, len(domain_bounds))), False
 
 
-def generate_uniform_random_points_rejection_sampling_with_hitandrun_padding(num_points, domain_bounds, A, b, x0=None):
-  points, success = generate_uniform_random_points_rejection_sampling(num_points, domain_bounds, A, b)
+def generate_uniform_random_points_rejection_sampling_with_hitandrun_padding(
+  num_points, domain_bounds, A, b, x0=None
+):
+  points, success = generate_uniform_random_points_rejection_sampling(
+    num_points, domain_bounds, A, b
+  )
   if not success and num_points > 0:  # fill in rest with hitandrun if rejection fails
 
     if x0 is None:
@@ -143,7 +153,9 @@ def generate_hitandrun_random_points(num_points, x0, A, b):
 @unit_cube_sampler_transform_decorator
 def generate_latin_hypercube_points(num_points, dimension, skip, seed):
   points = numpy.linspace(0, 1, num_points, endpoint=False)
-  points = points[:, None] + numpy.random.uniform(0.0, 1 / num_points, size=(num_points, dimension))
+  points = points[:, None] + numpy.random.uniform(
+    0.0, 1 / num_points, size=(num_points, dimension)
+  )
   for i in range(dimension):
     numpy.random.shuffle(points[:, i])
   return points
@@ -171,7 +183,8 @@ def generate_grid_points(points_per_dimension, domain_bounds):
     points_per_dimension = numpy.resize(points_per_dimension, len(domain_bounds))
 
   per_axis_grid = [
-    numpy.linspace(bounds[0], bounds[1], points_per_dimension[i]) for i, bounds in enumerate(domain_bounds)
+    numpy.linspace(bounds[0], bounds[1], points_per_dimension[i])
+    for i, bounds in enumerate(domain_bounds)
   ]
   mesh_grid = numpy.meshgrid(*per_axis_grid)
   return numpy.vstack([numpy.ravel(g) for g in mesh_grid]).T

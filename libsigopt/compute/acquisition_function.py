@@ -52,7 +52,9 @@ class AcquisitionFunction(HasPredictor):
   # Generally this will be more efficiently evaluated in child classes, but this should always work
   # TODO(RTL-48): Consider relevance of batch_size here ... eventually relevant in vectorized optimizers
   def joint_function_gradient_eval(self, points_to_evaluate):
-    return self._evaluate_at_point_list(points_to_evaluate), self._evaluate_grad_at_point_list(points_to_evaluate)
+    return self._evaluate_at_point_list(
+      points_to_evaluate
+    ), self._evaluate_grad_at_point_list(points_to_evaluate)
 
   def append_lie_locations(self, lie_locations):
     eval_shape = lie_locations.shape

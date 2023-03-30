@@ -56,30 +56,50 @@ def form_one_hot_hyperparameter_domain(
 
   # NOTE: This nan should only occur if there is no data (maybe better to handle elsewhere or error?
   sample_variance = numpy.var(historical_data.points_sampled_value)
-  sample_variance = MINIMUM_VALUE_VAR if numpy.isnan(sample_variance) else max(sample_variance, MINIMUM_VALUE_VAR)
-  hyperparameter_domain_elements.append([ALPHA_LOWER_FACTOR * sample_variance, ALPHA_UPPER_FACTOR * sample_variance])
+  sample_variance = (
+    MINIMUM_VALUE_VAR
+    if numpy.isnan(sample_variance)
+    else max(sample_variance, MINIMUM_VALUE_VAR)
+  )
+  hyperparameter_domain_elements.append(
+    [ALPHA_LOWER_FACTOR * sample_variance, ALPHA_UPPER_FACTOR * sample_variance]
+  )
 
   for one_hot_mapping in categorical_domain.one_hot_to_categorical_mapping:
     if one_hot_mapping["var_type"] == CATEGORICAL_EXPERIMENT_PARAMETER_NAME:
       for _ in one_hot_mapping["input_ind_value_map"]:
-        hyperparameter_domain_elements.append([discrete_lower_limit, CATEGORICAL_UPPER_BOUND])
+        hyperparameter_domain_elements.append(
+          [discrete_lower_limit, CATEGORICAL_UPPER_BOUND]
+        )
     else:
-      bounds = categorical_domain.domain_components[one_hot_mapping["output_ind"]]["elements"]
+      bounds = categorical_domain.domain_components[one_hot_mapping["output_ind"]][
+        "elements"
+      ]
       width = bounds[-1] - bounds[0]
-      lower_bound, upper_bound = LENGTH_SCALE_LOWER_FACTOR * width, LENGTH_SCALE_UPPER_FACTOR * width
+      lower_bound, upper_bound = (
+        LENGTH_SCALE_LOWER_FACTOR * width,
+        LENGTH_SCALE_UPPER_FACTOR * width,
+      )
       if one_hot_mapping["var_type"] == INT_EXPERIMENT_PARAMETER_NAME:
         lower_bound = max(discrete_lower_limit, lower_bound)
       elif one_hot_mapping["var_type"] == QUANTIZED_EXPERIMENT_PARAMETER_NAME:
-        lower_bound = max(QUANTIZED_LENGTH_SCALE_LOWER_FACTOR * min(numpy.diff(bounds)), lower_bound)
+        lower_bound = max(
+          QUANTIZED_LENGTH_SCALE_LOWER_FACTOR * min(numpy.diff(bounds)), lower_bound
+        )
 
       hyperparameter_domain_elements.append([lower_bound, upper_bound])
 
   if task_cost_populated:
-    hyperparameter_domain_elements.append([TASK_LENGTH_LOWER_BOUND, CATEGORICAL_UPPER_BOUND])
+    hyperparameter_domain_elements.append(
+      [TASK_LENGTH_LOWER_BOUND, CATEGORICAL_UPPER_BOUND]
+    )
 
   if use_auto_noise:
     hyperparameter_domain_elements.append(
-      [TIKHONOV_LOWER_FACTOR * sample_variance, TIKHONOV_UPPER_FACTOR * sample_variance],
+      [
+        TIKHONOV_LOWER_FACTOR * sample_variance,
+        TIKHONOV_UPPER_FACTOR * sample_variance,
+      ],
     )
 
   if select_hyper_opt_in_log_domain:
@@ -87,7 +107,8 @@ def form_one_hot_hyperparameter_domain(
       these_elements[0], these_elements[1] = numpy.log(these_elements)
 
   domain_components = [
-    {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": e} for e in hyperparameter_domain_elements
+    {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": e}
+    for e in hyperparameter_domain_elements
   ]
   return CategoricalDomain(domain_components).one_hot_domain
 
@@ -107,13 +128,17 @@ class GpHyperOptMultimetricView(GPView):
     hyperparameters = deepcopy(model_info.hyperparameters)
 
     successful_indexes = numpy.logical_not(self.points_sampled_failures)
-    one_hot_points_sampled_points = self.one_hot_points_sampled_points[successful_indexes, :]
+    one_hot_points_sampled_points = self.one_hot_points_sampled_points[
+      successful_indexes, :
+    ]
     if self.has_optimization_metrics:
       for i, index in enumerate(self.optimized_metrics_index):
         points_sampled_values = self.points_sampled_for_af_values[successful_indexes, i]
         if self.should_skip_hyperopt(points_sampled_values):
           continue
-        points_sampled_value_vars = self.points_sampled_for_af_value_vars[successful_indexes, i]
+        points_sampled_value_vars = self.points_sampled_for_af_value_vars[
+          successful_indexes, i
+        ]
         hyperparameter_dict = self.params["model_info"].hyperparameters[index]
         hyperparameters[index] = self.call_hyperopt_per_metric(
           one_hot_points_sampled_points,
@@ -127,13 +152,15 @@ class GpHyperOptMultimetricView(GPView):
         points_sampled_values = self.points_sampled_for_pf_values[successful_indexes, i]
         if self.should_skip_hyperopt(points_sampled_values):
           continue
-        points_sampled_value_vars = self.points_sampled_for_pf_value_vars[successful_indexes, i]
+        points_sampled_value_vars = self.points_sampled_for_pf_value_vars[
+          successful_indexes, i
+        ]
         hyperparameter_dict = self.params["model_info"].hyperparameters[index]
         hyperparameters[index] = self.call_hyperopt_per_metric(
           one_hot_points_sampled_points,
           points_sampled_values,
           points_sampled_value_vars,
-          hyperparameter_dict
+          hyperparameter_dict,
         )
     self.tag.update({"optimizer_info": self.optimizer_info})
     return {
@@ -198,8 +225,12 @@ class GpHyperOptMultimetricView(GPView):
     optimized_hyperparameter_list = optimized_hyperparameters.tolist()
     alpha = optimized_hyperparameter_list.pop(0)
     tikhonov = optimized_hyperparameter_list.pop(-1) if use_auto_noise else None
-    length_scales = self.domain.map_one_hot_length_scales_to_categorical(optimized_hyperparameter_list)
-    task_length = optimized_hyperparameter_list.pop(-1) if self.task_cost_populated else None
+    length_scales = self.domain.map_one_hot_length_scales_to_categorical(
+      optimized_hyperparameter_list
+    )
+    task_length = (
+      optimized_hyperparameter_list.pop(-1) if self.task_cost_populated else None
+    )
 
     return {
       "alpha": alpha,

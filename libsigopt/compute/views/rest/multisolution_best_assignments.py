@@ -21,7 +21,9 @@ def k_center_clustering(points, first_center_index, k):
     distance_matrix_squared[i, furhest_point_index] = -numpy.inf
     if i == k - 1:
       break
-    furhest_point_index = numpy.argmax(numpy.min(distance_matrix_squared[: i + 1, :], axis=0))
+    furhest_point_index = numpy.argmax(
+      numpy.min(distance_matrix_squared[: i + 1, :], axis=0)
+    )
     centers_indices.append(furhest_point_index)
   partition = numpy.argmin(distance_matrix_squared, axis=0)
   return centers_indices, partition
@@ -37,8 +39,12 @@ class MultisolutionBestAssignments(View):
     values = self.points_sampled_for_af_values[:, 0]
 
     first_center_index = numpy.argmin(values)
-    search_points = convert_one_hot_to_search_hypercube_points(self.domain, self.one_hot_points_sampled_points)
-    _, partition = k_center_clustering(search_points, first_center_index, k=num_solutions)
+    search_points = convert_one_hot_to_search_hypercube_points(
+      self.domain, self.one_hot_points_sampled_points
+    )
+    _, partition = k_center_clustering(
+      search_points, first_center_index, k=num_solutions
+    )
 
     # Get the best index for each partition
     best_index_partition = [None] * num_solutions

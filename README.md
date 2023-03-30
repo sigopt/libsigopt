@@ -4,6 +4,8 @@ Copyright © 2023 Intel Corporation
 SPDX-License-Identifier: Apache License 2.0
 -->
 
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/sigopt/libsigopt/main.svg)](https://results.pre-commit.ci/latest/github/sigopt/libsigopt/main)
+
 # `libsigopt`
 
 `libsigopt` is a module that contains various optimization utilities.

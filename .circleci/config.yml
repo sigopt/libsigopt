@@ -1,14 +1,14 @@
 version: 2.1
 
 jobs:
-  pre-commit:
+  pylint:
     docker:
       - image: cimg/python:3.10
     resource_class: small
     steps:
       - checkout
       - run: pip install . -r requirements-dev.txt
-      - run: pre-commit run --all-files
+      - run: git ls-files '*.py' | xargs pylint --output-format=text -sn
   testaux:
     docker:
       - image: cimg/python:3.10
@@ -42,6 +42,6 @@ jobs:
 workflows:
   main:
     jobs:
-      - pre-commit
+      - pylint
       - testaux
       - testcompute

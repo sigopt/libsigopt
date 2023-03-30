@@ -3,6 +3,6 @@
   description: This hook applies the copyright notice and license disclaimer to all files.
   entry: tools/check_copyright_and_license_disclaimers.py --fix-in-place
   language: python
-  types:
+  types_or:
     - markdown
     - python

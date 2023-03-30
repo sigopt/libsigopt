@@ -51,8 +51,6 @@ jobs:
           sudo dpkg -i trivy.deb
           rm trivy.deb
       - run: trivy fs .
-      - store_artifacts:
-          path: trivy-results.json
 workflows:
   main:
     jobs:

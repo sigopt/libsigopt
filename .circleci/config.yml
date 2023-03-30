@@ -17,17 +17,17 @@ jobs:
       - checkout
       - run: pip install . -r requirements-dev.txt
       - run: pylint --output-format=text libsigopt/ test/
-  testaux:
+  test-aux:
     docker:
       - image: cimg/python:3.10
     resource_class: small
     steps:
       - checkout
       - run: pip install . -r requirements-dev.txt
-      - run: pytest -rw --durations=5 --junitxml=junit-results.xml test/testaux/
+      - run: pytest -rw --durations=5 --junitxml=junit-results.xml test/aux/
       - store_test_results:
           path: junit-results.xml
-  testcompute:
+  test-compute:
     docker:
       - image: cimg/python:3.10
     resource_class: small
@@ -42,7 +42,7 @@ jobs:
       - checkout
       - run: pip install . -r requirements-dev.txt
       - run: |
-          circleci tests glob "test/testcompute/**/*.py" \
+          circleci tests glob "test/compute/**/*.py" \
             | circleci tests split --split-by=timings \
             | xargs env pytest -rw --durations=5 --junitxml=junit-results.xml
       - store_test_results:
@@ -52,5 +52,5 @@ workflows:
     jobs:
       - pre-commit
       - pylint
-      - testaux
-      - testcompute
+      - test-aux
+      - test-compute

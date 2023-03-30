@@ -50,7 +50,7 @@ jobs:
           curl -fSsLo trivy.deb https://github.com/aquasecurity/trivy/releases/download/v0.38.3/trivy_0.38.3_Linux-64bit.deb
           sudo dpkg -i trivy.deb
           rm trivy.deb
-      - run: trivy fs .
+      - run: trivy fs . --debug
 workflows:
   main:
     jobs:

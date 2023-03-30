@@ -23,10 +23,14 @@ repos:
     rev: sigopt-22.10.0
     hooks:
       - id: black
-  - repo: https://github.com/pylint-dev/pylint.git
-    rev: v2.15.5
+  - repo: local
     hooks:
       - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args: ["-rn", "-sn"]
   - repo: https://github.com/sigopt/libsigopt.git
     rev: pre-commit-0.0.0
     hooks:

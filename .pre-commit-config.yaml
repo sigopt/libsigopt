@@ -19,7 +19,6 @@ repos:
       - id: no-commit-to-branch
         args: [--branch=main]
       - id: requirements-txt-fixer
-      - id: sort-simple-yaml
       - id: trailing-whitespace
   - repo: https://github.com/sigopt/black.git
     rev: sigopt-22.10.0

@@ -27,6 +27,12 @@ repos:
       - id: black
   - repo: local
     hooks:
+      - id: pylint
+        name: pylint
+        entry: env PYTHONPATH=./test pylint
+        language: system
+        types: [python]
+        args: ["-rn", "-sn"]
       - id: apply-copyright-notice
         name: Apply the copywright notice
         description: This hook applies the copyright notice and license disclaimer to all files.

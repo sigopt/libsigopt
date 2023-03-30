@@ -7,7 +7,7 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - run: grep pre-commit requirements-dev.txt | xargs pip install
+      - run: pip install . -r requirements-dev.txt
       - run: pre-commit run --all-files
   testaux:
     docker:

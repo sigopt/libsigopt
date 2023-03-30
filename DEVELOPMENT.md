@@ -17,4 +17,4 @@ File formatting can be configured with `pre-commit` by running `pre-commit insta
 The next time you commit your changes, your files will be formatted according to the configured pre-commit hooks.
 A list of all configured pre-commit hooks can be found at [./.pre-commit-config.yaml](./.pre-commit-config.yaml).
 
-Apply fixes with `pre-commit` by running `pre-commit run --all-files`. Commit the changed files.
+Apply fixes with `pre-commit` by running `pre-commit run`. Commit the changed files.

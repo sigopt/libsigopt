@@ -39,9 +39,24 @@ jobs:
             | xargs env pytest -rw --durations=5 --junitxml=junit-results.xml
       - store_test_results:
           path: junit-results.xml
+  trivy:
+    docker:
+      - image: cimg/base:stable
+    resource_class: small
+    steps:
+      - checkout
+      - run: |
+          set -e
+          curl -fSsLo trivy.deb https://github.com/aquasecurity/trivy/releases/download/v0.38.3/trivy_0.38.3_Linux-64bit.deb
+          sudo dpkg -i trivy.deb
+          rm trivy.deb
+      - run: trivy fs .
+      - store_artifacts:
+          path: trivy-results.json
 workflows:
   main:
     jobs:
       - pre-commit
       - testaux
       - testcompute
+      - trivy

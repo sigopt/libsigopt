@@ -9,17 +9,17 @@ jobs:
       - checkout
       - run: pip install -r requirements-dev.txt
       - run: pre-commit run --all-files
-  test-aux:
+  testaux:
     docker:
       - image: cimg/python:3.10
     resource_class: small
     steps:
       - checkout
       - run: pip install . -r requirements-dev.txt
-      - run: pytest -rw --durations=5 --junitxml=junit-results.xml test/aux/
+      - run: pytest -rw --durations=5 --junitxml=junit-results.xml test/testaux/
       - store_test_results:
           path: junit-results.xml
-  test-compute:
+  testcompute:
     docker:
       - image: cimg/python:3.10
     resource_class: small
@@ -34,7 +34,7 @@ jobs:
       - checkout
       - run: pip install . -r requirements-dev.txt
       - run: |
-          circleci tests glob "test/compute/**/*.py" \
+          circleci tests glob "test/testcompute/**/*.py" \
             | circleci tests split --split-by=timings \
             | xargs env pytest -rw --durations=5 --junitxml=junit-results.xml
       - store_test_results:
@@ -43,5 +43,5 @@ workflows:
   main:
     jobs:
       - pre-commit
-      - test-aux
-      - test-compute
+      - testaux
+      - testcompute

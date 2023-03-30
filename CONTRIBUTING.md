@@ -11,8 +11,6 @@ We welcome community contributions to `libsigopt`. You can:
 - Submit your changes directly with a [pull request](https://github.com/sigopt/libsigopt/pulls).
 - Log a bug or make a feature request with an [issue](https://github.com/sigopt/libsigopt/issues).
 
-Refer to our guidelines on [pull requests](#pull-requests) and [issues](#issues) before you proceed.
-
 ## Issues
 
 Use [GitHub issues](https://github.com/sigopt/libsigopt/issues) to:

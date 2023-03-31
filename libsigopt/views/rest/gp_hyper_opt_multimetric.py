@@ -136,7 +136,10 @@ class GpHyperOptMultimetricView(GPView):
         points_sampled_value_vars = self.points_sampled_for_pf_value_vars[successful_indexes, i]
         hyperparameter_dict = self.params["model_info"].hyperparameters[index]
         hyperparameters[index] = self.call_hyperopt_per_metric(
-          one_hot_points_sampled_points, points_sampled_values, points_sampled_value_vars, hyperparameter_dict
+          one_hot_points_sampled_points,
+          points_sampled_values,
+          points_sampled_value_vars,
+          hyperparameter_dict,
         )
     self.tag.update({"optimizer_info": self.optimizer_info})
     return {

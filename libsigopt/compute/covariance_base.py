@@ -134,9 +134,9 @@ class DifferentiableCovariance(CovarianceBase):
 
     hyperparameter_grad_covariance = numpy.empty((n, self.num_hyperparameters))
     hyperparameter_grad_covariance[:, 0] = self._covariance(x, z)
-    hyperparameter_grad_covariance[:, 1:] = (
-      self.process_variance * self._hyperparameter_grad_covariance_without_process_variance(x, z)
-    )
+    hyperparameter_grad_covariance[
+      :, 1:
+    ] = self.process_variance * self._hyperparameter_grad_covariance_without_process_variance(x, z)
 
     return hyperparameter_grad_covariance
 
@@ -166,9 +166,8 @@ class DifferentiableCovariance(CovarianceBase):
 
     kg_tensor = numpy.empty((n_rows, n_cols, self.num_hyperparameters))
     kg_tensor[:, :, 0] = self._build_kernel_matrix(points_sampled, points_to_sample)
-    kg_tensor[:, :, 1:] = (
-      self.process_variance
-      * self._build_kernel_hparam_grad_tensor_without_process_variance(points_sampled, points_to_sample)
+    kg_tensor[:, :, 1:] = self.process_variance * self._build_kernel_hparam_grad_tensor_without_process_variance(
+      points_sampled, points_to_sample
     )
 
     return kg_tensor
@@ -182,6 +181,7 @@ class RadialCovariance(CovarianceBase):
     array [alpha, l_1, l_2, ..., l_dim], where dim is the dimension of the physical space of interest.
 
     """
+
   def __init__(self, hyperparameters):
     self._hyperparameters = None
     self._length_scales = None

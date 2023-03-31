@@ -18,10 +18,7 @@ class GpEiCategoricalView(GPView):
     gaussian_process = self.form_gaussian_process_for_acquisition_function()
     num_being_sampled = len(self.one_hot_points_being_sampled_points)
     probabilistic_failures = self.form_probabilistic_failures_model()
-    use_parallel_ei = (
-      num_being_sampled > 0
-      and parallelism == PARALLEL_QEI
-    )
+    use_parallel_ei = num_being_sampled > 0 and parallelism == PARALLEL_QEI
     expected_improvement_evaluator = self.form_acquisition_function(
       gaussian_process=gaussian_process,
       probabilistic_failures=probabilistic_failures,

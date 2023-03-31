@@ -157,8 +157,9 @@ class SPENextPoints(View):
     suggestion_list = []
     for _ in range(num_to_sample):
       num_lower_points = len(sigopt_parzen_estimator.lower_points)
-      sorted_index_by_eis = sigopt_parzen_estimator.evaluate_expected_improvement(
-        sigopt_parzen_estimator.lower_points)[2].argsort()[::-1]
+      sorted_index_by_eis = sigopt_parzen_estimator.evaluate_expected_improvement(sigopt_parzen_estimator.lower_points)[
+        2
+      ].argsort()[::-1]
       inbound = numpy.array(
         [
           domain.check_point_acceptable(point)
@@ -294,9 +295,7 @@ class SPENextPoints(View):
 
     observation_count = len(one_hot_points_sampled_points)
     open_suggestion_count = len(one_hot_points_being_sampled_points)
-    sample_randomly = (
-      observation_count <= SPE_OPEN_SUGGESTION_RATIO_BOUND * open_suggestion_count
-    )
+    sample_randomly = observation_count <= SPE_OPEN_SUGGESTION_RATIO_BOUND * open_suggestion_count
 
     try:
       sigopt_parzen_estimator = self.form_sigopt_parzen_estimator(

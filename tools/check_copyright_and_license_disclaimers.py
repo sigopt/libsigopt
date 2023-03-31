@@ -52,12 +52,14 @@ def guess_filetype(filename):
 def generate_disclaimer(filetype):
   opener, closer = COMMENT_BLOCKS[filetype]
   separator = COMMENT_LINES[filetype]
-  return "\n".join([
-    f"{opener}{separator}{COPYRIGHT}",
-    separator.rstrip(" "),
-    f"{separator}{LICENSE}",
-    f"{closer}",
-  ])
+  return "\n".join(
+    [
+      f"{opener}{separator}{COPYRIGHT}",
+      separator.rstrip(" "),
+      f"{separator}{LICENSE}",
+      f"{closer}",
+    ]
+  )
 
 
 DISCLAIMERS_BY_FILETYPE = {filetype: generate_disclaimer(filetype) for filetype in FILETYPES}

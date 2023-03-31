@@ -8,7 +8,7 @@ from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE, NON
 
 
 def indices_represent_zero_mean(indices_list):
-  """Tests possible inputs to see if they correspond to the zero mean case. """
+  """Tests possible inputs to see if they correspond to the zero mean case."""
 
   return indices_list is None or numpy.asarray(indices_list, dtype=int).size == 0
 

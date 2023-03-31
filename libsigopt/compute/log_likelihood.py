@@ -70,6 +70,7 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
     the problem_size for a LogProfileLikelihood for an experiment with two parameters and AUTO_NOISE
     would be 4 - 1 = 3 since we do not need to optimize for alpha.
   """
+
   @property
   def num_hyperparameters(self):
     return self.covariance.num_hyperparameters + (1 if self.use_auto_noise else 0)

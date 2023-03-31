@@ -46,16 +46,22 @@ class SquareExponential(DifferentiableRadialCovariance):
     return numpy.exp(-0.5 * distance_matrix_squared)
 
   def eval_radial_kernel_grad(self, distance_matrix_squared, difference_matrix):
-    return _scale_difference_matrix(
-      -numpy.exp(-0.5 * distance_matrix_squared),
-      difference_matrix,
-    ) / self._length_scales_squared
+    return (
+      _scale_difference_matrix(
+        -numpy.exp(-0.5 * distance_matrix_squared),
+        difference_matrix,
+      )
+      / self._length_scales_squared
+    )
 
   def eval_radial_kernel_hparam_grad(self, distance_matrix_squared, difference_matrix):
-    return _scale_difference_matrix(
-      numpy.exp(-0.5 * distance_matrix_squared),
-      (difference_matrix**2),
-    ) / self._length_scales_cubed
+    return (
+      _scale_difference_matrix(
+        numpy.exp(-0.5 * distance_matrix_squared),
+        (difference_matrix**2),
+      )
+      / self._length_scales_cubed
+    )
 
   def _covariance(self, x, z):
     r, _ = self._distance_between_points(z, x)
@@ -166,17 +172,23 @@ class C4RadialMatern(DifferentiableRadialCovariance):
 
   def eval_radial_kernel_grad(self, distance_matrix_squared, difference_matrix):
     r = numpy.sqrt(distance_matrix_squared)
-    return _scale_difference_matrix(
-      -(1.0 / 3.0) * (1 + r) * numpy.exp(-r),
-      difference_matrix,
-    ) / self._length_scales_squared
+    return (
+      _scale_difference_matrix(
+        -(1.0 / 3.0) * (1 + r) * numpy.exp(-r),
+        difference_matrix,
+      )
+      / self._length_scales_squared
+    )
 
   def eval_radial_kernel_hparam_grad(self, distance_matrix_squared, difference_matrix):
     r = numpy.sqrt(distance_matrix_squared)
-    return _scale_difference_matrix(
-      (1.0 / 3.0) * (1 + r) * numpy.exp(-r),
-      (difference_matrix**2),
-    ) / self._length_scales_cubed
+    return (
+      _scale_difference_matrix(
+        (1.0 / 3.0) * (1 + r) * numpy.exp(-r),
+        (difference_matrix**2),
+      )
+      / self._length_scales_cubed
+    )
 
   def _covariance(self, x, z):
     r, _ = self._distance_between_points(z, x)

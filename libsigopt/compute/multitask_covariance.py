@@ -156,4 +156,5 @@ class MultitaskTensorCovariance(DifferentiableCovariance):
     kg_tensor[:, :, :-1] = phys_kgt * task_matrix[:, :, None]
     kg_tensor[:, :, -1:] = task_kgt * phys_matrix[:, :, None]
     return kg_tensor
+
   # pylint: disable=protected-access

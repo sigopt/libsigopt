@@ -63,9 +63,8 @@ class SigOptParzenEstimator(ScipyOptimizable):
 
   @property
   def differentiable(self):
-    return (
-      isinstance(self.lower_covariance, DifferentiableCovariance)
-      and isinstance(self.greater_covariance, DifferentiableCovariance)
+    return isinstance(self.lower_covariance, DifferentiableCovariance) and isinstance(
+      self.greater_covariance, DifferentiableCovariance
     )
 
   def __repr__(self):

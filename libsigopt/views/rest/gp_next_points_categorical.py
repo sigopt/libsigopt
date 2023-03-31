@@ -119,10 +119,7 @@ def get_discrete_conversion_option(domain):
   number_of_integer_components = len(domain.get_integer_component_mappings())
   product_of_cats = domain.product_of_categories
   option = "none"
-  if (
-    0 < number_of_integer_components <= MAXIMUM_INT_COMPONENTS
-    and 1 < product_of_cats <= MAXIMUM_PRODUCT_OF_CATS
-  ):
+  if 0 < number_of_integer_components <= MAXIMUM_INT_COMPONENTS and 1 < product_of_cats <= MAXIMUM_PRODUCT_OF_CATS:
     if product_of_cats * (2**number_of_integer_components) <= MAXIMUM_NEIGHBORING_POINTS:
       option = "both"
     else:
@@ -141,10 +138,7 @@ def get_discrete_conversion_option(domain):
 # TODO(RTL-78): Need to think about the implications for this in the QEI setting (or a workaround)
 def convert_from_one_hot(one_hot_points, domain, acquisition_function, temperature=None):
   option = get_discrete_conversion_option(domain)
-  if (
-    isinstance(acquisition_function, ExpectedParallelImprovement)
-    or domain.is_integer_constrained
-  ):
+  if isinstance(acquisition_function, ExpectedParallelImprovement) or domain.is_integer_constrained:
     option = "none"
   discrete_one_hot_neighbors = find_best_one_hot_neighbor_by_af(
     one_hot_points=one_hot_points,
@@ -284,11 +278,7 @@ class GpNextPointsCategorical(GPView):
     gaussian_process = self.form_gaussian_process_for_acquisition_function()
     num_being_sampled = len(self.one_hot_points_being_sampled_points)
     probabilistic_failures = self.form_probabilistic_failures_model()
-    use_parallel_ei = (
-      num_being_sampled > 0
-      and parallelism == PARALLEL_QEI
-      and not self.task_cost_populated
-    )
+    use_parallel_ei = num_being_sampled > 0 and parallelism == PARALLEL_QEI and not self.task_cost_populated
     acquisition_function = self.form_acquisition_function(
       gaussian_process=gaussian_process,
       probabilistic_failures=probabilistic_failures,

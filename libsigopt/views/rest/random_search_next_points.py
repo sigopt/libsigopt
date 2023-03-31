@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache License 2.0
 from libsigopt.views.view import View
 
+
 class RandomSearchNextPoints(View):
   view_name = "random_search_next_points"
 

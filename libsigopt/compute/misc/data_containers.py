@@ -91,13 +91,13 @@ class MultiMetricMidpointInfo(MetricMidpointInfo):
 class SingleMetricMidpointInfo(MetricMidpointInfo):
   def __init__(self, values, failures, objective=None):
     """Rescales the data from
-          [min, max]
-          to
-          [MIDPOINT_NORMALIZATION_SCALE_FACTOR, -MIDPOINT_NORMALIZATION_SCALE_FACTOR]
-          Note the application of the -1 that is applied, to convert a max problem to a min problem.
+        [min, max]
+        to
+        [MIDPOINT_NORMALIZATION_SCALE_FACTOR, -MIDPOINT_NORMALIZATION_SCALE_FACTOR]
+        Note the application of the -1 that is applied, to convert a max problem to a min problem.
 
-          This also now computes the "lie" or "failure" value, which I think makes sense because it's
-          doing essentially the same computation
+        This also now computes the "lie" or "failure" value, which I think makes sense because it's
+        doing essentially the same computation
 
         """
     super().__init__()

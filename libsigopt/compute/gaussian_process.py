@@ -239,9 +239,8 @@ class GaussianProcess(Predictor):
 
   def _compute_grad_mean_of_points(self, points_to_sample, grad_K_eval):
     grad_P_eval = build_grad_polynomial_tensor(self.mean_poly_indices, points=points_to_sample)
-    return (
-      numpy.einsum("ijk, j", grad_K_eval, self.K_inv_demeaned_y)
-      + numpy.einsum("ijk, j", grad_P_eval, self.poly_coef)
+    return numpy.einsum("ijk, j", grad_K_eval, self.K_inv_demeaned_y) + numpy.einsum(
+      "ijk, j", grad_P_eval, self.poly_coef
     )
 
   # NOTE: An aspect of computation required in compute_variance is copied here for efficiency.

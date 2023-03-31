@@ -251,8 +251,8 @@ class ExpectedParallelImprovement(AcquisitionFunction):
 
     def multivar_norm_cdf(upper, cov_matrix):
       """CDF of multivariate Gaussian centered at 0 with covariance matrix cov_matrix.
-         CDF is taken from -inf to u.
-         """
+            CDF is taken from -inf to u.
+            """
       if upper.size == 1:
         return norm.cdf(upper[0], 0, numpy.sqrt(cov_matrix[0, 0]))
 
@@ -431,9 +431,9 @@ class ExpectedParallelImprovementWithFailures(ExpectedParallelImprovement):
         posterior_predictions_failures[i] = numpy.tensordot(chol_cov_tensor_failures[i], normals, [[1], [1]])
         posterior_predictions_failures[i, : self.num_points_to_sample, :, :] += mean_to_evaluate_failures[i, :, :, None]
         if self.num_points_being_sampled:
-          posterior_predictions_failures[i, -self.num_points_being_sampled :, :, :] += (
-            mean_being_sampled_failures[i, :, None, None]
-          )
+          posterior_predictions_failures[i, -self.num_points_being_sampled :, :, :] += mean_being_sampled_failures[
+            i, :, None, None
+          ]
 
       posterior_improvement_predictions = self.best_value - posterior_predictions
       posterior_predictions_failures_product = numpy.ones_like(posterior_improvement_predictions)

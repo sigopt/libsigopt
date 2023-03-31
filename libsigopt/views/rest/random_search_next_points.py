@@ -9,7 +9,7 @@ from libsigopt.compute.domain import CategoricalDomain
 class RandomSearchNextPoints(object):
   view_name = "random_search_next_points"
 
-  def __init__(self, params):
+  def __init__(self, params, logging_service=None):
     self.params = params
     self.domain = CategoricalDomain(**asdict(self.params["domain_info"]))
     self.tag = self.params["tag"]

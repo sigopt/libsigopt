@@ -19,7 +19,7 @@ class RandomSearchNextPoints(object):
 
   def view(self):
     num_to_sample = self.params["num_to_sample"]
-    if self.domain.priors and not self.domain.constraint:
+    if self.domain.priors and not self.domain.is_constrained:
       categorical_next_points = self.domain.generate_random_points_according_to_priors(num_to_sample)
     else:
       categorical_next_points = self.domain.generate_quasi_random_points_in_domain(num_to_sample)

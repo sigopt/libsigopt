@@ -411,5 +411,5 @@ class ZigoptSimulator(object):
 
   def form_random_search_view_input(self):
     domain = form_random_unconstrained_categorical_domain(self.dim)
-    view_input = self.form_random_search_inputs_from_domain(domain)
+    view_input = self.form_random_search_view_input_from_domain(domain)
     return view_input, domain

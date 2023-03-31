@@ -5,7 +5,7 @@ import numpy
 import pytest
 
 from libsigopt.views.rest.spe_search_next_points import SPESearchNextPoints
-from testcompute.zigopt_input_utils import ZigoptSimulator
+from testviews.zigopt_input_utils import ZigoptSimulator
 
 
 class TestSearchNextPoints(object):

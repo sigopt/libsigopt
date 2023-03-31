@@ -18,7 +18,7 @@ from libsigopt.compute.probabilistic_failures import (
   ProductOfListOfProbabilisticFailures,
 )
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import (
+from testviews.zigopt_input_utils import (
   form_points_sampled,
   form_random_hyperparameter_dict,
 )

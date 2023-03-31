@@ -23,7 +23,7 @@ from libsigopt.views.rest.spe_next_points import (
   get_experiment_phase,
 )
 from testcompute.domain_test import samples_satisfy_kolmogorov_smirnov_test
-from testcompute.zigopt_input_utils import ZigoptSimulator
+from testviews.zigopt_input_utils import ZigoptSimulator
 
 
 PHASE_LIST = [

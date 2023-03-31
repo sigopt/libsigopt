@@ -20,7 +20,7 @@ from libsigopt.compute.search import (
   round_one_hot_points_categorical_values_to_target,
 )
 from testcompute.gaussian_process_test_case import GaussianProcessTestCase
-from testcompute.zigopt_input_utils import form_random_unconstrained_categorical_domain
+from testviews.zigopt_input_utils import form_random_unconstrained_categorical_domain
 
 
 class TestSearch(GaussianProcessTestCase):

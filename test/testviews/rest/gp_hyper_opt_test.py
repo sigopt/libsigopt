@@ -21,7 +21,7 @@ from libsigopt.views.rest.gp_hyper_opt_multimetric import (
   form_one_hot_hyperparameter_domain,
 )
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import ZigoptSimulator
+from testviews.zigopt_input_utils import ZigoptSimulator
 
 
 class TestCategoricalTools(NumericalTestCase):

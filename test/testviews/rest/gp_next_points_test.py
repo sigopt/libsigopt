@@ -29,7 +29,7 @@ from libsigopt.views.rest.gp_next_points_categorical import (
 )
 from testaux.numerical_test_case import NumericalTestCase
 from testcompute.domain_test import domains_approximately_equal
-from testcompute.zigopt_input_utils import (
+from testviews.zigopt_input_utils import (
   ZigoptSimulator,
   form_random_unconstrained_categorical_domain,
 )

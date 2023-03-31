@@ -25,7 +25,7 @@ from libsigopt.views.view import (
   identify_scaled_values_exceeding_scaled_upper_thresholds,
 )
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import ZigoptSimulator, form_points_sampled
+from testviews.zigopt_input_utils import ZigoptSimulator, form_points_sampled
 
 
 class TestView(NumericalTestCase):

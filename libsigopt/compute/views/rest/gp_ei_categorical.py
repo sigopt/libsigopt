@@ -3,9 +3,7 @@
 # SPDX-License-Identifier: Apache License 2.0
 from libsigopt.aux.constant import PARALLEL_QEI
 from libsigopt.compute.misc.constant import DEFAULT_MAX_SIMULTANEOUS_QEI_POINTS
-from libsigopt.compute.multitask_acquisition_function import (
-  MultitaskAcquisitionFunction,
-)
+from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
 from libsigopt.compute.views.view import GPView
 
 

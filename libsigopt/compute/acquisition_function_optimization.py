@@ -10,11 +10,7 @@ from libsigopt.compute.misc.constant import (
   DEFAULT_MAX_SIMULTANEOUS_EI_POINTS,
   GRADIENT_BASED_OPTIMIZERS,
 )
-from libsigopt.compute.optimization_auxiliary import (
-  AdamParameters,
-  DEParameters,
-  OptimizerInfo,
-)
+from libsigopt.compute.optimization_auxiliary import AdamParameters, DEParameters, OptimizerInfo
 from libsigopt.compute.vectorized_optimizers import AdamOptimizer, DEOptimizer
 
 

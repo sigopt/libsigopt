@@ -22,10 +22,8 @@ from libsigopt.compute.expected_improvement import (
 from libsigopt.compute.gaussian_process import GaussianProcess
 from libsigopt.compute.gaussian_process_sum import GaussianProcessSum
 from libsigopt.compute.misc.data_containers import HistoricalData
-from libsigopt.compute.probabilistic_failures import (
-  ProbabilisticFailures,
-  ProductOfListOfProbabilisticFailures,
-)
+from libsigopt.compute.probabilistic_failures import ProbabilisticFailures, ProductOfListOfProbabilisticFailures
+
 from testaux.numerical_test_case import NumericalTestCase
 
 

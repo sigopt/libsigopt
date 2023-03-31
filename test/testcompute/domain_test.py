@@ -16,15 +16,9 @@ from libsigopt.aux.constant import (
   ParameterPriorNames,
 )
 from libsigopt.aux.geometry_utils import find_interior_point
-from libsigopt.compute.domain import (
-  CategoricalDomain,
-  ContinuousDomain,
-  FixedIndicesOnContinuousDomain,
-)
-from testaux.utils import (
-  form_random_constrained_categorical_domain,
-  form_random_unconstrained_categorical_domain,
-)
+from libsigopt.compute.domain import CategoricalDomain, ContinuousDomain, FixedIndicesOnContinuousDomain
+
+from testaux.utils import form_random_constrained_categorical_domain, form_random_unconstrained_categorical_domain
 
 
 def domains_approximately_equal(domain1, domain2, inequality_tolerance=1e-14):

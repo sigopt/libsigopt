@@ -25,11 +25,7 @@ from libsigopt.compute.misc.constant import (
   DEFAULT_COVARIANCE_KERNEL,
   DEFAULT_TASK_COVARIANCE_KERNEL,
 )
-from libsigopt.compute.misc.data_containers import (
-  HistoricalData,
-  MultiMetricMidpointInfo,
-  SingleMetricMidpointInfo,
-)
+from libsigopt.compute.misc.data_containers import HistoricalData, MultiMetricMidpointInfo, SingleMetricMidpointInfo
 from libsigopt.compute.misc.multimetric import (
   CONVEX_COMBINATION,
   EPSILON_CONSTRAINT,

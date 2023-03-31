@@ -22,6 +22,7 @@ from libsigopt.compute.views.rest.spe_next_points import (
   SPENextPoints,
   get_experiment_phase,
 )
+
 from testcompute.domain_test import samples_satisfy_kolmogorov_smirnov_test
 from testcompute.zigopt_input_utils import ZigoptSimulator
 

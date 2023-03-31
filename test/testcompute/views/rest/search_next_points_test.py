@@ -8,6 +8,7 @@ from mock import patch
 from libsigopt.aux.constant import PARALLEL_CONSTANT_LIAR
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.views.rest.search_next_points import SearchNextPoints
+
 from testcompute.zigopt_input_utils import ZigoptSimulator
 
 

@@ -1,11 +1,21 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
-from libsigopt.views.view import View
+from dataclasses import asdict
+from libsigopt.compute.domain import CategoricalDomain
 
 
-class RandomSearchNextPoints(View):
+class RandomSearchNextPoints(object):
   view_name = "random_search_next_points"
+
+  def __init__(self, params):
+    self.params = params
+    self.domain = CategoricalDomain(**asdict(self.params["domain_info"]))
+    self.tag = self.params["tag"]
+
+  def call(self):
+    response = self.view()
+    return response
 
   def view(self):
     num_to_sample = self.params["num_to_sample"]

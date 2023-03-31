@@ -22,7 +22,10 @@ from libsigopt.compute.expected_improvement import (
 from libsigopt.compute.gaussian_process import GaussianProcess
 from libsigopt.compute.gaussian_process_sum import GaussianProcessSum
 from libsigopt.compute.misc.data_containers import HistoricalData
-from libsigopt.compute.probabilistic_failures import ProbabilisticFailures, ProductOfListOfProbabilisticFailures
+from libsigopt.compute.probabilistic_failures import (
+  ProbabilisticFailures,
+  ProductOfListOfProbabilisticFailures,
+)
 from testaux.numerical_test_case import NumericalTestCase
 
 
@@ -81,7 +84,12 @@ class TestGaussianProcessSum(NumericalTestCase):
         "all",
       ):
         mean_variance_grad_of_points = gp.compute_mean_variance_grad_of_points(xt)
-        all_mean[:, i], all_var[:, i], all_grad_mean[:, :, i], all_grad_var[:, :, i] = mean_variance_grad_of_points
+        (
+          all_mean[:, i],
+          all_var[:, i],
+          all_grad_mean[:, :, i],
+          all_grad_var[:, :, i],
+        ) = mean_variance_grad_of_points
       if option in ("all",):
         all_covariance[:, :, i] = gp.compute_covariance_of_points(xt)
 
@@ -164,7 +172,10 @@ class TestGaussianProcessSum(NumericalTestCase):
         assert gp_from_sum.num_sampled == gp_from_list.num_sampled
         assert numpy.allclose(gp_from_sum.points_sampled, gp_from_list.points_sampled)
         assert numpy.allclose(gp_from_sum.points_sampled_value, gp_from_list.points_sampled_value)
-        assert numpy.allclose(gp_from_sum.points_sampled_noise_variance, gp_from_list.points_sampled_noise_variance)
+        assert numpy.allclose(
+          gp_from_sum.points_sampled_noise_variance,
+          gp_from_list.points_sampled_noise_variance,
+        )
       assert len(gp_sum.points_sampled) == gp_sum.num_sampled
       assert len(gp_sum.points_sampled_value) == gp_sum.num_sampled
       assert len(gp_sum.points_sampled_noise_variance) == gp_sum.num_sampled
@@ -317,7 +328,10 @@ class TestGaussianProcessSum(NumericalTestCase):
           list_of_pfs.append(ProbabilisticFailures(predictor, threshold))
         ppf = ProductOfListOfProbabilisticFailures(list_of_pfs)
         return ExpectedParallelImprovementWithFailures(
-          predictor, num_points_to_sample=1, failure_model=ppf, points_being_sampled=points_being_sampled
+          predictor,
+          num_points_to_sample=1,
+          failure_model=ppf,
+          points_being_sampled=points_being_sampled,
         )
       else:
         return None

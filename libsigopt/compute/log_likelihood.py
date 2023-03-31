@@ -156,7 +156,10 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
         P = self.gp.P
         KinvP = self.gp.K_inv_P
         PKP_chol = self.gp.PKP_chol
-        temp = -numpy.dot(P, scipy.linalg.cho_solve(PKP_chol, numpy.dot(KinvP.T, numpy.dot(dK, Kinvy_Pb))))
+        temp = -numpy.dot(
+          P,
+          scipy.linalg.cho_solve(PKP_chol, numpy.dot(KinvP.T, numpy.dot(dK, Kinvy_Pb))),
+        )
         grad_log_marginal[k] += 2 * numpy.dot(Kinvy_Pb, temp)
 
     log_scaling = numpy.exp(self.hyperparameters) if self.log_domain else 1.0

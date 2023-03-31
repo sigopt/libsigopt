@@ -8,10 +8,15 @@ import pytest
 from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import C2RadialMatern, SquareExponential
 from libsigopt.compute.domain import CategoricalDomain, FixedIndicesOnContinuousDomain
-from libsigopt.compute.expected_improvement import AugmentedExpectedImprovement, ExpectedImprovement
+from libsigopt.compute.expected_improvement import (
+  AugmentedExpectedImprovement,
+  ExpectedImprovement,
+)
 from libsigopt.compute.gaussian_process import GaussianProcess
 from libsigopt.compute.misc.data_containers import HistoricalData
-from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
+from libsigopt.compute.multitask_acquisition_function import (
+  MultitaskAcquisitionFunction,
+)
 from libsigopt.compute.multitask_covariance import MultitaskTensorCovariance
 from libsigopt.compute.vectorized_optimizers import AdamOptimizer, DEOptimizer
 from testaux.numerical_test_case import NumericalTestCase

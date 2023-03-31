@@ -66,7 +66,10 @@ def form_one_hot_hyperparameter_domain(
     else:
       bounds = categorical_domain.domain_components[one_hot_mapping["output_ind"]]["elements"]
       width = bounds[-1] - bounds[0]
-      lower_bound, upper_bound = LENGTH_SCALE_LOWER_FACTOR * width, LENGTH_SCALE_UPPER_FACTOR * width
+      lower_bound, upper_bound = (
+        LENGTH_SCALE_LOWER_FACTOR * width,
+        LENGTH_SCALE_UPPER_FACTOR * width,
+      )
       if one_hot_mapping["var_type"] == INT_EXPERIMENT_PARAMETER_NAME:
         lower_bound = max(discrete_lower_limit, lower_bound)
       elif one_hot_mapping["var_type"] == QUANTIZED_EXPERIMENT_PARAMETER_NAME:
@@ -79,7 +82,10 @@ def form_one_hot_hyperparameter_domain(
 
   if use_auto_noise:
     hyperparameter_domain_elements.append(
-      [TIKHONOV_LOWER_FACTOR * sample_variance, TIKHONOV_UPPER_FACTOR * sample_variance],
+      [
+        TIKHONOV_LOWER_FACTOR * sample_variance,
+        TIKHONOV_UPPER_FACTOR * sample_variance,
+      ],
     )
 
   if select_hyper_opt_in_log_domain:

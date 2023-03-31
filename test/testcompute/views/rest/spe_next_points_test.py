@@ -132,8 +132,16 @@ class TestSPENextPointsViews(object):
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 3, 5]},
     ]
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [1, 1, 1, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [1, 1, 1, 0, 0],
+        "rhs": 2,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
     zs = ZigoptSimulator(
@@ -220,7 +228,10 @@ class TestSPENextPointsViews(object):
     bounds_array = numpy.array([[metric_0_lower_bound, metric_1_lower_bound]])
     should_exclude = numpy.logical_not(numpy.prod(values > bounds_array, axis=1, dtype=bool))
     natural_failures = view.points_sampled_failures
-    assert numpy.array_equal(augmented_points_sampled_failures, numpy.logical_or(should_exclude, natural_failures))
+    assert numpy.array_equal(
+      augmented_points_sampled_failures,
+      numpy.logical_or(should_exclude, natural_failures),
+    )
 
   @pytest.mark.parametrize("dim", [3, 56])
   def test_identify_spe_failures_with_metric_constraints(self, dim):
@@ -270,7 +281,10 @@ class TestSPENextPointsViews(object):
     # Consider when there are already too many failures present to allow the bounds
     num_natural_fails = n - MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS + 1
     view_input["points_sampled"].values = numpy.concatenate(
-      (numpy.random.random((n - num_natural_fails, 2)) - 1, numpy.random.random((num_natural_fails, 2))),
+      (
+        numpy.random.random((n - num_natural_fails, 2)) - 1,
+        numpy.random.random((num_natural_fails, 2)),
+      ),
       axis=0,
     )
     expected_bounds_violations = numpy.concatenate((numpy.ones(n - num_natural_fails), numpy.zeros(num_natural_fails)))
@@ -288,7 +302,10 @@ class TestSPENextPointsViews(object):
   @pytest.mark.parametrize("num_sampled", [19, 40, 151])
   @pytest.mark.parametrize("num_to_sample", [1, 3])
   @pytest.mark.parametrize("num_being_sampled", [0, 44])
-  @pytest.mark.parametrize("optimized_metric_thresholds", [[None, None], [None, -0.01234], [0, None], [0.1234, 0.0567]])
+  @pytest.mark.parametrize(
+    "optimized_metric_thresholds",
+    [[None, None], [None, -0.01234], [0, None], [0.1234, 0.0567]],
+  )
   def test_spe_optimized_metric_thresholds(
     self,
     dim,
@@ -311,7 +328,8 @@ class TestSPENextPointsViews(object):
   # These optimized_metric_thresholds could maybe be more intelligent in tests where function values are complicated
   @pytest.mark.parametrize("dim", [7])
   @pytest.mark.parametrize(
-    "optimized_metric_thresholds", [[None, None], [None, -0.01234], [0, None], [0.1234, 0.05678]]
+    "optimized_metric_thresholds",
+    [[None, None], [None, -0.01234], [0, None], [0.1234, 0.05678]],
   )
   @pytest.mark.parametrize(
     "num_constraint_metrics, constraint_metric_thresholds",
@@ -438,11 +456,19 @@ class TestSPENextPointsViews(object):
     assert len(points_to_sample[0]) == view_input["domain_info"].dim
 
   @flaky(max_runs=2)
-  def test_spe_with_priors_initialization_phase(self):  # Check that priors are used in spe_next_points initialization
+  def test_spe_with_priors_initialization_phase(
+    self,
+  ):  # Check that priors are used in spe_next_points initialization
     n_samples = 500
     zs = ZigoptSimulator(dim=2, num_sampled=10, num_to_sample=n_samples)
-    peaky_normal_prior = {"name": ParameterPriorNames.NORMAL, "params": {"mean": -100, "scale": 0.001}}
-    heavy_tailed_beta_prior = {"name": ParameterPriorNames.BETA, "params": {"shape_a": 2, "shape_b": 50}}
+    peaky_normal_prior = {
+      "name": ParameterPriorNames.NORMAL,
+      "params": {"mean": -100, "scale": 0.001},
+    }
+    heavy_tailed_beta_prior = {
+      "name": ParameterPriorNames.BETA,
+      "params": {"shape_a": 2, "shape_b": 50},
+    }
     domain = CategoricalDomain(
       domain_components=[
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-200, 0]},

@@ -13,7 +13,10 @@ from libsigopt.compute.sigopt_parzen_estimator import (
   SPEInsufficientDataError,
 )
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import form_points_sampled, form_random_unconstrained_categorical_domain
+from testcompute.zigopt_input_utils import (
+  form_points_sampled,
+  form_random_unconstrained_categorical_domain,
+)
 
 
 domain = form_random_unconstrained_categorical_domain(numpy.random.randint(4, 12)).one_hot_domain
@@ -52,7 +55,10 @@ class TestSigoptParzenEstimator(NumericalTestCase):
 
     return _form_multimetric_info
 
-  @pytest.mark.parametrize("phase", [CONVEX_COMBINATION, EPSILON_CONSTRAINT, OPTIMIZING_ONE_METRIC, NOT_MULTIMETRIC])
+  @pytest.mark.parametrize(
+    "phase",
+    [CONVEX_COMBINATION, EPSILON_CONSTRAINT, OPTIMIZING_ONE_METRIC, NOT_MULTIMETRIC],
+  )
   def test_form_multimetric_info_fixture(self, form_multimetric_info, phase):
     multimetric_info = form_multimetric_info(phase)
     if phase == NOT_MULTIMETRIC:
@@ -60,7 +66,10 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     else:
       assert multimetric_info.method == phase
 
-  @pytest.mark.parametrize("phase", [CONVEX_COMBINATION, EPSILON_CONSTRAINT, OPTIMIZING_ONE_METRIC, NOT_MULTIMETRIC])
+  @pytest.mark.parametrize(
+    "phase",
+    [CONVEX_COMBINATION, EPSILON_CONSTRAINT, OPTIMIZING_ONE_METRIC, NOT_MULTIMETRIC],
+  )
   def test_default(self, form_multimetric_info, phase):
     num_metrics = 1 if phase == NOT_MULTIMETRIC else 2
     points_sampled = form_points_sampled(
@@ -74,7 +83,7 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     multimetric_info = form_multimetric_info(phase)
     lie_values = numpy.empty(num_metrics)
     points_to_sample = domain.generate_quasi_random_points_in_domain(numpy.random.randint(100, 200))
-    points_sampled.points, points_sampled.values = filter_multimetric_points_sampled_spe(
+    (points_sampled.points, points_sampled.values,) = filter_multimetric_points_sampled_spe(
       multimetric_info,
       points_sampled.points,
       points_sampled.values,
@@ -152,11 +161,17 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     )
     sorted_indexed = numpy.argsort(values)
     points_sorted = points[sorted_indexed, :]
-    lower, greater = points_sorted[: len(points_sorted) // 2], points_sorted[len(points_sorted) // 2 :]
+    lower, greater = (
+      points_sorted[: len(points_sorted) // 2],
+      points_sorted[len(points_sorted) // 2 :],
+    )
     assert sorted([tuple(l) for l in spe.lower_points]) == sorted([tuple(l) for l in lower])
     assert sorted([tuple(l) for l in spe.greater_points]) == sorted([tuple(l) for l in greater])
 
-  @pytest.mark.parametrize("phase", [CONVEX_COMBINATION, EPSILON_CONSTRAINT, OPTIMIZING_ONE_METRIC, NOT_MULTIMETRIC])
+  @pytest.mark.parametrize(
+    "phase",
+    [CONVEX_COMBINATION, EPSILON_CONSTRAINT, OPTIMIZING_ONE_METRIC, NOT_MULTIMETRIC],
+  )
   def test_insufficient_data(self, form_multimetric_info, phase):
     num_metrics = 1 if phase == NOT_MULTIMETRIC else 2
     points_sampled = form_points_sampled(
@@ -168,7 +183,7 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     )
     multimetric_info = form_multimetric_info(phase)
     lie_values = numpy.empty(num_metrics)
-    points_sampled.points, points_sampled.values = filter_multimetric_points_sampled_spe(
+    (points_sampled.points, points_sampled.values,) = filter_multimetric_points_sampled_spe(
       multimetric_info,
       points_sampled.points,
       points_sampled.values,
@@ -184,7 +199,10 @@ class TestSigoptParzenEstimator(NumericalTestCase):
         gamma,
       )
 
-  @pytest.mark.parametrize("phase", [CONVEX_COMBINATION, EPSILON_CONSTRAINT, OPTIMIZING_ONE_METRIC, NOT_MULTIMETRIC])
+  @pytest.mark.parametrize(
+    "phase",
+    [CONVEX_COMBINATION, EPSILON_CONSTRAINT, OPTIMIZING_ONE_METRIC, NOT_MULTIMETRIC],
+  )
   def test_insufficient_data_with_forget_factor(self, form_multimetric_info, phase):
     num_metrics = 1 if phase == NOT_MULTIMETRIC else 2
     points_sampled = form_points_sampled(
@@ -196,7 +214,7 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     )
     multimetric_info = form_multimetric_info(phase)
     lie_values = numpy.empty(num_metrics)
-    points_sampled.points, points_sampled.values = filter_multimetric_points_sampled_spe(
+    (points_sampled.points, points_sampled.values,) = filter_multimetric_points_sampled_spe(
       multimetric_info,
       points_sampled.points,
       points_sampled.values,
@@ -248,6 +266,9 @@ class TestSigoptParzenEstimator(NumericalTestCase):
 
     sorted_indexed = numpy.argsort(points_sampled_values)
     points_sorted = points_sampled_points[sorted_indexed, :]
-    lower, greater = points_sorted[: int(len(points_sorted) * gamma)], points_sorted[int(len(points_sorted) * gamma) :]
+    lower, greater = (
+      points_sorted[: int(len(points_sorted) * gamma)],
+      points_sorted[int(len(points_sorted) * gamma) :],
+    )
     assert sorted([tuple(l) for l in spe.lower_points]) == sorted([tuple(l) for l in lower])
     assert sorted([tuple(l) for l in spe.greater_points]) == sorted([tuple(l) for l in greater])

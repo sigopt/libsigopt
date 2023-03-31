@@ -64,7 +64,10 @@ class TestSearch(GaussianProcessTestCase):
     domain = CategoricalDomain(
       [
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": first_cat_elements},
+        {
+          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "elements": first_cat_elements,
+        },
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-5, 5]},
       ]
     )
@@ -122,11 +125,17 @@ class TestSearch(GaussianProcessTestCase):
     domain = CategoricalDomain(
       [
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [2, 5]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": first_cat_elements},
+        {
+          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "elements": first_cat_elements,
+        },
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-10, -1]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [100, 120]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": second_cat_elements},
+        {
+          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "elements": second_cat_elements,
+        },
       ]
     )
     first_categorical_indices = [1, 2, 3, 4]
@@ -149,10 +158,16 @@ class TestSearch(GaussianProcessTestCase):
       [
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-5, -1]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [10, 20]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": first_cat_elements},
+        {
+          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "elements": first_cat_elements,
+        },
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, -1]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-5, 5]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": second_cat_elements},
+        {
+          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "elements": second_cat_elements,
+        },
       ]
     )
     points = [

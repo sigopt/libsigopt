@@ -139,7 +139,7 @@ class TestConstrainedSamplers(object):
 
   def test_rejection_with_padding_sampler(self):
     num_points = 100
-    samples, success = generate_uniform_random_points_rejection_sampling_with_hitandrun_padding(
+    (samples, success,) = generate_uniform_random_points_rejection_sampling_with_hitandrun_padding(
       num_points,
       self.domain_bounds,
       self.A,

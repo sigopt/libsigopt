@@ -591,10 +591,26 @@ class TestMultimetricFiltering(NumericalTestCase):
   @pytest.mark.parametrize(
     "params",
     [
-      (CONVEX_COMBINATION, "libsigopt.compute.misc.multimetric.filter_convex_combination_sum_of_gps", 123),
-      (EPSILON_CONSTRAINT, "libsigopt.compute.misc.multimetric.filter_probabilistic_failure", 321),
-      (OPTIMIZING_ONE_METRIC, "libsigopt.compute.misc.multimetric.filter_optimizing_one_metric", 222),
-      (NOT_MULTIMETRIC, "libsigopt.compute.misc.multimetric.filter_not_multimetric", 333),
+      (
+        CONVEX_COMBINATION,
+        "libsigopt.compute.misc.multimetric.filter_convex_combination_sum_of_gps",
+        123,
+      ),
+      (
+        EPSILON_CONSTRAINT,
+        "libsigopt.compute.misc.multimetric.filter_probabilistic_failure",
+        321,
+      ),
+      (
+        OPTIMIZING_ONE_METRIC,
+        "libsigopt.compute.misc.multimetric.filter_optimizing_one_metric",
+        222,
+      ),
+      (
+        NOT_MULTIMETRIC,
+        "libsigopt.compute.misc.multimetric.filter_not_multimetric",
+        333,
+      ),
     ],
   )
   def test_filter_multimetric_points_sampled(self, params):

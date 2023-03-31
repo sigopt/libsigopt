@@ -79,7 +79,13 @@ class VectorizedOptimizer(Optimizer):
   # NOTE: If we want to extract out the AF, we need to build reshaping into the vectorized evaluation
   def evaluate_and_monitor(self, points):
     if self.af.num_points_to_sample > 1:
-      points = points.reshape((len(points), self.af.num_points_to_sample, self.dim // self.af.num_points_to_sample))
+      points = points.reshape(
+        (
+          len(points),
+          self.af.num_points_to_sample,
+          self.dim // self.af.num_points_to_sample,
+        )
+      )
 
     gradients = None
     if self.requires_gradients:
@@ -133,7 +139,14 @@ class DEOptimizer(VectorizedOptimizer):
   optimizer_parameters_type = DEParameters
   requires_gradients = False
 
-  def __init__(self, domain, acquisition_function, num_multistarts, optimizer_parameters=None, maxiter=None):
+  def __init__(
+    self,
+    domain,
+    acquisition_function,
+    num_multistarts,
+    optimizer_parameters=None,
+    maxiter=None,
+  ):
     super().__init__(domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter)
     self.strategy = self.optimizer_parameters.strategy
     self.mutation = self.optimizer_parameters.mutation
@@ -147,7 +160,10 @@ class DEOptimizer(VectorizedOptimizer):
     #  [0, 1, 2, ...., n-1]]
     self.index_matrix = numpy.triu(
       numpy.tile(numpy.arange(1, self.num_multistarts, dtype=int), (self.num_multistarts, 1))
-    ) + numpy.tril(numpy.tile(numpy.arange(0, self.num_multistarts - 1, dtype=int), (self.num_multistarts, 1)), -1)
+    ) + numpy.tril(
+      numpy.tile(numpy.arange(0, self.num_multistarts - 1, dtype=int), (self.num_multistarts, 1)),
+      -1,
+    )
 
     if self.strategy == "rand1bin":
       self.mutation_strat = self._rand1
@@ -197,7 +213,14 @@ class AdamOptimizer(VectorizedOptimizer):
   optimizer_parameters_type = AdamParameters
   requires_gradients = True
 
-  def __init__(self, domain, acquisition_function, num_multistarts, optimizer_parameters=None, maxiter=None):
+  def __init__(
+    self,
+    domain,
+    acquisition_function,
+    num_multistarts,
+    optimizer_parameters=None,
+    maxiter=None,
+  ):
     super().__init__(domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter)
     self.learning_rate = self.optimizer_parameters.learning_rate
     assert self.learning_rate >= 0

@@ -61,7 +61,9 @@ class MultitaskTensorCovariance(DifferentiableCovariance):
     return len(self.hyperparameters)
 
   @property
-  def dim(self):  # This is the physical dimension, which I think is probably the appropriate interpretation
+  def dim(
+    self,
+  ):  # This is the physical dimension, which I think is probably the appropriate interpretation
     return len(self.hyperparameters) - 1
 
   @property

@@ -26,7 +26,12 @@ from testcompute.zigopt_input_utils import ZigoptSimulator
 
 class TestCategoricalTools(NumericalTestCase):
   def assert_hyperparameter_dict_keys(self, hyperparameter_dict):
-    assert set(hyperparameter_dict.keys()) == {"alpha", "length_scales", "tikhonov", "task_length"}
+    assert set(hyperparameter_dict.keys()) == {
+      "alpha",
+      "length_scales",
+      "tikhonov",
+      "task_length",
+    }
 
   def assert_length_scales_valid(self, length_scales, domain):
     assert len(length_scales) == domain.dim

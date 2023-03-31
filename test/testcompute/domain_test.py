@@ -16,8 +16,15 @@ from libsigopt.aux.constant import (
   ParameterPriorNames,
 )
 from libsigopt.aux.geometry_utils import find_interior_point
-from libsigopt.compute.domain import CategoricalDomain, ContinuousDomain, FixedIndicesOnContinuousDomain
-from testaux.utils import form_random_constrained_categorical_domain, form_random_unconstrained_categorical_domain
+from libsigopt.compute.domain import (
+  CategoricalDomain,
+  ContinuousDomain,
+  FixedIndicesOnContinuousDomain,
+)
+from testaux.utils import (
+  form_random_constrained_categorical_domain,
+  form_random_unconstrained_categorical_domain,
+)
 
 
 def domains_approximately_equal(domain1, domain2, inequality_tolerance=1e-14):
@@ -116,7 +123,10 @@ class TestContinuousDomain(object):
     random_points = domain.generate_quasi_random_points_in_domain(num_points)
     assert tuple(random_points.shape) == (num_points, domain.dim)
     assert all(domain.check_point_acceptable(p) for p in random_points)
-    assert tuple(domain.generate_grid_points_in_domain(6).shape) == (6**domain.dim, domain.dim)
+    assert tuple(domain.generate_grid_points_in_domain(6).shape) == (
+      6**domain.dim,
+      domain.dim,
+    )
     other_domain = ContinuousDomain([[20000, 30000]] * domain.dim)
     outside_points = other_domain.generate_quasi_random_points_in_domain(num_points)
     assert all(not domain.check_point_acceptable(p) for p in outside_points)
@@ -210,7 +220,11 @@ class TestContinuousDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 100]},
       ],
       constraint_list=[
-        {"weights": coeff_vector, "rhs": rhs, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": coeff_vector,
+          "rhs": rhs,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
 
@@ -231,12 +245,27 @@ class TestContinuousDomain(object):
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 3]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
     ]
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [1, 1, 1, 0, 0, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [0, 0, 0, 1, 1, 0, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [1, 1, 1, 0, 0, 0, 0],
+        "rhs": 2,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [0, 0, 0, 1, 1, 0, 0],
+        "rhs": 2,
+        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
     one_hot_domain = domain.one_hot_domain
@@ -260,7 +289,11 @@ class TestContinuousDomain(object):
     domain = CategoricalDomain(
       domain_components=[{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]}] * dim,
       constraint_list=[
-        {"weights": [1.0] * dim, "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0] * dim,
+          "rhs": -1,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     domain = domain.one_hot_domain
@@ -336,7 +369,11 @@ class TestContinuousDomain(object):
     domain = CategoricalDomain(
       domain_components=[{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]}] * dim,
       constraint_list=[
-        {"weights": [1.0] * dim, "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0] * dim,
+          "rhs": 1,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     domain = domain.one_hot_domain
@@ -412,13 +449,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert domains_approximately_equal(domain, domain)
@@ -437,9 +489,21 @@ class TestCategoricalDomain(object):
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -451,13 +515,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -469,13 +548,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 2.6, 0.2, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 2.6, 0.2, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -487,13 +581,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [0.0, 1.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 1.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0.0, 1.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 1.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -505,13 +614,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -523,13 +647,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.4, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.4, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -541,13 +680,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0], "rhs": 1.2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
+          "rhs": 1.2,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert not domains_approximately_equal(domain, other_domain)
@@ -560,17 +714,28 @@ class TestCategoricalDomain(object):
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.6, 10e3]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 2.6, 10e3],
+        },
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
       ],
       constraint_list=[
-        {"weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 0.0, -0.5, 0.0, 2.2, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
         {
           "weights": [1.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0],
           "rhs": 1.3 + 1e-15,
           "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
         },
-        {"weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     assert domains_approximately_equal(domain, other_domain)
@@ -582,7 +747,11 @@ class TestCategoricalDomain(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
     ]
     constraint_list = [
-      {"weights": [-1, -1, -1], "rhs": -10, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [-1, -1, -1],
+        "rhs": -10,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list=constraint_list)
     domain.one_hot_domain.set_constraint_list([])
@@ -590,22 +759,37 @@ class TestCategoricalDomain(object):
     assert domain.one_hot_domain.one_hot_unconstrained_indices == list(range(3))
 
   def test_quantized_domain(self):
-    inf_quantized_comp = {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, 0.2, numpy.inf]}
+    inf_quantized_comp = {
+      "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      "elements": [-0.2, 0.2, numpy.inf],
+    }
     with pytest.raises(AssertionError):
       assert CategoricalDomain(domain_components=[inf_quantized_comp])
 
-    same_quantized_comp = {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.2, 0.2]}
+    same_quantized_comp = {
+      "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      "elements": [0.2, 0.2],
+    }
     with pytest.raises(AssertionError):
       assert CategoricalDomain(domain_components=[same_quantized_comp])
 
-    one_quantized_comp = {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.2]}
+    one_quantized_comp = {
+      "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      "elements": [0.2],
+    }
     with pytest.raises(AssertionError):
       assert CategoricalDomain(domain_components=[one_quantized_comp])
 
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 26, 1e3]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.31, 0, -2, -5]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.1, 0.2, 26, 1e3],
+        },
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0.31, 0, -2, -5],
+        },
       ]
     )
 
@@ -637,7 +821,12 @@ class TestCategoricalDomain(object):
 
   def test_quantized_unique(self):
     domain = CategoricalDomain(
-      [{"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1e-5, 1.1e-5, 1.11e-5, 1.111e-5, 1]}]
+      [
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0, 1e-5, 1.1e-5, 1.11e-5, 1.111e-5, 1],
+        }
+      ]
     )
     points = numpy.array([[1e-5], [1.1e-5], [1.11e-5], [1.111e-5]])
     unique_points = domain.identify_unique_points(points)
@@ -653,7 +842,12 @@ class TestCategoricalDomain(object):
     assert numpy.all(points[:3] == unique_points)
 
     domain = CategoricalDomain(
-      [{"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1e-5, 1.1e-5, 1.11e-5, 1.111e-5, 1e-4]}]
+      [
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [0, 1e-5, 1.1e-5, 1.11e-5, 1.111e-5, 1e-4],
+        }
+      ]
     )
     unique_points = domain.identify_unique_points(points)
     assert len(unique_points) == 4
@@ -778,7 +972,10 @@ class TestCategoricalDomain(object):
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [1, 5]},
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
         {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": all_cats},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.1, 0, 0.1, 2]},
+        {
+          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "elements": [-0.1, 0, 0.1, 2],
+        },
       ]
     )
 
@@ -847,7 +1044,10 @@ class TestCategoricalDomain(object):
     domain_components = [
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 3, 7]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 0.2, 2.4, 4.8, 23]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [0.1, 0.2, 2.4, 4.8, 23],
+      },
     ]
     domain = CategoricalDomain(domain_components)
     discrete_elements = [
@@ -925,7 +1125,10 @@ class TestCategoricalDomain(object):
     domain_components = [
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": non_enum_elements},
+      {
+        "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+        "elements": non_enum_elements,
+      },
     ]
     with pytest.raises(AssertionError):
       CategoricalDomain(domain_components)
@@ -961,12 +1164,21 @@ class TestCategoricalDomain(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 1]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 3]},
     ]
 
     # Can't have categorical weights which are nonzero
-    constraint_list = [{"weights": [1, 0, 0, 0, 2, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME}]
+    constraint_list = [
+      {
+        "weights": [1, 0, 0, 0, 2, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      }
+    ]
     with pytest.raises(AssertionError):
       CategoricalDomain(domain_components, constraint_list)
 
@@ -981,8 +1193,16 @@ class TestCategoricalDomain(object):
       CategoricalDomain(domain_components, constraint_list)
 
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [1, 1, 1, 0, 0, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [1, 1, 1, 0, 0, 0, 0],
+        "rhs": 2,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
 
@@ -1009,13 +1229,24 @@ class TestCategoricalDomain(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2.1, 2.1]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
     ]
     constraint_list = [
-      {"weights": [1, 0, 0, 1, 0, 0, 0], "rhs": 1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [0, 0, 0, 1, 0, 0, 1], "rhs": 1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 0, 0, 1, 0, 0, 0],
+        "rhs": 1,
+        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [0, 0, 0, 1, 0, 0, 1],
+        "rhs": 1,
+        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(integer_domain, constraint_list)
     assert domain.is_integer_constrained
@@ -1055,7 +1286,11 @@ class TestCategoricalDomain(object):
           {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2.1, 2.1]},
         ],
         constraint_list=[
-          {"weights": [1.0, 1.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [1.0, 1.0],
+            "rhs": 0.3,
+            "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
       )
     with pytest.raises(AssertionError):
@@ -1065,7 +1300,11 @@ class TestCategoricalDomain(object):
           {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
         ],
         constraint_list=[
-          {"weights": [1.0, 1.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [1.0, 1.0],
+            "rhs": 0.3,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
       )
 
@@ -1077,7 +1316,11 @@ class TestCategoricalDomain(object):
           {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2.1, 2.1]},
         ],
         constraint_list=[
-          {"weights": [1.0, 1.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [1.0, 1.0],
+            "rhs": 0.3,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
       )
 
@@ -1106,13 +1349,22 @@ class TestCategoricalDomain(object):
     assert domains_approximately_equal(domain_with_priors, domain_with_priors)
 
     priors_unchanged = copy.deepcopy(priors)
-    priors_unchanged[0] = {"name": ParameterPriorNames.NORMAL, "params": {"mean": 1.0, "scale": 2.0}}
-    priors_unchanged[1] = {"name": ParameterPriorNames.BETA, "params": {"shape_a": 3.0, "shape_b": 4.0}}
+    priors_unchanged[0] = {
+      "name": ParameterPriorNames.NORMAL,
+      "params": {"mean": 1.0, "scale": 2.0},
+    }
+    priors_unchanged[1] = {
+      "name": ParameterPriorNames.BETA,
+      "params": {"shape_a": 3.0, "shape_b": 4.0},
+    }
     domain_with_priors_unchanged = CategoricalDomain(domain_components=domain_components, priors=priors_unchanged)
     assert domains_approximately_equal(domain_with_priors, domain_with_priors_unchanged)
 
     priors_changed = copy.deepcopy(priors)
-    priors_changed[0] = {"name": ParameterPriorNames.BETA, "params": {"shape_a": 1, "shape_b": 2}}
+    priors_changed[0] = {
+      "name": ParameterPriorNames.BETA,
+      "params": {"shape_a": 1, "shape_b": 2},
+    }
     domain_with_priors_changed = CategoricalDomain(domain_components=domain_components, priors=priors_changed)
     assert not domains_approximately_equal(domain_with_priors, domain_with_priors_changed)
 
@@ -1136,7 +1388,11 @@ class TestPriorSamplers(object):
 
   @pytest.mark.parametrize(
     "var_type",
-    [INT_EXPERIMENT_PARAMETER_NAME, CATEGORICAL_EXPERIMENT_PARAMETER_NAME, QUANTIZED_EXPERIMENT_PARAMETER_NAME],
+    [
+      INT_EXPERIMENT_PARAMETER_NAME,
+      CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+      QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+    ],
   )
   def test_non_double_var_types_raise_assertion_error(self, var_type):
     domain_components = [
@@ -1157,7 +1413,10 @@ class TestPriorSamplers(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 2]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [4, 5, 6]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 4]},
     ]
@@ -1217,7 +1476,10 @@ class TestPriorSamplers(object):
     ]
     n_samples = 200
     priors = [
-      {"name": ParameterPriorNames.BETA, "params": {"shape_a": shape_a, "shape_b": shape_b}},
+      {
+        "name": ParameterPriorNames.BETA,
+        "params": {"shape_a": shape_a, "shape_b": shape_b},
+      },
       {"name": None, "params": None},
     ]
     domain = CategoricalDomain(domain_components=domain_components, priors=priors)
@@ -1241,31 +1503,71 @@ class TestInferUnconstrainedIndicesHalfspace(object):
     [
       (
         [
-          {"weights": [-1, -1, 0, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [-1, -1, 0, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
         [2, 3, 4, 5, 6, 7, 8],
       ),
       (
         [
-          {"weights": [0, 0, 0, 0, 0, 1, 1], "rhs": -1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [-1, -1, 0, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [0, 0, 0, 0, 0, 1, 1],
+            "rhs": -1,
+            "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [-1, -1, 0, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
         [2, 3, 4, 5, 6],
       ),
       (
         [
-          {"weights": [-1, -1, 0, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [0, 0, 0, 0, 0, 1, 1], "rhs": -1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [1, 1, 1, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [-1, -1, 0, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [0, 0, 0, 0, 0, 1, 1],
+            "rhs": -1,
+            "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [1, 1, 1, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
         [3, 4, 5, 6],
       ),
       (
         [
-          {"weights": [-1, -1, 0, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [0, 0, 0, 0, 0, 1, 1], "rhs": -1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [1, 0, 0, 0, 1, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-          {"weights": [0, 1, 1, 0, 0, 0, 0], "rhs": -1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+          {
+            "weights": [-1, -1, 0, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [0, 0, 0, 0, 0, 1, 1],
+            "rhs": -1,
+            "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [1, 0, 0, 0, 1, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
+          {
+            "weights": [0, 1, 1, 0, 0, 0, 0],
+            "rhs": -1,
+            "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          },
         ],
         [3, 4, 5],
       ),
@@ -1283,7 +1585,12 @@ class TestInferUnconstrainedIndicesHalfspace(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]},
     ]
     constraint_list = [
-      {"type": "ineq", "weights": [-1, -1, -1], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME}
+      {
+        "type": "ineq",
+        "weights": [-1, -1, -1],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      }
     ]
     constraint_list = [{"weights": [-1, -1, -1], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME}]
     one_hot_domain = CategoricalDomain(domain_components, constraint_list=constraint_list).one_hot_domain
@@ -1315,12 +1622,19 @@ class TestHitandRunSampling(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 0]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-20, 2]},
     ]
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list=constraint_list, force_hitandrun_sampling=True)
     samples = domain.generate_quasi_random_points_in_domain(10)
@@ -1331,12 +1645,19 @@ class TestHitandRunSampling(object):
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 0]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.2, -0.1, 1, 2.5, 10]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.2, -0.1, 1, 2.5, 10],
+      },
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-20, 2]},
     ]
     constraint_list = [
-      {"weights": [0, 0, 0, 0, 1, 1], "rhs": 5, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [0, 0, 0, 0, 1, 1],
+        "rhs": 5,
+        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list=constraint_list, force_hitandrun_sampling=True)
     samples = domain.generate_quasi_random_points_in_domain(10)

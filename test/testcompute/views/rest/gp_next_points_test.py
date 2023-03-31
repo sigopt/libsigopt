@@ -29,7 +29,10 @@ from libsigopt.views.rest.gp_next_points_categorical import (
 )
 from testaux.numerical_test_case import NumericalTestCase
 from testcompute.domain_test import domains_approximately_equal
-from testcompute.zigopt_input_utils import ZigoptSimulator, form_random_unconstrained_categorical_domain
+from testcompute.zigopt_input_utils import (
+  ZigoptSimulator,
+  form_random_unconstrained_categorical_domain,
+)
 
 
 class TestCategoricalNextPoints(NumericalTestCase):
@@ -41,7 +44,10 @@ class TestCategoricalNextPoints(NumericalTestCase):
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [11, 22]},
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 6, 9]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.1, 0.2, 0.5, 9.0]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.1, 0.2, 0.5, 9.0],
+      },
     ]
   )
 
@@ -171,8 +177,16 @@ class TestCategoricalNextPoints(NumericalTestCase):
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 3, 5]},
     ]
     constraint_list = [
-      {"weights": [1, 1, 0, 0, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-      {"weights": [1, 1, 1, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+      {
+        "weights": [1, 1, 0, 0, 0],
+        "rhs": 1,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
+      {
+        "weights": [1, 1, 1, 0, 0],
+        "rhs": 2,
+        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
     zs = ZigoptSimulator(
@@ -315,7 +329,10 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
       {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [11, 22]},
       {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
       {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 6, 9]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-0.1, 0.2, 0.5, 9.0]},
+      {
+        "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+        "elements": [-0.1, 0.2, 0.5, 9.0],
+      },
     ]
   )
 
@@ -546,8 +563,16 @@ class TestAugmentedDomain:
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [5, 10]},
       ],
       constraint_list=[
-        {"weights": [1.0, -0.5, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 1.0, 1.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, -0.5, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 1.0, 1.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     computed_domain = form_augmented_domain(domain_with_constraint)
@@ -562,8 +587,16 @@ class TestAugmentedDomain:
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0.2, 1]},
       ],
       constraint_list=[
-        {"weights": [1.0, -0.5, 0.0, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 1.0, 1.0, 0.0], "rhs": 1.0, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, -0.5, 0.0, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 1.0, 1.0, 0.0],
+          "rhs": 1.0,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     computed_domain = form_augmented_domain(domain_with_constraint, task_cost_populated=True, task_options=self.tasks)
@@ -615,10 +648,26 @@ class TestAugmentedDomain:
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 6]},
       ],
       constraint_list=[
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     computed_domain = form_augmented_domain(domain_with_constraints)
@@ -634,10 +683,26 @@ class TestAugmentedDomain:
         {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 6]},
       ],
       constraint_list=[
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
       force_hitandrun_sampling=True,
     )
@@ -681,10 +746,26 @@ class TestAugmentedDomain:
           "rhs": 1.3,
           "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
         },
-        {"weights": [0, 0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0, 0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 1.0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     af = Mock(dim=8, num_points_to_sample=2)
@@ -702,10 +783,26 @@ class TestAugmentedDomain:
         {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0.2, 1.0]},
       ],
       constraint_list=[
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0, 0.0], "rhs": 0.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0, 0.0], "rhs": 1.3, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0], "rhs": 0.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0], "rhs": 1.3, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0, 0.0],
+          "rhs": 0.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [1.0, 1.0, 0.0, -0.5, 0.0, 0.0, 0.0],
+          "rhs": 1.3,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0],
+          "rhs": 0.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0],
+          "rhs": 1.3,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     af = Mock(dim=9, num_points_to_sample=1)

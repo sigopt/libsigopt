@@ -4,7 +4,10 @@
 import numpy
 import scipy.linalg
 
-from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE, NONZERO_MEAN_LINEAR_MEAN_TYPE
+from libsigopt.compute.misc.constant import (
+  NONZERO_MEAN_CONSTANT_MEAN_TYPE,
+  NONZERO_MEAN_LINEAR_MEAN_TYPE,
+)
 
 
 def indices_represent_zero_mean(indices_list):
@@ -42,7 +45,10 @@ def polynomial_index_point_check(indices_list, dim):
 
 
 def validate_polynomial_indices(polynomial_indices, nonzero_mean_type, dim):
-  if nonzero_mean_type in (NONZERO_MEAN_CONSTANT_MEAN_TYPE, NONZERO_MEAN_LINEAR_MEAN_TYPE):
+  if nonzero_mean_type in (
+    NONZERO_MEAN_CONSTANT_MEAN_TYPE,
+    NONZERO_MEAN_LINEAR_MEAN_TYPE,
+  ):
     polynomial_indices = [[0] * dim]
     if nonzero_mean_type == NONZERO_MEAN_LINEAR_MEAN_TYPE:
       polynomial_indices.extend([[int(j == k) for j in range(dim)] for k in range(dim)])

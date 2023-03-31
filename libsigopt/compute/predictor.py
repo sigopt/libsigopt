@@ -84,7 +84,12 @@ class HasPredictor(object):
     if option in ("func",):
       mean, var = self.predictor.compute_mean_and_variance_of_points(points_to_evaluate)
     else:  # option in ("grad", "both")
-      mean, var, grad_mean, grad_var = self.predictor.compute_mean_variance_grad_of_points(points_to_evaluate)
+      (
+        mean,
+        var,
+        grad_mean,
+        grad_var,
+      ) = self.predictor.compute_mean_variance_grad_of_points(points_to_evaluate)
     sqrt_var = numpy.sqrt(var)
     if grad_var is not None:
       grad_sqrt_var = 0.5 * grad_var / sqrt_var[:, None]

@@ -263,7 +263,10 @@ class TestExpectedImprovementWithFailures(GaussianProcessTestCase):
       self.assert_vector_within_relative(ei_vals * pf_vals, eif_vals, 1e-13)
 
   def test_grad_product_against_finite_difference(
-    self, one_hot_domain_list, gaussian_process_list, product_of_list_probabilistic_failures_list
+    self,
+    one_hot_domain_list,
+    gaussian_process_list,
+    product_of_list_probabilistic_failures_list,
   ):
     h = 1e-6
     n_test = 50

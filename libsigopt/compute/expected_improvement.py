@@ -7,7 +7,10 @@ import numpy
 from scipy.stats import multivariate_normal, norm
 
 from libsigopt.compute.acquisition_function import AcquisitionFunction
-from libsigopt.compute.probabilistic_failures import ProbabilisticFailuresBase, ProductOfListOfProbabilisticFailures
+from libsigopt.compute.probabilistic_failures import (
+  ProbabilisticFailuresBase,
+  ProductOfListOfProbabilisticFailures,
+)
 from libsigopt.compute.python_utils import compute_cholesky_for_gp_sampling
 
 

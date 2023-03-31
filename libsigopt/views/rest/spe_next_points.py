@@ -8,7 +8,10 @@ import numpy
 from libsigopt.aux.constant import CATEGORICAL_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import C4RadialMatern
 from libsigopt.compute.covariance_base import HyperparameterInvalidError
-from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS, MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
+from libsigopt.compute.misc.constant import (
+  MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS,
+  MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS,
+)
 from libsigopt.compute.misc.multimetric import filter_multimetric_points_sampled_spe
 from libsigopt.compute.optimization import LBFGSBOptimizer, MultistartOptimizer, SLSQPOptimizer
 from libsigopt.compute.sigopt_parzen_estimator import SigOptParzenEstimator, SPEInsufficientDataError
@@ -283,7 +286,7 @@ class SPENextPoints(View):
     # Here, we counting points as failures whether they actually were reported failures or if they exceed
     # the user's bounds.  I think there's another model we could build in this setting but not sure yet.
     failures_or_beyond_bounds = self.augment_failures_with_user_specified_thresholds_violations()
-    one_hot_points_sampled_points, points_sampled_values = filter_multimetric_points_sampled_spe(
+    (one_hot_points_sampled_points, points_sampled_values,) = filter_multimetric_points_sampled_spe(
       self.multimetric_info,
       self.one_hot_points_sampled_points,
       self.points_sampled_for_af_values,
@@ -310,7 +313,7 @@ class SPENextPoints(View):
       return self.create_random_suggestions(num_to_sample)
 
     sigopt_parzen_estimator.append_lies(list(one_hot_points_being_sampled_points))
-    oh_suggested_points, num_rejection_samples, max_value, num_proposal_points = self.draw_samples(
+    (oh_suggested_points, num_rejection_samples, max_value, num_proposal_points,) = self.draw_samples(
       sigopt_parzen_estimator,
       num_to_sample,
       self.domain,

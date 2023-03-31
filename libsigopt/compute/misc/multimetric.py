@@ -7,7 +7,10 @@ import numpy
 
 from libsigopt.aux.multimetric import find_pareto_frontier_observations_for_maximization
 from libsigopt.aux.samplers import generate_grid_points, generate_halton_points
-from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS, MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
+from libsigopt.compute.misc.constant import (
+  MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS,
+  MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS,
+)
 
 
 # These are the names of the multimetric optimization methods
@@ -81,7 +84,10 @@ def identify_multimetric_phase(
   if fraction_served <= INITIALIZE_FRAC or fraction_completed <= 0.1:
     return INITIALIZATION, {}
   elif fraction_served <= OPTIMIZE_ONE_METRIC_FRAC:
-    return OPTIMIZING_ONE_METRIC_OPTIMIZE_1 if observation_count % 2 else OPTIMIZING_ONE_METRIC_OPTIMIZE_0, {}
+    return (
+      OPTIMIZING_ONE_METRIC_OPTIMIZE_1 if observation_count % 2 else OPTIMIZING_ONE_METRIC_OPTIMIZE_0,
+      {},
+    )
   elif fraction_served <= CONVEX_RANDOM_FRAC:
     completed_frac = (fraction_served - OPTIMIZE_ONE_METRIC_FRAC) / (CONVEX_RANDOM_FRAC - OPTIMIZE_ONE_METRIC_FRAC)
     kwargs = {"fraction_of_phase_completed": completed_frac}
@@ -91,11 +97,17 @@ def identify_multimetric_phase(
     kwargs = {"fraction_of_phase_completed": completed_frac}
     return CONVEX_COMBINATION_SEQUENTIAL, kwargs
   elif fraction_served <= POLISH_ONE_METRIC_FRAC:
-    return OPTIMIZING_ONE_METRIC_OPTIMIZE_1 if observation_count % 2 else OPTIMIZING_ONE_METRIC_OPTIMIZE_0, {}
+    return (
+      OPTIMIZING_ONE_METRIC_OPTIMIZE_1 if observation_count % 2 else OPTIMIZING_ONE_METRIC_OPTIMIZE_0,
+      {},
+    )
   elif fraction_served <= EPSILON_CONSTRAINT_FRAC:
     completed_frac = (fraction_served - POLISH_ONE_METRIC_FRAC) / (EPSILON_CONSTRAINT_FRAC - POLISH_ONE_METRIC_FRAC)
     kwargs = {"fraction_of_phase_completed": completed_frac}
-    return EPSILON_CONSTRAINT_OPTIMIZE_1 if observation_count % 2 else EPSILON_CONSTRAINT_OPTIMIZE_0, kwargs
+    return (
+      EPSILON_CONSTRAINT_OPTIMIZE_1 if observation_count % 2 else EPSILON_CONSTRAINT_OPTIMIZE_0,
+      kwargs,
+    )
   else:
     return COMPLETION, {}
 
@@ -534,7 +546,7 @@ def filter_multimetric_points_sampled_spe(
     filter_function = filter_optimizing_one_metric
   else:
     filter_function = filter_not_multimetric
-  modified_points_sampled_points, modified_points_sampled_values, _, modified_lie_value = filter_function(
+  (modified_points_sampled_points, modified_points_sampled_values, _, modified_lie_value,) = filter_function(
     multimetric_info,
     points_sampled_points,
     points_sampled_values,

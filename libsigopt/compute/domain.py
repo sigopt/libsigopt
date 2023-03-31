@@ -215,7 +215,7 @@ class ContinuousDomain(object):
           domain_bounds[self.one_hot_unconstrained_indices, :],
         )
       else:
-        points, success = generate_uniform_random_points_rejection_sampling_with_hitandrun_padding(
+        (points, success,) = generate_uniform_random_points_rejection_sampling_with_hitandrun_padding(
           num_points,
           domain_bounds,
           A,
@@ -268,7 +268,10 @@ class ContinuousDomain(object):
     slack = b[:, None] - A_normal
     viable_point_minus_A_normal = numpy.dot(A, viable_point)[:, None] - A_normal
     multipliers = numpy.divide(
-      slack, viable_point_minus_A_normal, out=numpy.zeros_like(slack), where=viable_point_minus_A_normal != 0
+      slack,
+      viable_point_minus_A_normal,
+      out=numpy.zeros_like(slack),
+      where=viable_point_minus_A_normal != 0,
     )
 
     valid_multipliers = numpy.logical_and(multipliers > 0, multipliers < 1)
@@ -312,7 +315,13 @@ class ContinuousDomain(object):
 
 
 class CategoricalDomain(object):
-  def __init__(self, domain_components, constraint_list=None, force_hitandrun_sampling=False, priors=None):
+  def __init__(
+    self,
+    domain_components,
+    constraint_list=None,
+    force_hitandrun_sampling=False,
+    priors=None,
+  ):
     """Construct a mixed continuous/categorical domain with the specified info.
 
         ** Sample domain_components dict **
@@ -336,7 +345,10 @@ class CategoricalDomain(object):
     self.one_hot_domain.force_hitandrun_sampling = force_hitandrun_sampling
     self.one_hot_constraint_list = self._form_one_hot_constraint_list()
     self.one_hot_domain.set_constraint_list(self.one_hot_constraint_list)
-    self.constrained_double_indices, self.constrained_integer_indices = self._form_constrained_variable_indices()
+    (
+      self.constrained_double_indices,
+      self.constrained_integer_indices,
+    ) = self._form_constrained_variable_indices()
     self.integer_constraint_function_indices = self._form_integer_constraint_function_indices()
 
   def __repr__(self):
@@ -355,7 +367,10 @@ class CategoricalDomain(object):
         DOUBLE_EXPERIMENT_PARAMETER_NAME,
         QUANTIZED_EXPERIMENT_PARAMETER_NAME,
       )
-      if component["var_type"] in (CATEGORICAL_EXPERIMENT_PARAMETER_NAME, QUANTIZED_EXPERIMENT_PARAMETER_NAME):
+      if component["var_type"] in (
+        CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+        QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      ):
         assert len(component["elements"]) > 1
         assert len(set(component["elements"])) == len(component["elements"])
         if component["var_type"] == CATEGORICAL_EXPERIMENT_PARAMETER_NAME:
@@ -371,7 +386,10 @@ class CategoricalDomain(object):
     if constraint_list:
       for constraint in constraint_list:
         assert "weights" in constraint and "rhs" in constraint and "var_type" in constraint
-        assert constraint["var_type"] in [DOUBLE_EXPERIMENT_PARAMETER_NAME, INT_EXPERIMENT_PARAMETER_NAME]
+        assert constraint["var_type"] in [
+          DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          INT_EXPERIMENT_PARAMETER_NAME,
+        ]
         assert len(constraint["weights"]) == len(domain_components)
 
         # Check that typing between constraint and domain_components is consistent
@@ -381,7 +399,10 @@ class CategoricalDomain(object):
 
         # Check that weights are zero for non-integer and non-double variables
         for weight, component in zip(constraint["weights"], domain_components):
-          if component["var_type"] not in [DOUBLE_EXPERIMENT_PARAMETER_NAME, INT_EXPERIMENT_PARAMETER_NAME]:
+          if component["var_type"] not in [
+            DOUBLE_EXPERIMENT_PARAMETER_NAME,
+            INT_EXPERIMENT_PARAMETER_NAME,
+          ]:
             assert weight == 0
 
     if priors:
@@ -456,7 +477,10 @@ class CategoricalDomain(object):
     for constraint in self.constraint_list:
       one_hot_weights = numpy.zeros(self.one_hot_dim)
       for weight, reference in zip(constraint["weights"], self.one_hot_to_categorical_mapping):
-        if reference["var_type"] in [DOUBLE_EXPERIMENT_PARAMETER_NAME, INT_EXPERIMENT_PARAMETER_NAME]:
+        if reference["var_type"] in [
+          DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          INT_EXPERIMENT_PARAMETER_NAME,
+        ]:
           one_hot_weights[reference["input_ind"]] = weight
 
       one_hot_constraint_list.append(
@@ -573,7 +597,10 @@ class CategoricalDomain(object):
     return numpy.prod(cat_shape, dtype=int)
 
   def _generate_quasi_random_1d_points_in_domain(self, num_points, domain_component):
-    if domain_component["var_type"] in (CATEGORICAL_EXPERIMENT_PARAMETER_NAME, QUANTIZED_EXPERIMENT_PARAMETER_NAME):
+    if domain_component["var_type"] in (
+      CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+      QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+    ):
       return numpy.random.choice(domain_component["elements"], replace=True, size=num_points)
     elif domain_component["var_type"] == INT_EXPERIMENT_PARAMETER_NAME:
       return numpy.random.randint(domain_component["elements"][0], domain_component["elements"][1] + 1, num_points)
@@ -689,13 +716,16 @@ class CategoricalDomain(object):
 
     discrete_elements = []
     for dc in self.domain_components:
-      if dc["var_type"] in (CATEGORICAL_EXPERIMENT_PARAMETER_NAME, QUANTIZED_EXPERIMENT_PARAMETER_NAME):
+      if dc["var_type"] in (
+        CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+        QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      ):
         discrete_elements.append(dc["elements"])
       else:
         discrete_elements.append(list(range(int(dc["elements"][0]), int(dc["elements"][1] + 1))))
 
     try:
-      num_total_discrete_values, should_generate_randomly = self._analyze_discrete_elements(
+      (num_total_discrete_values, should_generate_randomly,) = self._analyze_discrete_elements(
         discrete_elements,
         num_points,
         len(excluded_points),
@@ -761,7 +791,10 @@ class CategoricalDomain(object):
     oh_num = 0
     for component_num, component in enumerate(domain_components):
       this_mapping = {"var_type": component["var_type"], "output_ind": component_num}
-      if component["var_type"] in (DOUBLE_EXPERIMENT_PARAMETER_NAME, INT_EXPERIMENT_PARAMETER_NAME):
+      if component["var_type"] in (
+        DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        INT_EXPERIMENT_PARAMETER_NAME,
+      ):
         this_mapping.update({"input_ind": oh_num})
         domain_bounds.append(component["elements"])
         oh_num += 1
@@ -819,7 +852,10 @@ class CategoricalDomain(object):
     if not (self.has_categoricals or self.has_quantized):
       return self.round_one_hot_points_integer_values(one_hot_points)
 
-    temperature = max(temperature or DEFAULT_ONE_HOT_SNAPPING_TEMPERATURE, MINIMUM_ONE_HOT_SNAPPING_TEMPERATURE)
+    temperature = max(
+      temperature or DEFAULT_ONE_HOT_SNAPPING_TEMPERATURE,
+      MINIMUM_ONE_HOT_SNAPPING_TEMPERATURE,
+    )
 
     def rel_prob_func(z):
       temp = numpy.power(z, 1 / temperature) + 1e-300  # A number near the smallest nonzero number on a computer

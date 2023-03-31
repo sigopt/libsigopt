@@ -10,7 +10,11 @@ from libsigopt.aux.constant import (
   INT_EXPERIMENT_PARAMETER_NAME,
 )
 from libsigopt.aux.geometry_utils import find_interior_point
-from libsigopt.compute.domain import DEFAULT_NUM_RANDOM_NEIGHBORS, MAX_GRID_DIM, CategoricalDomain
+from libsigopt.compute.domain import (
+  DEFAULT_NUM_RANDOM_NEIGHBORS,
+  MAX_GRID_DIM,
+  CategoricalDomain,
+)
 from testaux.numerical_test_case import NumericalTestCase
 
 
@@ -126,7 +130,11 @@ class TestNeighborsFeasibility(object):
         {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
       ],
       constraint_list=[
-        {"weights": [0.0, 0.0, 0.2, 0.2, 0.0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0.0, 0.0, 0.2, 0.2, 0.0],
+          "rhs": 1,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     with pytest.raises(AssertionError):
@@ -144,9 +152,21 @@ class TestNeighborsFeasibility(object):
         {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
       ],
       constraint_list=[
-        {"weights": [0.2, 0.2, 0.0, 0, 0, 0], "rhs": 1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.2, 0.2, 0, 0, 0], "rhs": 1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0.0, 0.0, 0.0, 1, 1, 0], "rhs": 1, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0.2, 0.2, 0.0, 0, 0, 0],
+          "rhs": 1,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.2, 0.2, 0, 0, 0],
+          "rhs": 1,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0.0, 0.0, 0.0, 1, 1, 0],
+          "rhs": 1,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
 
@@ -208,12 +228,36 @@ class TestNeighborsFeasibility(object):
         {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
       ],
       constraint_list=[
-        {"weights": [0.25, 0.25, 0, 0, 0, 0, 0, 0, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0.25, 0.25, 0, 0, 0, 0, 0, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0.25, 0, 0, 0, 0.25, 0, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 0, 0, 0.25, 0.25, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 1.5, 1.5, 0, 0, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 1.5, 1.5, 0, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0.25, 0.25, 0, 0, 0, 0, 0, 0, 0],
+          "rhs": 2,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0.25, 0.25, 0, 0, 0, 0, 0, 0],
+          "rhs": 2,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0.25, 0, 0, 0, 0.25, 0, 0],
+          "rhs": 2,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 0, 0, 0.25, 0.25, 0],
+          "rhs": 2,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 1.5, 1.5, 0, 0, 0, 0],
+          "rhs": 2,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 1.5, 1.5, 0, 0, 0],
+          "rhs": 2,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
 
@@ -291,12 +335,36 @@ class TestNeighborsFeasibility(object):
         {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
       ],
       constraint_list=[
-        {"weights": [0.25, 0.2, 0, 0, 0, 0, 0, 0, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0.2, 0.2, 0, 0, 0, 0, 0, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0.2, 0, 0, 0, 0.2, 0, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 0, 0, 0.2, 0.2, 0], "rhs": 2, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 1.5, 1.5, 0, 0, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
-        {"weights": [0, 0, 0, 0, 1.5, 1.5, 0, 0, 0], "rhs": 2, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": [0.25, 0.2, 0, 0, 0, 0, 0, 0, 0],
+          "rhs": 2,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0.2, 0.2, 0, 0, 0, 0, 0, 0],
+          "rhs": 2,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0.2, 0, 0, 0, 0.2, 0, 0],
+          "rhs": 2,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 0, 0, 0.2, 0.2, 0],
+          "rhs": 2,
+          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 1.5, 1.5, 0, 0, 0, 0],
+          "rhs": 2,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
+        {
+          "weights": [0, 0, 0, 0, 1.5, 1.5, 0, 0, 0],
+          "rhs": 2,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
     one_hot_points = domain_borderline.snap_one_hot_points_to_integer_feasible(one_hot_next_points)

@@ -138,7 +138,11 @@ class TestOptimizer(NumericalTestCase):
     domain = CategoricalDomain(
       domain_components=[{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-1, 1]}] * dim,
       constraint_list=[
-        {"weights": coeff_vector, "rhs": rhs, "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME},
+        {
+          "weights": coeff_vector,
+          "rhs": rhs,
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        },
       ],
     )
 

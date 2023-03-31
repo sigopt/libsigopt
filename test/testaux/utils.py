@@ -24,7 +24,10 @@ def form_random_unconstrained_categorical_domain(dim, categoricals_allowed=True,
       )
     elif numpy.random.random() < 0.25 and categoricals_allowed:
       domain_components.append(
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": list(range(numpy.random.randint(2, 5)))}
+        {
+          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "elements": list(range(numpy.random.randint(2, 5))),
+        }
       )
     elif numpy.random.random() < 0.5:
       bounds = [numpy.random.randint(-10, 0), numpy.random.randint(0, 10)]
@@ -37,7 +40,12 @@ def form_random_unconstrained_categorical_domain(dim, categoricals_allowed=True,
         random_values = numpy.random.gamma(0.3, 1.0, size=(2,))
       else:
         random_values = numpy.random.uniform(-34567, 12345, size=(2,))
-      domain_components.append({"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": sorted(random_values)})
+      domain_components.append(
+        {
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "elements": sorted(random_values),
+        }
+      )
   return CategoricalDomain(domain_components)
 
 
@@ -58,10 +66,16 @@ def form_random_constrained_categorical_domain(n_double_param=5, n_int_param=5, 
   domain_components = [None] * dim
   for i in idx_double:
     bounds = [0, numpy.random.randint(1, 5)]
-    domain_components[i] = {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": bounds}
+    domain_components[i] = {
+      "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      "elements": bounds,
+    }
   for i in idx_int:
     bounds = [5, numpy.random.randint(10, 20)]
-    domain_components[i] = {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": bounds}
+    domain_components[i] = {
+      "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      "elements": bounds,
+    }
   for i in idx_cat:
     domain_components[i] = {
       "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,

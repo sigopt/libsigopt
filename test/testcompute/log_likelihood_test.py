@@ -6,7 +6,11 @@ import numpy
 import pytest
 import scipy
 
-from libsigopt.compute.covariance import C2RadialMatern, C4RadialMatern, SquareExponential
+from libsigopt.compute.covariance import (
+  C2RadialMatern,
+  C4RadialMatern,
+  SquareExponential,
+)
 from libsigopt.compute.domain import ContinuousDomain
 from libsigopt.compute.log_likelihood import GaussianProcessLogMarginalLikelihood
 from libsigopt.compute.misc.data_containers import HistoricalData
@@ -67,7 +71,12 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
 
     for num_sampled in num_sampled_list:
       gaussian_process = self.form_deterministic_gaussian_process(dim, num_sampled)
-      python_cov, historical_data, mean_poly_indices, _ = gaussian_process.get_core_data_copy()
+      (
+        python_cov,
+        historical_data,
+        mean_poly_indices,
+        _,
+      ) = gaussian_process.get_core_data_copy()
 
       lml = GaussianProcessLogMarginalLikelihood(python_cov, historical_data, mean_poly_indices)
 
@@ -144,7 +153,12 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
   def test_evaluate_log_likelihood_at_points(self, deterministic_gaussian_process, hyperparameter_domain):
     """Check that ``evaluate_log_likelihood_at_hyperparameter_list`` computes and orders results correctly."""
     gaussian_process = deterministic_gaussian_process
-    python_cov, historical_data, mean_poly_indices, _ = gaussian_process.get_core_data_copy()
+    (
+      python_cov,
+      historical_data,
+      mean_poly_indices,
+      _,
+    ) = gaussian_process.get_core_data_copy()
 
     lml = GaussianProcessLogMarginalLikelihood(python_cov, historical_data, mean_poly_indices)
 
@@ -168,7 +182,12 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
     num_multistarts = 30
 
     gaussian_process = deterministic_gaussian_process
-    python_cov, historical_data, mean_poly_indices, _ = gaussian_process.get_core_data_copy()
+    (
+      python_cov,
+      historical_data,
+      mean_poly_indices,
+      _,
+    ) = gaussian_process.get_core_data_copy()
 
     lml = GaussianProcessLogMarginalLikelihood(python_cov, historical_data, mean_poly_indices)
 

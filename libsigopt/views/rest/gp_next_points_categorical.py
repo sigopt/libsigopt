@@ -5,7 +5,11 @@ from copy import deepcopy
 
 import numpy
 
-from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME, PARALLEL_QEI, TASK_SELECTION_STRATEGY_A_PRIORI
+from libsigopt.aux.constant import (
+  DOUBLE_EXPERIMENT_PARAMETER_NAME,
+  PARALLEL_QEI,
+  TASK_SELECTION_STRATEGY_A_PRIORI,
+)
 from libsigopt.compute.acquisition_function_optimization import (
   constant_liar_acquisition_function_optimization,
   qei_acquisition_function_optimization,
@@ -49,7 +53,8 @@ def generate_neighboring_categorical_points(one_hot_points, domain):
   product_of_cats = domain.product_of_categories
   # For each neighboring point, we need to create product_of_cats neighboring categorical points
   neighboring_points = numpy.reshape(
-    numpy.tile(one_hot_points, (1, product_of_cats)), (num_one_hot_points, product_of_cats, one_hot_dim)
+    numpy.tile(one_hot_points, (1, product_of_cats)),
+    (num_one_hot_points, product_of_cats, one_hot_dim),
   )
   remaining_product_of_cats = product_of_cats
   running_product_of_cats = 1
@@ -72,7 +77,10 @@ def generate_neighboring_categorical_points(one_hot_points, domain):
     num_of_cat_indices = len(cat_indices)
     remaining_product_of_cats //= num_of_cat_indices
     neighboring_points[:, :, cat_indices] = numpy.reshape(
-      numpy.tile(numpy.eye(num_of_cat_indices), (running_product_of_cats, remaining_product_of_cats)),
+      numpy.tile(
+        numpy.eye(num_of_cat_indices),
+        (running_product_of_cats, remaining_product_of_cats),
+      ),
       (product_of_cats, num_of_cat_indices),
     )
     running_product_of_cats *= num_of_cat_indices
@@ -289,20 +297,20 @@ class GpNextPointsCategorical(GPView):
     af_optimization_domain = self.form_af_optimization_domain(acquisition_function)
 
     if use_parallel_ei:
-      one_hot_next_points_unshaped, optimizer_info = qei_acquisition_function_optimization(
+      (one_hot_next_points_unshaped, optimizer_info,) = qei_acquisition_function_optimization(
         af_optimization_domain,
         acquisition_function,
       )
       one_hot_next_points = numpy.reshape(one_hot_next_points_unshaped, (num_to_sample, self.dim_with_task))
     else:
-      one_hot_next_points, optimizer_info = constant_liar_acquisition_function_optimization(
+      (one_hot_next_points, optimizer_info,) = constant_liar_acquisition_function_optimization(
         af_optimization_domain,
         acquisition_function,
         num_to_sample,
       )
     self.tag.update({"optimizer_info": optimizer_info})
 
-    categorical_next_points, next_points_task_costs = self.convert_one_hot_points_to_distinct_categorical_points(
+    (categorical_next_points, next_points_task_costs,) = self.convert_one_hot_points_to_distinct_categorical_points(
       one_hot_next_points,
       acquisition_function,
     )

@@ -69,7 +69,11 @@ class MultiMetricMidpointInfo(MetricMidpointInfo):
     assert objectives is None or len(objectives) == values.shape[1], "there must be an objective for each metric"
 
     self.tuple_of_smmi = tuple(
-      SingleMetricMidpointInfo(values=values[:, i], failures=failures, objective=objectives[i] if objectives else None)
+      SingleMetricMidpointInfo(
+        values=values[:, i],
+        failures=failures,
+        objective=objectives[i] if objectives else None,
+      )
       for i in range(values.shape[1])
     )
 
@@ -151,7 +155,11 @@ class HistoricalData(object):
   def __str__(self):
     """String representation of this HistoricalData object."""
     return "\n".join(
-      [repr(self.points_sampled), repr(self.points_sampled_value), repr(self.points_sampled_noise_variance)]
+      [
+        repr(self.points_sampled),
+        repr(self.points_sampled_value),
+        repr(self.points_sampled_noise_variance),
+      ]
     )
 
   def append_lies(self, points_being_sampled, lie_value, lie_value_var):

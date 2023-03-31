@@ -8,14 +8,20 @@ from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import SquareExponential
 from libsigopt.compute.domain import CategoricalDomain, ContinuousDomain
 from libsigopt.compute.gaussian_process import GaussianProcess
-from libsigopt.compute.misc.data_containers import HistoricalData, SingleMetricMidpointInfo
+from libsigopt.compute.misc.data_containers import (
+  HistoricalData,
+  SingleMetricMidpointInfo,
+)
 from libsigopt.compute.probabilistic_failures import (
   ProbabilisticFailures,
   ProbabilisticFailuresCDF,
   ProductOfListOfProbabilisticFailures,
 )
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import form_points_sampled, form_random_hyperparameter_dict
+from testcompute.zigopt_input_utils import (
+  form_points_sampled,
+  form_random_hyperparameter_dict,
+)
 
 
 def fill_random_covariance_hyperparameters(interval, num_hyperparameters, covariance_type):
@@ -105,7 +111,13 @@ class GaussianProcessTestCase(NumericalTestCase):
   @staticmethod
   def form_continous_and_uniform_domain(dim=3, lower_element=-2, higher_element=2):
     return CategoricalDomain(
-      [{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [lower_element, higher_element]}] * dim
+      [
+        {
+          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "elements": [lower_element, higher_element],
+        }
+      ]
+      * dim
     )
 
   @staticmethod

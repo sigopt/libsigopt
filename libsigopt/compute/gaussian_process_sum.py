@@ -149,7 +149,12 @@ class GaussianProcessSum(Predictor):
     grad_mean = numpy.zeros((num_points, dim))
     grad_var = numpy.zeros((num_points, dim))
     for w, gp in zip(self.weights, self.gaussian_process_list):
-      gp_mean, gp_var, gp_grad_mean, gp_grad_var = gp.compute_mean_variance_grad_of_points(points_to_sample)
+      (
+        gp_mean,
+        gp_var,
+        gp_grad_mean,
+        gp_grad_var,
+      ) = gp.compute_mean_variance_grad_of_points(points_to_sample)
       mean = mean + w * gp_mean
       var = var + (w**2) * gp_var
       grad_mean = grad_mean + w * gp_grad_mean

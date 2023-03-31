@@ -12,6 +12,7 @@ from libsigopt.compute.probabilistic_failures import (
   ProbabilisticFailuresCDF,
   ProductOfListOfProbabilisticFailures,
 )
+
 from testcompute.gaussian_process_test_case import GaussianProcessTestCase
 
 

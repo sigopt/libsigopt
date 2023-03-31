@@ -8,20 +8,15 @@ from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import SquareExponential
 from libsigopt.compute.domain import CategoricalDomain, ContinuousDomain
 from libsigopt.compute.gaussian_process import GaussianProcess
-from libsigopt.compute.misc.data_containers import (
-  HistoricalData,
-  SingleMetricMidpointInfo,
-)
+from libsigopt.compute.misc.data_containers import HistoricalData, SingleMetricMidpointInfo
 from libsigopt.compute.probabilistic_failures import (
   ProbabilisticFailures,
   ProbabilisticFailuresCDF,
   ProductOfListOfProbabilisticFailures,
 )
+
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import (
-  form_points_sampled,
-  form_random_hyperparameter_dict,
-)
+from testcompute.zigopt_input_utils import form_points_sampled, form_random_hyperparameter_dict
 
 
 def fill_random_covariance_hyperparameters(interval, num_hyperparameters, covariance_type):

@@ -14,6 +14,7 @@ from libsigopt.aux.constant import (
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
 from libsigopt.compute.misc.multimetric import *
+
 from testaux.numerical_test_case import NumericalTestCase
 from testcompute.zigopt_input_utils import form_points_sampled
 

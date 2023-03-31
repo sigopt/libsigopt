@@ -5,11 +5,7 @@ from copy import deepcopy
 
 import numpy
 
-from libsigopt.aux.constant import (
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  PARALLEL_QEI,
-  TASK_SELECTION_STRATEGY_A_PRIORI,
-)
+from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME, PARALLEL_QEI, TASK_SELECTION_STRATEGY_A_PRIORI
 from libsigopt.compute.acquisition_function_optimization import (
   constant_liar_acquisition_function_optimization,
   qei_acquisition_function_optimization,
@@ -17,9 +13,7 @@ from libsigopt.compute.acquisition_function_optimization import (
 from libsigopt.compute.domain import CategoricalDomain, FixedIndicesOnContinuousDomain
 from libsigopt.compute.expected_improvement import ExpectedParallelImprovement
 from libsigopt.compute.misc.constant import CATEGORICAL_POINT_UNIQUENESS_TOLERANCE
-from libsigopt.compute.multitask_acquisition_function import (
-  MultitaskAcquisitionFunction,
-)
+from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
 from libsigopt.compute.views.view import GPView
 
 

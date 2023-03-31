@@ -12,11 +12,9 @@ from libsigopt.compute.sigopt_parzen_estimator import (
   SigOptParzenEstimator,
   SPEInsufficientDataError,
 )
+
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import (
-  form_points_sampled,
-  form_random_unconstrained_categorical_domain,
-)
+from testcompute.zigopt_input_utils import form_points_sampled, form_random_unconstrained_categorical_domain
 
 
 domain = form_random_unconstrained_categorical_domain(numpy.random.randint(4, 12)).one_hot_domain

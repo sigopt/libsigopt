@@ -13,14 +13,8 @@ from libsigopt.aux.constant import (
   PARALLEL_QEI,
 )
 from libsigopt.compute.domain import CategoricalDomain
-from libsigopt.compute.misc.constant import (
-  CONSTANT_LIAR_MIN,
-  NONZERO_MEAN_CONSTANT_MEAN_TYPE,
-)
-from libsigopt.compute.misc.data_containers import (
-  MultiMetricMidpointInfo,
-  SingleMetricMidpointInfo,
-)
+from libsigopt.compute.misc.constant import CONSTANT_LIAR_MIN, NONZERO_MEAN_CONSTANT_MEAN_TYPE
+from libsigopt.compute.misc.data_containers import MultiMetricMidpointInfo, SingleMetricMidpointInfo
 from libsigopt.compute.views.view import (
   _UNSET,
   GPView,
@@ -30,6 +24,7 @@ from libsigopt.compute.views.view import (
   form_one_hot_points_with_tasks,
   identify_scaled_values_exceeding_scaled_upper_thresholds,
 )
+
 from testaux.numerical_test_case import NumericalTestCase
 from testcompute.zigopt_input_utils import ZigoptSimulator, form_points_sampled
 

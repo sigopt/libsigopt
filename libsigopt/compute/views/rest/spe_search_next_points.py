@@ -13,14 +13,8 @@ from libsigopt.compute.views.rest.search_next_points import (
   SEARCH_INITIALIZATION_PHASE,
   identify_search_phase,
 )
-from libsigopt.compute.views.rest.spe_next_points import (
-  SPE_CAT_LENGTH_SCALE,
-  SPENextPoints,
-)
-from libsigopt.compute.views.view import (
-  View,
-  identify_scaled_values_exceeding_scaled_upper_thresholds,
-)
+from libsigopt.compute.views.rest.spe_next_points import SPE_CAT_LENGTH_SCALE, SPENextPoints
+from libsigopt.compute.views.view import View, identify_scaled_values_exceeding_scaled_upper_thresholds
 
 
 class SPESearchNextPoints(View):

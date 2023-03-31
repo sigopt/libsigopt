@@ -5,20 +5,11 @@ from copy import deepcopy
 
 import numpy
 
-from libsigopt.compute.misc.constant import (
-  CATEGORICAL_POINT_UNIQUENESS_TOLERANCE,
-  DEFAULT_MAX_SIMULTANEOUS_EI_POINTS,
-)
+from libsigopt.compute.misc.constant import CATEGORICAL_POINT_UNIQUENESS_TOLERANCE, DEFAULT_MAX_SIMULTANEOUS_EI_POINTS
 from libsigopt.compute.optimization_auxiliary import DEParameters, OptimizerInfo
-from libsigopt.compute.search import (
-  ProbabilityOfImprovementSearch,
-  SearchAcquisitionFunction,
-)
+from libsigopt.compute.search import ProbabilityOfImprovementSearch, SearchAcquisitionFunction
 from libsigopt.compute.vectorized_optimizers import DEOptimizer
-from libsigopt.compute.views.rest.gp_next_points_categorical import (
-  GpNextPointsCategorical,
-  convert_from_one_hot,
-)
+from libsigopt.compute.views.rest.gp_next_points_categorical import GpNextPointsCategorical, convert_from_one_hot
 from libsigopt.compute.views.view import GPView
 
 

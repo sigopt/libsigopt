@@ -22,11 +22,7 @@ For minimized metrics, the `values` must be negated before using this method.
 def find_pareto_frontier_observations_for_maximization(values, observations):
   values = numpy.array(values)
   observations = numpy.array(observations)
-  assert (
-    len(values) == len(observations)
-    and len(values.shape) == 2
-    and len(observations.shape) == 1
-  )
+  assert len(values) == len(observations) and len(values.shape) == 2 and len(observations.shape) == 1
   assert not numpy.any(numpy.isnan(values))
 
   good_ind = numpy.ones(values.shape[0], dtype=bool)

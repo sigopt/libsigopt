@@ -95,9 +95,7 @@ def identify_search_phase(
 ):
   INITIALIZATION_FRACTION = 0.2
   EXPLOITATION_FRACTION = 0.4
-  adjusted_budget = max(
-    observation_budget - failure_count, max(num_open_suggestions, 1)
-  )
+  adjusted_budget = max(observation_budget - failure_count, max(num_open_suggestions, 1))
   fraction_served = (observation_count + num_open_suggestions) / adjusted_budget
 
   if fraction_served <= INITIALIZATION_FRACTION:
@@ -132,20 +130,14 @@ class SearchNextPoints(GPView):
       num_to_sample,
     )
     self.tag.update({"optimizer_info": optimizer_info})
-    proposed_next_points = convert_from_one_hot(
-      one_hot_next_points, self.domain, acquisition_function
-    )
+    proposed_next_points = convert_from_one_hot(one_hot_next_points, self.domain, acquisition_function)
     return proposed_next_points
 
   def search_next_points_expected_improvement_with_failures(self):
     if len(self.constraint_metrics_index) == 1:
       return self.search_next_points_expected_improvement()
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
-    constraint_metrics = [
-      i
-      for i in self.params["metrics_info"].constraint_metrics_index
-      if i != optimized_metric
-    ]
+    constraint_metrics = [i for i in self.params["metrics_info"].constraint_metrics_index if i != optimized_metric]
     view_input = deepcopy(self.params)
     view_input["metrics_info"].optimized_metrics_index = [optimized_metric]
     view_input["metrics_info"].constraint_metrics_index = constraint_metrics
@@ -172,9 +164,7 @@ class SearchNextPoints(GPView):
 
   def view(self):
     assert self.has_constraint_metrics, "Search must have constraint metrics"
-    assert (
-      not self.has_optimization_metrics
-    ), "Search does not support optimization metrics"
+    assert not self.has_optimization_metrics, "Search does not support optimization metrics"
 
     num_to_sample = self.params["num_to_sample"]
 

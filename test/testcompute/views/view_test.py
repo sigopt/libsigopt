@@ -134,9 +134,7 @@ class TestView(NumericalTestCase):
       ps.points,
       ps.task_costs,
     )
-    assert (
-      one_hot_points_with_no_task_costs == one_hot_points_with_task_costs[:, :-1]
-    ).all()
+    assert (one_hot_points_with_no_task_costs == one_hot_points_with_task_costs[:, :-1]).all()
     assert (ps.task_costs == one_hot_points_with_task_costs[:, -1]).all()
 
   # pylint: disable=pointless-statement
@@ -159,9 +157,7 @@ class TestView(NumericalTestCase):
       v.one_hot_points_to_evaluate_points
 
   def check_gp_next_points_fields(self, zigopt_simulator, parallelism_method):
-    view_input, _ = zigopt_simulator.form_gp_next_points_categorical_inputs(
-      parallelism_method
-    )
+    view_input, _ = zigopt_simulator.form_gp_next_points_categorical_inputs(parallelism_method)
     v = GPView(view_input)
     assert v.has_optimization_metrics
     assert v.polynomial_indices is not object()
@@ -231,9 +227,7 @@ class TestView(NumericalTestCase):
     num_optimized_metrics,
     num_stored_metrics,
   ):
-    zs = ZigoptSimulator(
-      dim, num_sampled, num_optimized_metrics, num_stored_metrics, failure_prob=0
-    )
+    zs = ZigoptSimulator(dim, num_sampled, num_optimized_metrics, num_stored_metrics, failure_prob=0)
     view_input, _ = zs.form_spe_next_points_inputs()
     view_input["metrics_info"].optimized_metrics_index = [0, 1]
     values = view_input["points_sampled"].values
@@ -306,9 +300,7 @@ class TestView(NumericalTestCase):
       num_tasks=num_tasks,
       constraint_metric_thresholds=constraint_metric_thresholds,
     )
-    view_input, _ = zigopt_simulator.form_search_next_points_categorical_inputs(
-      parallelism_method
-    )
+    view_input, _ = zigopt_simulator.form_search_next_points_categorical_inputs(parallelism_method)
     view = View(view_input)
     assert not view.has_optimization_metrics
     assert view.optimized_metrics_objectives is _UNSET
@@ -361,8 +353,6 @@ class TestView(NumericalTestCase):
       num_tasks=num_tasks,
       constraint_metric_thresholds=constraint_metric_thresholds,
     )
-    view_input, _ = zigopt_simulator.form_search_next_points_categorical_inputs(
-      parallelism_method
-    )
+    view_input, _ = zigopt_simulator.form_search_next_points_categorical_inputs(parallelism_method)
     with pytest.raises(AssertionError):
       View(view_input)

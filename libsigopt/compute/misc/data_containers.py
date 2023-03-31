@@ -41,15 +41,9 @@ class MetricMidpointInfo(object):
     return self.negate * self.scale * (values - self.midpoint)
 
   def relative_objective_variance(self, value_vars):
-    value_vars = (
-      value_vars
-      if value_vars is not None
-      else numpy.full_like(value_vars, DEFAULT_VALUE_VAR)
-    )
+    value_vars = value_vars if value_vars is not None else numpy.full_like(value_vars, DEFAULT_VALUE_VAR)
     if self.skip:
-      return numpy.fmax(
-        value_vars, 1e-6
-      )  # Experimenting with MINIMUM_VALUE_VAR changes other things too
+      return numpy.fmax(value_vars, 1e-6)  # Experimenting with MINIMUM_VALUE_VAR changes other things too
     return numpy.fmax(value_vars * self.scale**2, MINIMUM_VALUE_VAR)
 
   def undo_scaling(self, values):
@@ -72,9 +66,7 @@ class MultiMetricMidpointInfo(MetricMidpointInfo):
     super().__init__()
 
     assert len(numpy.asarray(values).shape) == 2, "values must be an n-D array"
-    assert (
-      objectives is None or len(objectives) == values.shape[1]
-    ), "there must be an objective for each metric"
+    assert objectives is None or len(objectives) == values.shape[1], "there must be an objective for each metric"
 
     self.tuple_of_smmi = tuple(
       SingleMetricMidpointInfo(
@@ -123,9 +115,7 @@ class SingleMetricMidpointInfo(MetricMidpointInfo):
       self.force_skip = True
 
     if not self.force_skip:
-      self.min, self.max = numpy.min(self.non_fail_values), numpy.max(
-        self.non_fail_values
-      )
+      self.min, self.max = numpy.min(self.non_fail_values), numpy.max(self.non_fail_values)
       self.midpoint = (self.max + self.min) * 0.5
 
       if (self.max - self.min) * 0.5 < MINIMUM_METRIC_HALF_WIDTH:
@@ -145,17 +135,9 @@ class SingleMetricMidpointInfo(MetricMidpointInfo):
 
     maximizing = bool(self.negate == -1)
     if lie_method == CONSTANT_LIAR_MIN:
-      return (
-        numpy.min(self.non_fail_values)
-        if maximizing
-        else numpy.max(self.non_fail_values)
-      )
+      return numpy.min(self.non_fail_values) if maximizing else numpy.max(self.non_fail_values)
     elif lie_method == CONSTANT_LIAR_MAX:
-      return (
-        numpy.max(self.non_fail_values)
-        if maximizing
-        else numpy.min(self.non_fail_values)
-      )
+      return numpy.max(self.non_fail_values) if maximizing else numpy.min(self.non_fail_values)
     elif lie_method == CONSTANT_LIAR_MEAN:
       return numpy.mean(self.non_fail_values)
 
@@ -187,31 +169,19 @@ class HistoricalData(object):
       lie_value_var * numpy.ones(len(points_being_sampled)),
     )
 
-  def append_historical_data(
-    self, points_sampled, points_sampled_value, points_sampled_noise_variance
-  ):
+  def append_historical_data(self, points_sampled, points_sampled_value, points_sampled_noise_variance):
     """Append lists of points_sampled, their values, and their noise variances to the data members of this class."""
     if points_sampled.size == 0:
       return
 
     assert len(points_sampled.shape) == 2
-    assert (
-      len(points_sampled_value.shape) == len(points_sampled_noise_variance.shape) == 1
-    )
-    assert (
-      len(points_sampled)
-      == len(points_sampled_value)
-      == len(points_sampled_noise_variance)
-    )
+    assert len(points_sampled_value.shape) == len(points_sampled_noise_variance.shape) == 1
+    assert len(points_sampled) == len(points_sampled_value) == len(points_sampled_noise_variance)
     assert points_sampled.shape[1] == self.dim
 
     self.points_sampled = numpy.append(self.points_sampled, points_sampled, axis=0)
-    self.points_sampled_value = numpy.append(
-      self.points_sampled_value, points_sampled_value
-    )
-    self.points_sampled_noise_variance = numpy.append(
-      self.points_sampled_noise_variance, points_sampled_noise_variance
-    )
+    self.points_sampled_value = numpy.append(self.points_sampled_value, points_sampled_value)
+    self.points_sampled_noise_variance = numpy.append(self.points_sampled_noise_variance, points_sampled_noise_variance)
 
   @property
   def num_sampled(self):

@@ -56,9 +56,7 @@ CONSTANT_LIAR_MIN = "constant_liar_min"
 CONSTANT_LIAR_MAX = "constant_liar_max"
 CONSTANT_LIAR_MEAN = "constant_liar_mean"
 
-DEFAULT_CONSTANT_LIAR_VALUE = (
-  -0.0123456789
-)  # In the event there is no data (should crash maybe??)
+DEFAULT_CONSTANT_LIAR_VALUE = -0.0123456789  # In the event there is no data (should crash maybe??)
 
 # TODO(GH-257): Find a better default.
 DEFAULT_CONSTANT_LIAR_LIE_NOISE_VARIANCE = 1e-12

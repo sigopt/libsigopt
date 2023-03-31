@@ -207,9 +207,7 @@ class TestOptimizer(NumericalTestCase):
   def test_multistarted_slsqp_optimizer_crippled(self):
     """Confirm that an error will occur if the problem is unsolved, but not when it is solved."""
     slsqp_parameters_crippled = SLSQPParameters(maxiter=1)
-    slsqp_optimizer_crippled = SLSQPOptimizer(
-      self.domain, self.polynomial, slsqp_parameters_crippled
-    )
+    slsqp_optimizer_crippled = SLSQPOptimizer(self.domain, self.polynomial, slsqp_parameters_crippled)
 
     num_points = 15
     points = self.domain.generate_quasi_random_points_in_domain(num_points)
@@ -219,12 +217,8 @@ class TestOptimizer(NumericalTestCase):
       multistart_optimizer.optimize(selected_starts=points)
       raise RuntimeError  # Just while we have deactivated the optimization monitoring
 
-    points_with_opt = numpy.append(
-      points, self.polynomial.optimum_point.reshape((1, self.polynomial.dim)), axis=0
-    )
-    slsqp_optimizer_okay = SLSQPOptimizer(
-      self.domain, self.polynomial, DEFAULT_SLSQP_PARAMETERS
-    )
+    points_with_opt = numpy.append(points, self.polynomial.optimum_point.reshape((1, self.polynomial.dim)), axis=0)
+    slsqp_optimizer_okay = SLSQPOptimizer(self.domain, self.polynomial, DEFAULT_SLSQP_PARAMETERS)
     multistart_optimizer = MultistartOptimizer(slsqp_optimizer_okay, 0)
     test_best_point, _ = multistart_optimizer.optimize(selected_starts=points_with_opt)
     # This optimizer should be able to find the exact answer since it was included
@@ -238,9 +232,7 @@ class TestOptimizer(NumericalTestCase):
       (SLSQPOptimizer, DEFAULT_SLSQP_PARAMETERS),
     ],
   )
-  def test_optimizer(
-    self, optimizer_class, optimizer_parameters, tolerance=2.0e-13 * 1e6
-  ):
+  def test_optimizer(self, optimizer_class, optimizer_parameters, tolerance=2.0e-13 * 1e6):
     """Check that the optimizer can find the optimum of the quadratic test objective."""
     # Check the claimed optima is an optima
     optimum_point = self.polynomial.optimum_point
@@ -252,9 +244,7 @@ class TestOptimizer(NumericalTestCase):
     optimizer = optimizer_class(self.domain, self.polynomial, optimizer_parameters)
     optimizer.optimize()
     output = optimizer.objective_function.current_point
-    self.assert_vector_within_relative(
-      output, optimum_point, 2.0 * numpy.finfo(numpy.float64).eps
-    )
+    self.assert_vector_within_relative(output, optimum_point, 2.0 * numpy.finfo(numpy.float64).eps)
 
     # Start at a wrong point and check optimization
     initial_guess = numpy.full(self.polynomial.dim, 0.2)
@@ -270,9 +260,7 @@ class TestOptimizer(NumericalTestCase):
 
     # Verify derivative
     gradient = self.polynomial.compute_grad_objective_function()
-    self.assert_vector_within_relative(
-      gradient, numpy.zeros(self.polynomial.dim), tolerance
-    )
+    self.assert_vector_within_relative(gradient, numpy.zeros(self.polynomial.dim), tolerance)
 
   @pytest.mark.parametrize(
     "optimizer_class, optimizer_parameters",
@@ -285,9 +273,7 @@ class TestOptimizer(NumericalTestCase):
     """Check that the multistarted optimizer can find the optimum in a 'very' large domain."""
     tolerance = 1.0e-8
     num_points = 30
-    optimizer = optimizer_class(
-      self.large_domain, self.polynomial, optimizer_parameters
-    )
+    optimizer = optimizer_class(self.large_domain, self.polynomial, optimizer_parameters)
     multistart_optimizer = MultistartOptimizer(optimizer, num_points)
 
     output, all_results = multistart_optimizer.optimize()
@@ -301,18 +287,10 @@ class TestOptimizer(NumericalTestCase):
 
     # Verify derivative
     gradient = self.polynomial.compute_grad_objective_function()
-    self.assert_vector_within_relative(
-      gradient, numpy.zeros(self.polynomial.dim), tolerance
-    )
+    self.assert_vector_within_relative(gradient, numpy.zeros(self.polynomial.dim), tolerance)
 
     # Verify all the results have been recorded for each category
-    assert (
-      len(all_results.starting_points)
-      == len(all_results.ending_points)
-      == len(all_results.function_values)
-    )
+    assert len(all_results.starting_points) == len(all_results.ending_points) == len(all_results.function_values)
 
     # Verify the answers from each multistart were inside the domain
-    assert all(
-      optimizer.domain.check_point_acceptable(x) for x in all_results.ending_points
-    )
+    assert all(optimizer.domain.check_point_acceptable(x) for x in all_results.ending_points)

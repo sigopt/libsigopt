@@ -19,9 +19,7 @@ from libsigopt.compute.optimization_auxiliary import DEFAULT_SLSQP_PARAMETERS
 from testcompute.gaussian_process_test_case import GaussianProcessTestCase
 
 
-def evaluate_log_likelihood_at_hyperparameter_list(
-  log_likelihood_evaluator, hyperparameters_to_evaluate
-):
+def evaluate_log_likelihood_at_hyperparameter_list(log_likelihood_evaluator, hyperparameters_to_evaluate):
   """Compute the specified log likelihood measure at each input set of hyperparameters.
 
     Will return 'nan' if the specified hyperparameters create a singular matrix.
@@ -80,9 +78,7 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
         _,
       ) = gaussian_process.get_core_data_copy()
 
-      lml = GaussianProcessLogMarginalLikelihood(
-        python_cov, historical_data, mean_poly_indices
-      )
+      lml = GaussianProcessLogMarginalLikelihood(python_cov, historical_data, mean_poly_indices)
 
       def func(hparams):
         lml.hyperparameters = hparams.squeeze()
@@ -101,9 +97,7 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
         fd_step=h * numpy.ones(lml.num_hyperparameters),
       )
 
-  @pytest.mark.parametrize(
-    "kernel", [SquareExponential, C2RadialMatern, C4RadialMatern]
-  )
+  @pytest.mark.parametrize("kernel", [SquareExponential, C2RadialMatern, C4RadialMatern])
   @pytest.mark.parametrize("log_domain", [False, True])
   @pytest.mark.parametrize("dim", range(1, 5))
   def test_grad_log_likelihood(self, kernel, log_domain, dim):
@@ -126,8 +120,7 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
     # Construct hyperparameter domain
     if log_domain:
       hdomain = ContinuousDomain(
-        [[numpy.log(1e-6), numpy.log(1e3)]]
-        + [[numpy.log(2 * 0.001), numpy.log(2 * 10)]] * dim
+        [[numpy.log(1e-6), numpy.log(1e3)]] + [[numpy.log(2 * 0.001), numpy.log(2 * 10)]] * dim
       )
     else:
       hdomain = ContinuousDomain([[1e-6, 1e3]] + [[2 * 0.001, 2 * 10]] * dim)
@@ -157,9 +150,7 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
       # care about is the direction anyway since most methods will end up doing line search.
       assert numpy.abs(numpy.dot(grad_normed, approx_grad_normed) - 1) <= 1e-3
 
-  def test_evaluate_log_likelihood_at_points(
-    self, deterministic_gaussian_process, hyperparameter_domain
-  ):
+  def test_evaluate_log_likelihood_at_points(self, deterministic_gaussian_process, hyperparameter_domain):
     """Check that ``evaluate_log_likelihood_at_hyperparameter_list`` computes and orders results correctly."""
     gaussian_process = deterministic_gaussian_process
     (
@@ -169,28 +160,20 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
       _,
     ) = gaussian_process.get_core_data_copy()
 
-    lml = GaussianProcessLogMarginalLikelihood(
-      python_cov, historical_data, mean_poly_indices
-    )
+    lml = GaussianProcessLogMarginalLikelihood(python_cov, historical_data, mean_poly_indices)
 
     num_to_eval = 10
     domain = hyperparameter_domain
-    hyperparameters_to_evaluate = domain.generate_quasi_random_points_in_domain(
-      num_to_eval
-    )
+    hyperparameters_to_evaluate = domain.generate_quasi_random_points_in_domain(num_to_eval)
 
-    test_values = evaluate_log_likelihood_at_hyperparameter_list(
-      lml, hyperparameters_to_evaluate
-    )
+    test_values = evaluate_log_likelihood_at_hyperparameter_list(lml, hyperparameters_to_evaluate)
 
     for i, value in enumerate(test_values):
       lml.hyperparameters = hyperparameters_to_evaluate[i, ...]
       truth = lml.compute_log_likelihood()
       assert value == truth
 
-  def test_multistarted_hyperparameter_optimization(
-    self, deterministic_gaussian_process, hyperparameter_domain
-  ):
+  def test_multistarted_hyperparameter_optimization(self, deterministic_gaussian_process, hyperparameter_domain):
     """Check that multistarted optimization can find the optimum hyperparameters."""
     random_state = numpy.random.get_state()
     numpy.random.seed(87612)
@@ -206,9 +189,7 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
       _,
     ) = gaussian_process.get_core_data_copy()
 
-    lml = GaussianProcessLogMarginalLikelihood(
-      python_cov, historical_data, mean_poly_indices
-    )
+    lml = GaussianProcessLogMarginalLikelihood(python_cov, historical_data, mean_poly_indices)
 
     num_hyperparameters = hyperparameter_domain.dim
     domain = ContinuousDomain([[0.01, 10]] * num_hyperparameters)
@@ -225,9 +206,7 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
     lml.hyperparameters = best_hyperparameters
     gradient = lml.compute_grad_log_likelihood()
     if not domain.check_point_on_boundary(best_hyperparameters, 1e-4):
-      self.assert_vector_within_relative_norm(
-        gradient, numpy.zeros(self.num_hyperparameters), tolerance
-      )
+      self.assert_vector_within_relative_norm(gradient, numpy.zeros(self.num_hyperparameters), tolerance)
 
     # Check that output is in the domain
     assert domain.check_point_acceptable(best_hyperparameters) is True

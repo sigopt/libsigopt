@@ -18,6 +18,4 @@ class TestDistanceMatrix(NumericalTestCase):
     z = numpy.random.random((num_z, dim))
     dm_sq = compute_distance_matrix_squared(x, z)
     dm_sq_cdist = cdist(x, z) ** 2
-    self.assert_vector_within_relative_norm(
-      dm_sq, dm_sq_cdist, tol=1e-15 * dim, norm=numpy.inf
-    )
+    self.assert_vector_within_relative_norm(dm_sq, dm_sq_cdist, tol=1e-15 * dim, norm=numpy.inf)

@@ -14,9 +14,7 @@ class AcquisitionFunctionTestBase(NumericalTestCase):
   def assert_call_successful(self, zigopt_simulator, parallelism_method):
     view_input = zigopt_simulator.form_gp_ei_categorical_inputs(parallelism_method)
     response = GpEiCategoricalView(view_input).call()
-    assert len(response["expected_improvement"]) == len(
-      view_input["points_to_evaluate"].points
-    )
+    assert len(response["expected_improvement"]) == len(view_input["points_to_evaluate"].points)
     assert [ei >= 0 for ei in response["expected_improvement"]]
 
 

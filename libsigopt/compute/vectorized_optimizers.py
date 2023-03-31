@@ -20,28 +20,21 @@ class VectorizedOptimizer(Optimizer):
   optimizer_name = NotImplemented
   optimizer_parameters_type = NotImplemented
 
-  def __init__(
-    self, domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter
-  ):
+  def __init__(self, domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter):
     """
         This is the base class for vectorized _maximization_.
         """
     assert isinstance(domain, (ContinuousDomain, FixedIndicesOnContinuousDomain))
     self.domain = domain
     assert isinstance(acquisition_function, AcquisitionFunction)
-    assert (
-      self.dim == acquisition_function.dim * acquisition_function.num_points_to_sample
-    )
+    assert self.dim == acquisition_function.dim * acquisition_function.num_points_to_sample
     self.af = acquisition_function
     assert not self.requires_gradients or self.af.differentiable
 
     self.num_multistarts = num_multistarts
     self.maxiter = maxiter if maxiter is not None else DEFAULT_VECOPT_MAXITER
 
-    optimizer_parameters = (
-      optimizer_parameters
-      or OPTIMIZATION_PARAMETERS_TO_DEFAULTS[self.optimizer_parameters_type]
-    )
+    optimizer_parameters = optimizer_parameters or OPTIMIZATION_PARAMETERS_TO_DEFAULTS[self.optimizer_parameters_type]
     # pylint: disable=isinstance-second-argument-not-valid-type
     if not isinstance(optimizer_parameters, self.optimizer_parameters_type):
       raise TypeError(
@@ -110,24 +103,18 @@ class VectorizedOptimizer(Optimizer):
 
   def optimize(self, selected_starts=None):
     if selected_starts is None:
-      starting_points = self.domain.generate_quasi_random_points_in_domain(
-        self.num_multistarts
-      )
+      starting_points = self.domain.generate_quasi_random_points_in_domain(self.num_multistarts)
     else:
       num_extra_starts = self.num_multistarts - len(selected_starts)
       if num_extra_starts <= 0:
         starting_points = numpy.copy(selected_starts)
       else:
-        extra_starts = self.domain.generate_quasi_random_points_in_domain(
-          num_extra_starts
-        )
+        extra_starts = self.domain.generate_quasi_random_points_in_domain(num_extra_starts)
         starting_points = numpy.concatenate((selected_starts, extra_starts), axis=0)
 
     # Restrict points makes a copy of starting points and guarantees they are all valid
     restricted_starting_points = self.restrict_points_to_domain(starting_points)
-    ending_points = self._optimize(
-      restricted_starting_points
-    )  # restricted_starting_points may change
+    ending_points = self._optimize(restricted_starting_points)  # restricted_starting_points may change
     values, _ = self.evaluate_and_monitor(ending_points)
 
     all_results = OptimizationResults(
@@ -160,9 +147,7 @@ class DEOptimizer(VectorizedOptimizer):
     optimizer_parameters=None,
     maxiter=None,
   ):
-    super().__init__(
-      domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter
-    )
+    super().__init__(domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter)
     self.strategy = self.optimizer_parameters.strategy
     self.mutation = self.optimizer_parameters.mutation
     self.crossover_probability = self.optimizer_parameters.crossover_probability
@@ -174,13 +159,9 @@ class DEOptimizer(VectorizedOptimizer):
     #  ....
     #  [0, 1, 2, ...., n-1]]
     self.index_matrix = numpy.triu(
-      numpy.tile(
-        numpy.arange(1, self.num_multistarts, dtype=int), (self.num_multistarts, 1)
-      )
+      numpy.tile(numpy.arange(1, self.num_multistarts, dtype=int), (self.num_multistarts, 1))
     ) + numpy.tril(
-      numpy.tile(
-        numpy.arange(0, self.num_multistarts - 1, dtype=int), (self.num_multistarts, 1)
-      ),
+      numpy.tile(numpy.arange(0, self.num_multistarts - 1, dtype=int), (self.num_multistarts, 1)),
       -1,
     )
 
@@ -192,17 +173,10 @@ class DEOptimizer(VectorizedOptimizer):
   def _optimize(self, points):
     self.evaluate_and_monitor(points)
     for _ in range(self.maxiter):
-      selection_indices = numpy.random.randint(
-        0, self.num_multistarts - 1, (self.num_multistarts, 3)
-      )
-      selection_indices = self.index_matrix[
-        numpy.arange(self.num_multistarts)[:, None], selection_indices
-      ]
+      selection_indices = numpy.random.randint(0, self.num_multistarts - 1, (self.num_multistarts, 3))
+      selection_indices = self.index_matrix[numpy.arange(self.num_multistarts)[:, None], selection_indices]
       mutants = self.mutation_strat(points, selection_indices)
-      cross_points = (
-        numpy.random.random((self.num_multistarts, self.dim))
-        < self.crossover_probability
-      )
+      cross_points = numpy.random.random((self.num_multistarts, self.dim)) < self.crossover_probability
       trials = numpy.where(cross_points, mutants, points)
 
       # makes sure we always evaluate_and_monitor acceptable points
@@ -247,9 +221,7 @@ class AdamOptimizer(VectorizedOptimizer):
     optimizer_parameters=None,
     maxiter=None,
   ):
-    super().__init__(
-      domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter
-    )
+    super().__init__(domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter)
     self.learning_rate = self.optimizer_parameters.learning_rate
     assert self.learning_rate >= 0
     self.beta_1 = self.optimizer_parameters.beta_1
@@ -266,16 +238,10 @@ class AdamOptimizer(VectorizedOptimizer):
       _, gradients = self.evaluate_and_monitor(points)
       ascend_gradients = -gradients
       first_moment = self.beta_1 * first_moment + (1 - self.beta_1) * ascend_gradients
-      second_moment = (
-        self.beta_2 * second_moment + (1 - self.beta_2) * ascend_gradients**2
-      )
+      second_moment = self.beta_2 * second_moment + (1 - self.beta_2) * ascend_gradients**2
       first_moment_unbiased = first_moment / (1 - self.beta_1**i)
       second_moment_unbiased = second_moment / (1 - self.beta_2**i)
-      update = (
-        -self.learning_rate
-        * first_moment_unbiased
-        / (numpy.sqrt(second_moment_unbiased) + self.epsilon)
-      )
+      update = -self.learning_rate * first_moment_unbiased / (numpy.sqrt(second_moment_unbiased) + self.epsilon)
       next_points = points + update
       points = self.restrict_points_to_domain(next_points)
     return points

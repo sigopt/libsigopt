@@ -159,9 +159,7 @@ class TestSPENextPointsViews(object):
     view_input, _ = zs.form_spe_next_points_inputs()
     view_input["points_sampled"].failures[0] = True
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     assert augmented_points_sampled_failures[0]
     assert not numpy.any(augmented_points_sampled_failures[1:])
 
@@ -173,9 +171,7 @@ class TestSPENextPointsViews(object):
     )
     view_input["points_sampled"].failures[-1] = True
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     assert augmented_points_sampled_failures[-1]
     assert not numpy.any(augmented_points_sampled_failures[:-1])
 
@@ -189,9 +185,7 @@ class TestSPENextPointsViews(object):
       None,
     )
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     assert numpy.all(numpy.logical_not(augmented_points_sampled_failures))
 
     # Choose a situation with points on both sides of the metric bound (with high probability)
@@ -202,13 +196,9 @@ class TestSPENextPointsViews(object):
       metric_1_lower_bound,
     ]
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     bounds_array = numpy.array([[metric_0_lower_bound, metric_1_lower_bound]])
-    should_exclude = numpy.logical_not(
-      numpy.prod(values > bounds_array, axis=1, dtype=bool)
-    )
+    should_exclude = numpy.logical_not(numpy.prod(values > bounds_array, axis=1, dtype=bool))
     assert numpy.array_equal(augmented_points_sampled_failures, should_exclude)
 
     # Confirm this works with only one bound attached
@@ -219,13 +209,9 @@ class TestSPENextPointsViews(object):
       None,
     )
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     bounds_array = numpy.array([[metric_0_lower_bound, -numpy.inf]])
-    should_exclude = numpy.logical_not(
-      numpy.prod(values > bounds_array, axis=1, dtype=bool)
-    )
+    should_exclude = numpy.logical_not(numpy.prod(values > bounds_array, axis=1, dtype=bool))
     assert numpy.array_equal(augmented_points_sampled_failures, should_exclude)
 
     # Confirm this works with a small number of failures present in the data naturally
@@ -238,13 +224,9 @@ class TestSPENextPointsViews(object):
       metric_1_lower_bound,
     ]
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     bounds_array = numpy.array([[metric_0_lower_bound, metric_1_lower_bound]])
-    should_exclude = numpy.logical_not(
-      numpy.prod(values > bounds_array, axis=1, dtype=bool)
-    )
+    should_exclude = numpy.logical_not(numpy.prod(values > bounds_array, axis=1, dtype=bool))
     natural_failures = view.points_sampled_failures
     assert numpy.array_equal(
       augmented_points_sampled_failures,
@@ -268,28 +250,18 @@ class TestSPENextPointsViews(object):
       observation_budget=10,
     )
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     bounds_array = numpy.array([[metric_0_lower_bound, -numpy.inf]])
-    should_exclude = numpy.logical_not(
-      numpy.prod(values > bounds_array, axis=1, dtype=bool)
-    )
+    should_exclude = numpy.logical_not(numpy.prod(values > bounds_array, axis=1, dtype=bool))
     assert numpy.array_equal(augmented_points_sampled_failures, should_exclude)
 
     view_input["points_sampled"].failures[:270] = True
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     bounds_array = numpy.array([[metric_0_lower_bound, -numpy.inf]])
-    should_exclude = numpy.logical_not(
-      numpy.prod(values > bounds_array, axis=1, dtype=bool)
-    )
+    should_exclude = numpy.logical_not(numpy.prod(values > bounds_array, axis=1, dtype=bool))
     assert numpy.all(augmented_points_sampled_failures[:270])
-    assert numpy.array_equal(
-      augmented_points_sampled_failures[270:], should_exclude[270:]
-    )
+    assert numpy.array_equal(augmented_points_sampled_failures[270:], should_exclude[270:])
 
   def test_identify_spe_failures_with_bounds_violations_edge_cases(self):
     # Consider when none of the points satisfy the stated bounds (ignore the bounds, only deal with normal failures)
@@ -303,9 +275,7 @@ class TestSPENextPointsViews(object):
     ]
     view_input["points_sampled"].values = numpy.full((n, 2), -1)
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
     assert not numpy.any(augmented_points_sampled_failures)
 
     # Consider when there are already too many failures present to allow the bounds
@@ -317,25 +287,15 @@ class TestSPENextPointsViews(object):
       ),
       axis=0,
     )
-    expected_bounds_violations = numpy.concatenate(
-      (numpy.ones(n - num_natural_fails), numpy.zeros(num_natural_fails))
-    )
+    expected_bounds_violations = numpy.concatenate((numpy.ones(n - num_natural_fails), numpy.zeros(num_natural_fails)))
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
-    assert numpy.array_equiv(
-      augmented_points_sampled_failures, expected_bounds_violations
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
+    assert numpy.array_equiv(augmented_points_sampled_failures, expected_bounds_violations)
 
     view_input["points_sampled"].failures[:num_natural_fails] = True
     view = SPENextPoints(view_input)
-    augmented_points_sampled_failures = (
-      view.augment_failures_with_user_specified_thresholds_violations()
-    )
-    assert numpy.array_equal(
-      augmented_points_sampled_failures, view_input["points_sampled"].failures
-    )
+    augmented_points_sampled_failures = view.augment_failures_with_user_specified_thresholds_violations()
+    assert numpy.array_equal(augmented_points_sampled_failures, view_input["points_sampled"].failures)
 
   # These optimized_metric_thresholds could maybe be more intelligent in tests where function values are complicated
   @pytest.mark.parametrize("dim", [23])
@@ -450,9 +410,7 @@ class TestSPENextPointsViews(object):
 
   @pytest.mark.parametrize("dim", [2])
   @pytest.mark.parametrize("observation_count, failure_count, phase", PHASE_LIST)
-  def test_spe_phases_no_observation_budget(
-    self, dim, observation_count, failure_count, phase
-  ):
+  def test_spe_phases_no_observation_budget(self, dim, observation_count, failure_count, phase):
     # Check computed phase
     computed_phase, _ = get_experiment_phase(
       budget=dim * SPE_PHANTOM_BUDGET_FACTOR,

@@ -62,15 +62,11 @@ class TestGaussianProcess(GaussianProcessTestCase):
 
       lower = numpy.min(gp.points_sampled, axis=0)
       upper = numpy.max(gp.points_sampled, axis=0)
-      points_to_check = numpy.random.uniform(
-        lower, upper, size=(num_points, len(upper))
-      )
+      points_to_check = numpy.random.uniform(lower, upper, size=(num_points, len(upper)))
 
       mean = gp.compute_mean_of_points(points_to_check)
       stddev = numpy.sqrt(gp.compute_variance_of_points(points_to_check))
-      samples = gp.draw_posterior_samples_of_points(
-        num_posterior_samples, points_to_check
-      )
+      samples = gp.draw_posterior_samples_of_points(num_posterior_samples, points_to_check)
 
       # NOTE: The confidence intervals are calculated per point, so this comparison is made per point for each
       # posterior sample.
@@ -78,11 +74,7 @@ class TestGaussianProcess(GaussianProcessTestCase):
       # which is likely to not be satisfied when as the number of points (where you draw posterior) increase.
       count_in_interval = 0
       for s in samples:
-        count_in_interval += sum(
-          numpy.logical_and(
-            s < mean + stddev * conf_times, s > mean - stddev * conf_times
-          )
-        )
+        count_in_interval += sum(numpy.logical_and(s < mean + stddev * conf_times, s > mean - stddev * conf_times))
       estimated = count_in_interval / float(num_posterior_samples * num_points)
 
       assert estimated >= confidence_interval
@@ -117,41 +109,25 @@ class TestHasPredictor(GaussianProcessTestCase):
     old_best_observed_value = old_data.points_sampled_value[old_min_index]
     old_best_observed_location = old_data.points_sampled[old_min_index, :]
     hpred = HasPredictor(gaussian_process)
-    self.assert_scalar_within_relative(
-      old_best_observed_value, gaussian_process.best_observed_value, 1e-15
-    )
-    self.assert_scalar_within_relative(
-      old_best_observed_value, hpred.predictor.best_observed_value, 1e-15
-    )
-    self.assert_vector_within_relative_norm(
-      old_best_observed_location, gaussian_process.best_observed_location, 1e-15
-    )
-    self.assert_vector_within_relative_norm(
-      old_best_observed_location, hpred.predictor.best_observed_location, 1e-15
-    )
+    self.assert_scalar_within_relative(old_best_observed_value, gaussian_process.best_observed_value, 1e-15)
+    self.assert_scalar_within_relative(old_best_observed_value, hpred.predictor.best_observed_value, 1e-15)
+    self.assert_vector_within_relative_norm(old_best_observed_location, gaussian_process.best_observed_location, 1e-15)
+    self.assert_vector_within_relative_norm(old_best_observed_location, hpred.predictor.best_observed_location, 1e-15)
 
     gaussian_process = self.form_gaussian_process_and_data(domain)
     new_data = gaussian_process.historical_data
     new_min_index = numpy.argmin(new_data.points_sampled_value)
     new_best_observed_value = new_data.points_sampled_value[new_min_index]
     new_best_observed_location = new_data.points_sampled[new_min_index, :]
-    self.assert_scalar_within_relative(
-      new_best_observed_value, gaussian_process.best_observed_value, 1e-15
-    )
-    self.assert_vector_within_relative_norm(
-      new_best_observed_location, gaussian_process.best_observed_location, 1e-15
-    )
+    self.assert_scalar_within_relative(new_best_observed_value, gaussian_process.best_observed_value, 1e-15)
+    self.assert_vector_within_relative_norm(new_best_observed_location, gaussian_process.best_observed_location, 1e-15)
 
     hpred.predictor.update_historical_data(new_data)
     confirm_new_data = hpred.predictor.historical_data
     assert old_data is not new_data
     assert new_data.num_sampled == confirm_new_data.num_sampled
-    self.assert_scalar_within_relative(
-      new_best_observed_value, hpred.predictor.best_observed_value, 1e-15
-    )
-    self.assert_vector_within_relative_norm(
-      new_best_observed_location, hpred.predictor.best_observed_location, 1e-15
-    )
+    self.assert_scalar_within_relative(new_best_observed_value, hpred.predictor.best_observed_value, 1e-15)
+    self.assert_vector_within_relative_norm(new_best_observed_location, hpred.predictor.best_observed_location, 1e-15)
 
   def test_predictions(self, gaussian_process_and_domain):
     gaussian_process, domain = gaussian_process_and_domain

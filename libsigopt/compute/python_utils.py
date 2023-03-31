@@ -138,9 +138,7 @@ def build_grad_polynomial_tensor(indices_list, points):
               if this_index == 0:
                 grad_poly_ten[row][col][d] = 0
               else:
-                grad_poly_ten[row][col][d] *= this_index * pow(
-                  this_point, this_index - 1
-                )
+                grad_poly_ten[row][col][d] *= this_index * pow(this_point, this_index - 1)
 
   return grad_poly_ten
 
@@ -159,14 +157,10 @@ def compute_cholesky_for_gp_sampling(covariance_matrix):
     """
   # pylint: disable=unexpected-keyword-arg
   try:
-    chol_cov = scipy.linalg.cholesky(
-      covariance_matrix, lower=True, overwrite_a=True, check_finite=False
-    )
+    chol_cov = scipy.linalg.cholesky(covariance_matrix, lower=True, overwrite_a=True, check_finite=False)
   except scipy.linalg.LinAlgError:
     U, E, _ = scipy.linalg.svd(covariance_matrix, overwrite_a=True, check_finite=False)
     chol_cov = U * numpy.sqrt(E)[None, :]
-    chol_cov = scipy.linalg.qr(
-      chol_cov.T, mode="r", overwrite_a=True, check_finite=False
-    )[0].T
+    chol_cov = scipy.linalg.qr(chol_cov.T, mode="r", overwrite_a=True, check_finite=False)[0].T
   # pylint: enable=unexpected-keyword-arg
   return chol_cov

@@ -130,17 +130,11 @@ class C2RadialMatern(DifferentiableRadialCovariance):
 
   def eval_radial_kernel_grad(self, distance_matrix_squared, difference_matrix):
     r = numpy.sqrt(distance_matrix_squared)
-    return (
-      _scale_difference_matrix(-numpy.exp(-r), difference_matrix)
-      / self._length_scales_squared
-    )
+    return _scale_difference_matrix(-numpy.exp(-r), difference_matrix) / self._length_scales_squared
 
   def eval_radial_kernel_hparam_grad(self, distance_matrix_squared, difference_matrix):
     r = numpy.sqrt(distance_matrix_squared)
-    return (
-      _scale_difference_matrix(numpy.exp(-r), difference_matrix**2)
-      / self._length_scales_cubed
-    )
+    return _scale_difference_matrix(numpy.exp(-r), difference_matrix**2) / self._length_scales_cubed
 
   def _covariance(self, x, z):
     r, _ = self._distance_between_points(z, x)
@@ -206,20 +200,12 @@ class C4RadialMatern(DifferentiableRadialCovariance):
   def _grad_covariance(self, x, z):
     r, dm = self._distance_between_points(z, x)
     r_2d = r[:, None]
-    return (
-      -(1.0 / 3.0) * (1 + r_2d) * numpy.exp(-r_2d) * dm / self._length_scales_squared
-    )
+    return -(1.0 / 3.0) * (1 + r_2d) * numpy.exp(-r_2d) * dm / self._length_scales_squared
 
   def _hyperparameter_grad_covariance_without_process_variance(self, x, z):
     r, dm = self._distance_between_points(z, x)
     r_2d = r[:, None]
-    return (
-      (1.0 / 3.0)
-      * (1 + r_2d)
-      * numpy.exp(-r_2d)
-      * (dm**2)
-      / self._length_scales_cubed
-    )
+    return (1.0 / 3.0) * (1 + r_2d) * numpy.exp(-r_2d) * (dm**2) / self._length_scales_cubed
 
 
 COVARIANCE_TYPES_TO_CLASSES = {

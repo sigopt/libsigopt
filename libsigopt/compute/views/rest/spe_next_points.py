@@ -74,8 +74,7 @@ def get_experiment_phase(budget, observation_count, failure_count):
   total_progress = observation_count / budget
   success_proportion = 1 - failure_count / (1 + observation_count)
   if success_progress < INITIALIZATION_PHASE_LIMIT and not (
-    total_progress > 2 * INITIALIZATION_PHASE_LIMIT
-    and success_proportion > MINIMUM_SUCCESS_THRESHOLD
+    total_progress > 2 * INITIALIZATION_PHASE_LIMIT and success_proportion > MINIMUM_SUCCESS_THRESHOLD
   ):
     phase = INITIALIZATION_PHASE
   elif success_progress < SKO_PHASE_LIMIT:
@@ -87,9 +86,7 @@ def get_experiment_phase(budget, observation_count, failure_count):
 
 def get_solver_options(phase, progress):
   if phase == SKO_PHASE:
-    progress_step = (progress - INITIALIZATION_PHASE_LIMIT) / (
-      SKO_PHASE_LIMIT - INITIALIZATION_PHASE_LIMIT
-    )
+    progress_step = (progress - INITIALIZATION_PHASE_LIMIT) / (SKO_PHASE_LIMIT - INITIALIZATION_PHASE_LIMIT)
     gamma = TOP_GAMMA - progress_step * (TOP_GAMMA - BOTTOM_GAMMA)
     proposal_factor = SPE_PROPOSAL_FACTOR
   else:
@@ -108,9 +105,7 @@ class SPENextPoints(View):
     return x[:, :-1]
 
   @staticmethod
-  def form_one_hot_covariance(
-    covariance_class, domain, one_hot_points, cat_length_scale, factor
-  ):
+  def form_one_hot_covariance(covariance_class, domain, one_hot_points, cat_length_scale, factor):
     point_spread = numpy.std(one_hot_points, axis=0) + STD_EPSILON_HACK
     one_hot_bandwidths = factor * numpy.sqrt(point_spread / 2)
 
@@ -166,30 +161,24 @@ class SPENextPoints(View):
     return sigopt_parzen_estimator
 
   @staticmethod
-  def suggest_next_points_constant_liar(
-    sigopt_parzen_estimator, num_to_sample, domain, num_multistarts
-  ):
+  def suggest_next_points_constant_liar(sigopt_parzen_estimator, num_to_sample, domain, num_multistarts):
     lie_data = sigopt_parzen_estimator.stash_lies()
 
     if domain.is_constrained:
       base_optimizer = SLSQPOptimizer(domain.one_hot_domain, sigopt_parzen_estimator)
     else:
       base_optimizer = LBFGSBOptimizer(domain.one_hot_domain, sigopt_parzen_estimator)
-    multistart_optimizer = MultistartOptimizer(
-      base_optimizer, num_multistarts=num_multistarts
-    )
+    multistart_optimizer = MultistartOptimizer(base_optimizer, num_multistarts=num_multistarts)
     suggestion_list = []
     for _ in range(num_to_sample):
       num_lower_points = len(sigopt_parzen_estimator.lower_points)
-      sorted_index_by_eis = sigopt_parzen_estimator.evaluate_expected_improvement(
-        sigopt_parzen_estimator.lower_points
-      )[2].argsort()[::-1]
+      sorted_index_by_eis = sigopt_parzen_estimator.evaluate_expected_improvement(sigopt_parzen_estimator.lower_points)[
+        2
+      ].argsort()[::-1]
       inbound = numpy.array(
         [
           domain.check_point_acceptable(point)
-          for point in domain.map_one_hot_points_to_categorical(
-            sigopt_parzen_estimator.lower_points
-          )
+          for point in domain.map_one_hot_points_to_categorical(sigopt_parzen_estimator.lower_points)
         ]
       )
       selected_starts_indexes = sorted_index_by_eis[: min(5, num_lower_points)]
@@ -228,9 +217,7 @@ class SPENextPoints(View):
       domain,
       num_multistarts,
     )[0]
-    max_value = sigopt_parzen_estimator.evaluate_expected_improvement(
-      numpy.atleast_2d(max_location)
-    )[2][0]
+    max_value = sigopt_parzen_estimator.evaluate_expected_improvement(numpy.atleast_2d(max_location))[2][0]
 
     uniform_domain = deepcopy(domain.one_hot_domain)
     uniform_domain.set_quasi_random_sampler_opts(sampler="uniform")
@@ -238,12 +225,8 @@ class SPENextPoints(View):
     num_rejection_samples = 0
     samples = numpy.empty((0, domain.one_hot_dim))
     # NOTE: lower_points are sorted by objective function values in decreasing order
-    num_lower_points_used = max(
-      1, int(proposal_factor * len(sigopt_parzen_estimator.lower_points))
-    )
-    while (
-      len(samples) < num_to_sample and num_rejection_samples < rejection_samples_limit
-    ):
+    num_lower_points_used = max(1, int(proposal_factor * len(sigopt_parzen_estimator.lower_points)))
+    while len(samples) < num_to_sample and num_rejection_samples < rejection_samples_limit:
       test_points_list = []
       for lower_point in sigopt_parzen_estimator.lower_points[:num_lower_points_used]:
         pts = uniform_domain.generate_random_points_near_point(
@@ -254,33 +237,23 @@ class SPENextPoints(View):
         test_points_list.append(pts)
       test_points = numpy.concatenate(test_points_list, axis=0)[:batch_size, :]
 
-      test_ei_vals_scaled = (
-        sigopt_parzen_estimator.evaluate_expected_improvement(test_points)[2]
-        / max_value
-      )
+      test_ei_vals_scaled = sigopt_parzen_estimator.evaluate_expected_improvement(test_points)[2] / max_value
       test_probs = numpy.random.random(batch_size)
-      samples = numpy.concatenate(
-        (samples, test_points[test_probs < test_ei_vals_scaled, :]), axis=0
-      )
+      samples = numpy.concatenate((samples, test_points[test_probs < test_ei_vals_scaled, :]), axis=0)
       num_rejection_samples += batch_size
 
     if len(samples) < num_to_sample:
-      remaining_uniform_samples = uniform_domain.generate_quasi_random_points_in_domain(
-        num_to_sample - len(samples)
-      )
+      remaining_uniform_samples = uniform_domain.generate_quasi_random_points_in_domain(num_to_sample - len(samples))
       samples = numpy.concatenate((samples, remaining_uniform_samples), axis=0)
     elif len(samples) > num_to_sample:
-      samples = samples[
-        numpy.random.choice(range(len(samples)), size=num_to_sample, replace=False), :
-      ]
+      samples = samples[numpy.random.choice(range(len(samples)), size=num_to_sample, replace=False), :]
 
     return samples, num_rejection_samples, max_value, num_lower_points_used
 
   def augment_failures_with_user_specified_thresholds_violations(self):
     observed_failures = self.points_sampled_failures
     if not (
-      self.params["metrics_info"].requires_pareto_frontier_optimization
-      or self.has_constraint_metrics
+      self.params["metrics_info"].requires_pareto_frontier_optimization or self.has_constraint_metrics
     ):  # Not a multimetric problem
       return observed_failures
 
@@ -293,20 +266,15 @@ class SPENextPoints(View):
       )
     metric_constraints_violations = numpy.zeros(num_points, dtype=bool)
     if self.has_constraint_metrics:
-      metric_constraints_violations = (
-        identify_scaled_values_exceeding_scaled_upper_thresholds(
-          self.points_sampled_for_pf_values,
-          self.constraint_thresholds,
-        )
+      metric_constraints_violations = identify_scaled_values_exceeding_scaled_upper_thresholds(
+        self.points_sampled_for_pf_values,
+        self.constraint_thresholds,
       )
-    either_failure = (
-      observed_failures | bounds_violations | metric_constraints_violations
-    )
+    either_failure = observed_failures | bounds_violations | metric_constraints_violations
 
     if (
       numpy.sum(bounds_violations) > num_points - MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS
-      or numpy.sum(metric_constraints_violations)
-      > num_points - MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
+      or numpy.sum(metric_constraints_violations) > num_points - MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
       or numpy.sum(either_failure) > num_points - MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
     ):
       return observed_failures
@@ -315,13 +283,9 @@ class SPENextPoints(View):
 
   def create_random_suggestions(self, num_to_sample):
     if self.domain.priors and not self.domain.constraint_list:
-      suggested_points = self.domain.generate_random_points_according_to_priors(
-        num_to_sample
-      )
+      suggested_points = self.domain.generate_random_points_according_to_priors(num_to_sample)
     else:
-      suggested_points = self.domain.generate_quasi_random_points_in_domain(
-        num_to_sample
-      )
+      suggested_points = self.domain.generate_quasi_random_points_in_domain(num_to_sample)
 
     return self._return_results_to_zigopt(suggested_points)
 
@@ -333,31 +297,20 @@ class SPENextPoints(View):
 
     # Here, we counting points as failures whether they actually were reported failures or if they exceed
     # the user's bounds.  I think there's another model we could build in this setting but not sure yet.
-    failures_or_beyond_bounds = (
-      self.augment_failures_with_user_specified_thresholds_violations()
-    )
-    (
-      one_hot_points_sampled_points,
-      points_sampled_values,
-    ) = filter_multimetric_points_sampled_spe(
+    failures_or_beyond_bounds = self.augment_failures_with_user_specified_thresholds_violations()
+    (one_hot_points_sampled_points, points_sampled_values,) = filter_multimetric_points_sampled_spe(
       self.multimetric_info,
       self.one_hot_points_sampled_points,
       self.points_sampled_for_af_values,
       failures_or_beyond_bounds,
       self.scaled_optimized_lie_values,
     )
-    one_hot_points_sampled_points = self.remove_task_info_as_needed(
-      one_hot_points_sampled_points
-    )
-    one_hot_points_being_sampled_points = self.remove_task_info_as_needed(
-      self.one_hot_points_being_sampled_points
-    )
+    one_hot_points_sampled_points = self.remove_task_info_as_needed(one_hot_points_sampled_points)
+    one_hot_points_being_sampled_points = self.remove_task_info_as_needed(self.one_hot_points_being_sampled_points)
 
     observation_count = len(one_hot_points_sampled_points)
     open_suggestion_count = len(one_hot_points_being_sampled_points)
-    sample_randomly = (
-      observation_count <= SPE_OPEN_SUGGESTION_RATIO_BOUND * open_suggestion_count
-    )
+    sample_randomly = observation_count <= SPE_OPEN_SUGGESTION_RATIO_BOUND * open_suggestion_count
 
     try:
       sigopt_parzen_estimator = self.form_sigopt_parzen_estimator(
@@ -372,20 +325,13 @@ class SPENextPoints(View):
       return self.create_random_suggestions(num_to_sample)
 
     sigopt_parzen_estimator.append_lies(list(one_hot_points_being_sampled_points))
-    (
-      oh_suggested_points,
-      num_rejection_samples,
-      max_value,
-      num_proposal_points,
-    ) = self.draw_samples(
+    (oh_suggested_points, num_rejection_samples, max_value, num_proposal_points,) = self.draw_samples(
       sigopt_parzen_estimator,
       num_to_sample,
       self.domain,
       proposal_factor=proposal_factor,
     )
-    suggested_points = self.domain.map_one_hot_points_to_categorical(
-      oh_suggested_points
-    )
+    suggested_points = self.domain.map_one_hot_points_to_categorical(oh_suggested_points)
     self.tag.update({"num_rejection_samples": num_rejection_samples})
     self.tag.update({"num_proposal_points": num_proposal_points})
     self.tag.update({"max_ei": max_value})
@@ -399,21 +345,14 @@ class SPENextPoints(View):
       "tag": self.tag,
     }
     if self.task_options.size:
-      results["task_costs"] = select_random_task_by_softmax(
-        self.task_options, size=len(suggested_points)
-      ).tolist()
+      results["task_costs"] = select_random_task_by_softmax(self.task_options, size=len(suggested_points)).tolist()
     return results
 
   def view(self):
-    assert (
-      self.has_optimization_metrics
-    ), f"{self.view_name} must have optimization metrics"
+    assert self.has_optimization_metrics, f"{self.view_name} must have optimization metrics"
     num_to_sample = self.params["num_to_sample"]
 
-    budget = (
-      self.params["metrics_info"].observation_budget
-      or self.domain.dim * SPE_PHANTOM_BUDGET_FACTOR
-    )
+    budget = self.params["metrics_info"].observation_budget or self.domain.dim * SPE_PHANTOM_BUDGET_FACTOR
     phase, progress = get_experiment_phase(
       budget=budget,
       observation_count=len(self.params["points_sampled"].points),

@@ -59,6 +59,5 @@ class TestRandomSearchNextPoints(object):
     )
     self.assert_call_successful(zs, domain=domain)
 
-
   def test_prior_sampler(self):
     pass

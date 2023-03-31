@@ -6,6 +6,7 @@ from copy import deepcopy
 import numpy
 import pytest
 from mock import Mock
+from testviews.zigopt_input_utils import ZigoptSimulator
 
 from libsigopt.aux.constant import (
   CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
@@ -20,8 +21,8 @@ from libsigopt.views.rest.gp_hyper_opt_multimetric import (
   GpHyperOptMultimetricView,
   form_one_hot_hyperparameter_domain,
 )
+
 from testaux.numerical_test_case import NumericalTestCase
-from testviews.zigopt_input_utils import ZigoptSimulator
 
 
 class TestCategoricalTools(NumericalTestCase):

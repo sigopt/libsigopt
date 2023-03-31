@@ -17,10 +17,9 @@ from libsigopt.compute.expected_improvement import (
 )
 from libsigopt.compute.gaussian_process import GaussianProcess
 from libsigopt.compute.misc.data_containers import HistoricalData
-from libsigopt.compute.multitask_acquisition_function import (
-  MultitaskAcquisitionFunction,
-)
+from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
 from libsigopt.compute.probabilistic_failures import ProbabilisticFailuresCDF
+
 from testaux.numerical_test_case import NumericalTestCase
 
 

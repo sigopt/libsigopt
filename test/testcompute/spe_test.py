@@ -4,6 +4,7 @@
 
 import numpy
 import pytest
+from testviews.zigopt_input_utils import form_points_sampled, form_random_unconstrained_categorical_domain
 
 from libsigopt.compute.covariance import C0RadialMatern, C4RadialMatern
 from libsigopt.compute.misc.multimetric import *
@@ -12,11 +13,8 @@ from libsigopt.compute.sigopt_parzen_estimator import (
   SigOptParzenEstimator,
   SPEInsufficientDataError,
 )
+
 from testaux.numerical_test_case import NumericalTestCase
-from testviews.zigopt_input_utils import (
-  form_points_sampled,
-  form_random_unconstrained_categorical_domain,
-)
 
 
 domain = form_random_unconstrained_categorical_domain(numpy.random.randint(4, 12)).one_hot_domain

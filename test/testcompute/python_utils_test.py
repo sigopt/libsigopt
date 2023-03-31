@@ -24,6 +24,7 @@ from libsigopt.compute.python_utils import (
   indices_represent_zero_mean,
   polynomial_index_point_check,
 )
+
 from testaux.numerical_test_case import DEFAULT_ABS_TOL, NumericalTestCase
 
 

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache License 2.0
 import pytest
 from flaky import flaky
+from testviews.zigopt_input_utils import ZigoptSimulator
 
 from libsigopt.aux.constant import (
   CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
@@ -13,8 +14,8 @@ from libsigopt.aux.constant import (
 )
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.views.rest.random_search_next_points import RandomSearchNextPoints
+
 from testcompute.domain_test import samples_satisfy_kolmogorov_smirnov_test
-from testviews.zigopt_input_utils import ZigoptSimulator
 
 
 class TestRandomSearchNextPoints(object):

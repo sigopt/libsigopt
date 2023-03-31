@@ -10,10 +10,8 @@ from libsigopt.compute.misc.constant import (
   CONSTANT_LIAR_MIN,
   DEFAULT_CONSTANT_LIAR_VALUE,
 )
-from libsigopt.compute.misc.data_containers import (
-  MultiMetricMidpointInfo,
-  SingleMetricMidpointInfo,
-)
+from libsigopt.compute.misc.data_containers import MultiMetricMidpointInfo, SingleMetricMidpointInfo
+
 from testaux.numerical_test_case import NumericalTestCase
 
 

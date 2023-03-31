@@ -5,11 +5,7 @@ from copy import deepcopy
 
 import numpy
 
-from libsigopt.aux.constant import (
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  PARALLEL_QEI,
-  TASK_SELECTION_STRATEGY_A_PRIORI,
-)
+from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME, PARALLEL_QEI, TASK_SELECTION_STRATEGY_A_PRIORI
 from libsigopt.compute.acquisition_function_optimization import (
   constant_liar_acquisition_function_optimization,
   qei_acquisition_function_optimization,

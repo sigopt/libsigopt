@@ -8,10 +8,7 @@ import numpy
 from libsigopt.aux.constant import CATEGORICAL_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import C4RadialMatern
 from libsigopt.compute.covariance_base import HyperparameterInvalidError
-from libsigopt.compute.misc.constant import (
-  MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS,
-  MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS,
-)
+from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS, MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
 from libsigopt.compute.misc.multimetric import filter_multimetric_points_sampled_spe
 from libsigopt.compute.optimization import LBFGSBOptimizer, MultistartOptimizer, SLSQPOptimizer
 from libsigopt.compute.sigopt_parzen_estimator import SigOptParzenEstimator, SPEInsufficientDataError

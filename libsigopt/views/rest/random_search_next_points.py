@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: Apache License 2.0
 from dataclasses import asdict
+
 from libsigopt.compute.domain import CategoricalDomain
 
 

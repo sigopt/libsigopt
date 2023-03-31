@@ -4,6 +4,7 @@
 import numpy
 import pytest
 from flaky import flaky
+from testviews.zigopt_input_utils import ZigoptSimulator
 
 from libsigopt.aux.adapter_info_containers import MetricsInfo
 from libsigopt.aux.constant import (
@@ -22,8 +23,8 @@ from libsigopt.views.rest.spe_next_points import (
   SPENextPoints,
   get_experiment_phase,
 )
+
 from testcompute.domain_test import samples_satisfy_kolmogorov_smirnov_test
-from testviews.zigopt_input_utils import ZigoptSimulator
 
 
 PHASE_LIST = [

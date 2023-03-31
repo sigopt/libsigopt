@@ -4,11 +4,11 @@
 import numpy
 import pytest
 from mock import patch
+from testviews.zigopt_input_utils import ZigoptSimulator
 
 from libsigopt.aux.constant import PARALLEL_CONSTANT_LIAR
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.views.rest.search_next_points import SearchNextPoints
-from testviews.zigopt_input_utils import ZigoptSimulator
 
 
 class TestSearchNextPoints(object):

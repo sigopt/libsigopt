@@ -15,6 +15,7 @@ from libsigopt.compute.gaussian_process import GaussianProcess
 from libsigopt.compute.misc.data_containers import HistoricalData
 from libsigopt.compute.vectorized_optimizers import AdamOptimizer, DEOptimizer
 from libsigopt.views.rest.gp_next_points_categorical import form_augmented_domain
+
 from testaux.numerical_test_case import NumericalTestCase
 
 

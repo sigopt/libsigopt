@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache License 2.0
 import numpy
 import pytest
+from testviews.zigopt_input_utils import form_random_unconstrained_categorical_domain
 
 from libsigopt.aux.constant import (
   CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
@@ -19,8 +20,8 @@ from libsigopt.compute.search import (
   map_non_categorical_points_to_unit_hypercube,
   round_one_hot_points_categorical_values_to_target,
 )
+
 from testcompute.gaussian_process_test_case import GaussianProcessTestCase
-from testviews.zigopt_input_utils import form_random_unconstrained_categorical_domain
 
 
 class TestSearch(GaussianProcessTestCase):

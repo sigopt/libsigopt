@@ -29,7 +29,7 @@ jobs:
       - run: pytest -rw --durations=5 --junitxml=junit-results.xml test/testcompute/
       - store_test_results:
           path: junit-results.xml
-  testview:
+  testviews:
     docker:
       - image: cimg/python:3.10
     resource_class: small

@@ -23,6 +23,12 @@ jobs:
     docker:
       - image: cimg/python:3.10
     resource_class: small
+    environment:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
     steps:
       - checkout
       - run: pip install . -r requirements-dev.txt

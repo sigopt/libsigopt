@@ -377,7 +377,7 @@ class ZigoptSimulator(object):
     view_input = {
       "domain_info": form_domain_info(domain),
       "num_to_sample": self.num_to_sample,
-      "task_options": [],
+      "task_options": task_options,
       "tag": {"experiment_id": -1},
     }
     return view_input

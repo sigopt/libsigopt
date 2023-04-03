@@ -374,28 +374,11 @@ class ZigoptSimulator(object):
 
   def form_random_search_view_input_from_domain(self, domain):
     task_options = numpy.sort(numpy.random.random(self.num_tasks) if self.num_tasks else [])
-    points_sampled = form_points_sampled(
-      domain,
-      self.num_sampled,
-      self.noise_per_point,
-      self.num_metrics,
-      task_options,
-      failure_prob=self.failure_prob,
-    )
     view_input = {
       "domain_info": form_domain_info(domain),
       "num_to_sample": self.num_to_sample,
-      "points_sampled": points_sampled,
       "task_options": [],
       "tag": {"experiment_id": -1},
-      "metrics_info": form_metrics_info(
-        self.num_optimized_metrics,
-        self.num_constraint_metrics,
-        self.num_stored_metrics,
-        self.metric_objectives,
-        self.optimized_metric_thresholds,
-        self.constraint_metric_thresholds,
-      ),
     }
     return view_input
 

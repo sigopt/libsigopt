@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: Apache License 2.0
 import pytest
 
-from zigopt.api.errors import InvalidTypeError, InvalidValueError
-from zigopt.api.validate_schema import validate
+from libsigopt.aux.errors import InvalidTypeError, InvalidValueError
+from libsigopt.aux.validate_schema import validate
 
 
 class TestValidateSchema(object):

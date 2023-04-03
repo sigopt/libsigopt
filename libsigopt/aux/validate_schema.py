@@ -10,7 +10,7 @@ from numbers import Integral
 from jsonschema import validate as validate_against_schema  # type: ignore
 from jsonschema.exceptions import ValidationError  # type: ignore
 
-from zigopt.api.errors import (
+from libsigopt.aux.errors import (
   InvalidKeyError,
   InvalidTypeError,
   InvalidValueError,

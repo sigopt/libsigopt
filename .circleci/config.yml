@@ -39,7 +39,7 @@ jobs:
     docker:
       - image: cimg/python:3.10
     resource_class: small
-    parallelism: 4
+    parallelism: 2
     environment:
       OMP_NUM_THREADS: "1"
       OPENBLAS_NUM_THREADS: "1"

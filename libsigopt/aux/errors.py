@@ -16,17 +16,15 @@ class SigoptValidationError(Exception):
 
 class MissingParamError(SigoptValidationError):
   def __init__(self, param, msg=None):
-    super().__init__()
     if not msg:
       msg = f"Missing required param: {param}"
-    self.msg = msg
+    super().__init__(msg)
 
 
 class MissingJsonKeyError(SigoptValidationError):
   def __init__(self, param, json_obj):
-    super().__init__()
     self.missing_json_key = param
-    self.msg = f'Missing required json key "{param}" in: {json.dumps(json_obj)}'
+    super().__init__(f'Missing required json key "{param}" in: {json.dumps(json_obj)}')
 
 
 # Note: TypeError is a stdlib name
@@ -42,9 +40,8 @@ class InvalidTypeError(SigoptValidationError):
     else:
       msg = f"Invalid type{value_sep}expected type {str(expected_type)}"
 
-    super().__init__()
+    super().__init__(msg)
     self.value = value
-    self.msg = msg
     self.expected_type = expected_type
 
 
@@ -60,6 +57,5 @@ class InvalidKeyError(SigoptValidationError):
   def __init__(self, key, msg=None):
     if not msg:
       msg = f"Invalid key: {key}"
-    super().__init__()
-    self.msg = msg
+    super().__init__(msg)
     self.invalid_key = key

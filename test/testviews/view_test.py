@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache License 2.0
 import numpy
 import pytest
+from testviews.zigopt_input_utils import ZigoptSimulator, form_points_sampled
 
 from libsigopt.aux.adapter_info_containers import MetricsInfo
 from libsigopt.aux.constant import (
@@ -15,7 +16,7 @@ from libsigopt.aux.constant import (
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import CONSTANT_LIAR_MIN, NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import MultiMetricMidpointInfo, SingleMetricMidpointInfo
-from libsigopt.compute.views.view import (
+from libsigopt.views.view import (
   _UNSET,
   GPView,
   View,
@@ -26,7 +27,6 @@ from libsigopt.compute.views.view import (
 )
 
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import ZigoptSimulator, form_points_sampled
 
 
 class TestView(NumericalTestCase):

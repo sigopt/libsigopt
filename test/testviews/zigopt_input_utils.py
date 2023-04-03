@@ -371,3 +371,18 @@ class ZigoptSimulator(object):
     }
 
     return view_input, domain
+
+  def form_random_search_view_input_from_domain(self, domain):
+    task_options = numpy.sort(numpy.random.random(self.num_tasks) if self.num_tasks else [])
+    view_input = {
+      "domain_info": form_domain_info(domain),
+      "num_to_sample": self.num_to_sample,
+      "task_options": task_options,
+      "tag": {"experiment_id": -1},
+    }
+    return view_input
+
+  def form_random_search_view_input(self):
+    domain = form_random_unconstrained_categorical_domain(self.dim)
+    view_input = self.form_random_search_view_input_from_domain(domain)
+    return view_input, domain

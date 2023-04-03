@@ -23,7 +23,7 @@ from libsigopt.compute.misc.constant import (
 from libsigopt.compute.misc.data_containers import HistoricalData
 from libsigopt.compute.optimization import MultistartOptimizer, SLSQPOptimizer
 from libsigopt.compute.optimization_auxiliary import OptimizerInfo, SLSQPParameters
-from libsigopt.compute.views.view import GPView
+from libsigopt.views.view import GPView
 
 
 SELECT_HYPER_OPT_IN_LOG_DOMAIN = False

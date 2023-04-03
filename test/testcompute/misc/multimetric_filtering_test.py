@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import numpy
 import pytest
+from testviews.zigopt_input_utils import form_points_sampled
 
 from libsigopt.aux.constant import (
   CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
@@ -16,7 +17,6 @@ from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINT
 from libsigopt.compute.misc.multimetric import *
 
 from testaux.numerical_test_case import NumericalTestCase
-from testcompute.zigopt_input_utils import form_points_sampled
 
 
 class TestMultimetricFiltering(NumericalTestCase):

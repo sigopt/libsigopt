@@ -7,14 +7,14 @@ import numpy
 
 from libsigopt.compute.covariance import C4RadialMatern
 from libsigopt.compute.sigopt_parzen_estimator import SigOptParzenEstimator
-from libsigopt.compute.views.rest.search_next_points import (
+from libsigopt.views.rest.search_next_points import (
   SEARCH_EXPLOITATION_PHASE,
   SEARCH_EXPLORE_RESOLVE_PHASE,
   SEARCH_INITIALIZATION_PHASE,
   identify_search_phase,
 )
-from libsigopt.compute.views.rest.spe_next_points import SPE_CAT_LENGTH_SCALE, SPENextPoints
-from libsigopt.compute.views.view import View, identify_scaled_values_exceeding_scaled_upper_thresholds
+from libsigopt.views.rest.spe_next_points import SPE_CAT_LENGTH_SCALE, SPENextPoints
+from libsigopt.views.view import View, identify_scaled_values_exceeding_scaled_upper_thresholds
 
 
 class SPESearchNextPoints(View):

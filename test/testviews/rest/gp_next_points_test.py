@@ -5,6 +5,7 @@ import numpy
 import pytest
 from flaky import flaky
 from mock import Mock
+from testviews.zigopt_input_utils import ZigoptSimulator, form_random_unconstrained_categorical_domain
 
 from libsigopt.aux.constant import (
   CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
@@ -18,7 +19,7 @@ from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import HistoricalData
 from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
-from libsigopt.compute.views.rest.gp_next_points_categorical import (
+from libsigopt.views.rest.gp_next_points_categorical import (
   GpNextPointsCategorical,
   convert_from_one_hot,
   find_best_one_hot_neighbor_by_af,
@@ -30,7 +31,6 @@ from libsigopt.compute.views.rest.gp_next_points_categorical import (
 
 from testaux.numerical_test_case import NumericalTestCase
 from testcompute.domain_test import domains_approximately_equal
-from testcompute.zigopt_input_utils import ZigoptSimulator, form_random_unconstrained_categorical_domain
 
 
 class TestCategoricalNextPoints(NumericalTestCase):

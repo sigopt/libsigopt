@@ -67,4 +67,5 @@ workflows:
       - pylint
       - testaux
       - testcompute
+      - testviews
       - trivy

@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache License 2.0
 from dataclasses import asdict
 
+import numpy
+
 from libsigopt.compute.domain import CategoricalDomain
 
 
@@ -12,6 +14,7 @@ class RandomSearchNextPoints(object):
   def __init__(self, params, logging_service=None):
     self.params = params
     self.domain = CategoricalDomain(**asdict(self.params["domain_info"]))
+    self.task_options = numpy.array(self.params["task_options"])
     self.tag = self.params["tag"]
 
   def call(self):
@@ -30,4 +33,6 @@ class RandomSearchNextPoints(object):
       "points_to_sample": categorical_next_points,
       "tag": self.tag,
     }
+    if self.task_options.size:
+      results["task_costs"] = numpy.random.choice(self.task_options, size=num_to_sample).tolist()
     return results

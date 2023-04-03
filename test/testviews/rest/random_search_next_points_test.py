@@ -1,6 +1,7 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
+import numpy
 import pytest
 from flaky import flaky
 from testviews.zigopt_input_utils import ZigoptSimulator
@@ -38,13 +39,23 @@ class TestRandomSearchNextPoints(object):
         elif dc["var_type"] == INT_EXPERIMENT_PARAMETER_NAME:
           assert int(pt[i]) == pt[i]
 
+    task_options = numpy.array(view_input["task_options"])
+    if task_options.size:
+      task_costs = response["task_costs"]
+      assert len(task_costs) == len(points_to_sample)
+      assert all(tc in task_options for tc in task_costs)
+    else:
+      assert "task_costs" not in response
+
   @pytest.mark.parametrize("dim", [1, 27, 77])
   @pytest.mark.parametrize("num_to_sample", [1, 50])
-  def test_basic(self, dim, num_to_sample):
+  @pytest.mark.parametrize("num_tasks", [0, 3])
+  def test_basic(self, dim, num_to_sample, num_tasks):
     zs = ZigoptSimulator(
       dim=dim,
       num_sampled=0,
-      num_to_sample=10,
+      num_to_sample=num_to_sample,
+      num_tasks=num_tasks,
     )
     self.assert_call_successful(zs)
 

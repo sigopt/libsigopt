@@ -47,8 +47,7 @@ class InvalidTypeError(SigoptValidationError):
 
 # Note: ValueError is a stdlib name
 class InvalidValueError(SigoptValidationError):
-  def __init__(self, msg):
-    super().__init__(msg)
+  pass
 
 
 # Note: KeyError is a stdlib name

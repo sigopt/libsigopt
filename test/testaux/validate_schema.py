@@ -35,6 +35,7 @@ class TestValidateSchema(object):
     }
     with pytest.raises(InvalidTypeError):
       validate({"key_of_array": [1]}, schema)
+    validate({"key_of_array": ["a", "b"]}, schema)
 
   def test_deeply_nested_array(self):
     schema = {
@@ -53,13 +54,14 @@ class TestValidateSchema(object):
     }
     with pytest.raises(InvalidTypeError):
       validate({"key_of_object": {"key_of_array": [["a"]]}}, schema)
+    validate({"key_of_object": {"key_of_array": ["a", "b"]}}, schema)
 
-  def test_unspecific_index_error(self):
+  def test_array_maxItems(self):
     schema = {"type": "array", "maxItems": 1}
     with pytest.raises(InvalidValueError):
       validate([{}, 2, {}], schema)
 
-  def test_nested_unspecific_index_error(self):
+  def test_nested_array_maxItems(self):
     schema = {
       "type": "object",
       "properties": {"key_of_array": {"type": "array", "maxItems": 1}},

@@ -29,10 +29,7 @@ def validate(json_dict, schema) -> None:
 def is_integer(num):
   if isinstance(num, bool):
     return False
-  elif isinstance(num, Integral):
-    return True
-  else:
-    return False
+  return isinstance(num, (int | Integral))
 
 
 def get_path_string(path):
@@ -73,9 +70,12 @@ def process_error(e):
     return SigoptValidationError(f"{e.instance} is not one of the allowed values: {allowed_values}")
   elif e.validator == "pattern":
     return SigoptValidationError(f"{e.instance} does not match the regular expression /{e.validator_value}/")
+  elif e.validator == "exclusiveMinimum":
+    key = get_path_string(e.path)
+    return InvalidValueError(f"{key} must be greater than {e.validator_value}")
   elif e.validator in ["oneOf", "anyOf"]:
     if len(e.context) > 0:
       return process_error(e.context[0])
-    return NotImplementedError("Error has no context but it is oneOf or anyOf")
+    return SigoptValidationError("Error has no context but it is oneOf or anyOf")
   else:
-    return NotImplementedError(f"Unrecognized error {e.validator} parsing json: {json.dumps(e.instance)}")
+    return SigoptValidationError(f"Unrecognized error {e.validator} parsing json: {json.dumps(e.instance)}")

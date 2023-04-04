@@ -23,8 +23,8 @@ class MissingParamError(SigoptValidationError):
 
 class MissingJsonKeyError(SigoptValidationError):
   def __init__(self, param, json_obj):
-    self.missing_json_key = param
     super().__init__(f'Missing required json key "{param}" in: {json.dumps(json_obj)}')
+    self.missing_json_key = param
 
 
 # Note: TypeError is a stdlib name
@@ -48,8 +48,7 @@ class InvalidTypeError(SigoptValidationError):
 # Note: ValueError is a stdlib name
 class InvalidValueError(SigoptValidationError):
   def __init__(self, msg):
-    super().__init__()
-    self.msg = msg
+    super().__init__(msg)
 
 
 # Note: KeyError is a stdlib name

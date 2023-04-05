@@ -8,7 +8,7 @@ SPDX-License-Identifier: Apache License 2.0
 
 # `libsigopt`
 
-`libsigopt` is a module that contains various the core computation elements for [`sigopt-server`](https://github.com/sigopt/sigopt-server) and [`sigoptlite`](https://github.com/sigopt/sigoptlite).
+`libsigopt` is a module that contains the core computational elements for [`sigopt-server`](https://github.com/sigopt/sigopt-server) and [`sigoptlite`](https://github.com/sigopt/sigoptlite).
 
 
 

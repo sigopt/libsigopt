@@ -18,11 +18,13 @@ from libsigopt.aux.errors import (
 )
 from libsigopt.aux.utils import is_integer
 
+
 def validate(json_dict, schema) -> None:
   try:
     validate_against_schema(json_dict, schema)
   except ValidationError as e:
     raise process_error(e) from e
+
 
 def get_path_string(path):
   strings = (f"[{part}]" if is_integer(part) else f".{part}" for part in path)

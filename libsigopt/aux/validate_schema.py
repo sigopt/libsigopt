@@ -5,7 +5,6 @@
 import json
 import re
 from collections.abc import Mapping
-from numbers import Integral
 
 from jsonschema import validate as validate_against_schema  # type: ignore
 from jsonschema.exceptions import ValidationError  # type: ignore
@@ -17,20 +16,13 @@ from libsigopt.aux.errors import (
   MissingJsonKeyError,
   SigoptValidationError,
 )
-
+from libsigopt.aux.utils import is_integer
 
 def validate(json_dict, schema) -> None:
   try:
     validate_against_schema(json_dict, schema)
   except ValidationError as e:
     raise process_error(e) from e
-
-
-def is_integer(num):
-  if isinstance(num, bool):
-    return False
-  return isinstance(num, (int | Integral))
-
 
 def get_path_string(path):
   strings = (f"[{part}]" if is_integer(part) else f".{part}" for part in path)

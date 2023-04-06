@@ -57,3 +57,7 @@ class InvalidKeyError(SigoptValidationError):
       msg = f"Invalid key: {key}"
     super().__init__(msg)
     self.invalid_key = key
+
+
+class SigoptComputeError(Exception):
+  pass

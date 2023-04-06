@@ -16,7 +16,9 @@ class TestUtils(object):
     assert is_integer(num)
     assert is_number(num)
 
-  @pytest.mark.parametrize("num", ["a", True, [], numpy.nan, numpy.inf, float('inf'), float('nan'), math.inf, -math.inf])
+  @pytest.mark.parametrize(
+    "num", ["a", True, [], numpy.nan, numpy.inf, float("inf"), float("nan"), math.inf, -math.inf]
+  )
   def test_not_int_or_numbers(self, num):
     assert is_integer(num) is False
     assert is_number(num) is False

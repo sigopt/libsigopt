@@ -157,8 +157,8 @@ class _ScipyOptimizerWrapper(Optimizer):
   """Wrapper class to construct an optimizer from scipy optimization methods."""
 
   # Type of the optimizer_parameters object, specified in subclass
-  optimizer_parameters_type = ()
-  optimizer_name = None
+  optimizer_parameters_type: type
+  optimizer_name: str
 
   def __init__(self, domain, optimizable, optimizer_parameters):
     self.domain = domain

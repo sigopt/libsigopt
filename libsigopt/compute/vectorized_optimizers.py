@@ -17,8 +17,8 @@ from libsigopt.compute.optimization_auxiliary import (
 
 
 class VectorizedOptimizer(Optimizer):
-  optimizer_name = NotImplemented
-  optimizer_parameters_type = NotImplemented
+  optimizer_name: str
+  optimizer_parameters_type: type
 
   def __init__(self, domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter):
     """

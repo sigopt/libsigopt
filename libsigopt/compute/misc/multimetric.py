@@ -20,8 +20,8 @@ MULTIMETRIC_INITIALIZATION = "initialization"
 
 @dataclass(frozen=True, slots=True)
 class MultimetricInfo:
-  method: str
-  params: object
+  method: str | None
+  params: object | None
 
 
 @dataclass(frozen=True, slots=True)

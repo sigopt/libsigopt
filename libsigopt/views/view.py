@@ -103,7 +103,7 @@ def get_relevant_expected_improvement(predictor):
 
 
 class View(object):
-  view_name = None
+  view_name: str
 
   def __init__(self, params, logging_service=None):
     self.params = params

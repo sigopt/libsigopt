@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache License 2.0
 import copy
-from functools import namedtuple
+from collections import namedtuple
 
 import numpy
 import pytest

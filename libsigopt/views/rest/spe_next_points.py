@@ -205,7 +205,7 @@ class SPENextPoints(View):
     max_value = sigopt_parzen_estimator.evaluate_expected_improvement(numpy.atleast_2d(max_location))[2][0]
 
     uniform_domain = deepcopy(domain.one_hot_domain)
-    uniform_domain.set_quasi_random_sampler_opts(sampler="uniform")
+    uniform_domain.set_quasi_random_sampler_opts({"sampler": "uniform"})
 
     num_rejection_samples = 0
     samples = numpy.empty((0, domain.one_hot_dim))

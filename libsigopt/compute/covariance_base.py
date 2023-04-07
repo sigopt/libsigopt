@@ -22,7 +22,7 @@ class HyperparameterInvalidError(ValueError):
 class CovarianceBase(object):
   r"""Base class for covariance kernels; the functions that all covariance kernels must have."""
 
-  covariance_type = NotImplemented
+  covariance_type: str
   process_variance = None
 
   @property

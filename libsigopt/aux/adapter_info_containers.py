@@ -9,18 +9,18 @@ import numpy
 @dataclass(slots=True)
 class PointsContainer:
   points: numpy.ndarray
-  values: numpy.ndarray = None
-  value_vars: numpy.ndarray = None
-  failures: numpy.ndarray = None
-  task_costs: numpy.ndarray = None
+  values: numpy.ndarray | None = None
+  value_vars: numpy.ndarray | None = None
+  failures: numpy.ndarray | None = None
+  task_costs: numpy.ndarray | None = None
 
 
 @dataclass(slots=True)
 class DomainInfo:
   constraint_list: list
-  domain_components: list = None
+  domain_components: list
   force_hitandrun_sampling: bool = False
-  priors: list = None
+  priors: list | None = None
 
   @property
   def dim(self) -> int:
@@ -56,4 +56,4 @@ class GPModelInfo:
   hyperparameters: list[dict]
   max_simultaneous_af_points: int
   nonzero_mean_info: dict
-  task_selection_strategy: str = None
+  task_selection_strategy: str | None = None

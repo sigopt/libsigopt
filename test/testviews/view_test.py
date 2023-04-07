@@ -44,7 +44,7 @@ class TestView(NumericalTestCase):
   metrics_info = MetricsInfo(
     requires_pareto_frontier_optimization=True,
     observation_budget=numpy.random.randint(40, 100),
-    user_specified_thresholds=(None, None),
+    user_specified_thresholds=[None, None],
     objectives=["maximize", "minimize"],
     optimized_metrics_index=[0, 1],
     constraint_metrics_index=[],

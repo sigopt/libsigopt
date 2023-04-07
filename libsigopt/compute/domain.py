@@ -104,15 +104,15 @@ class ContinuousDomain(object):
   def one_hot_unconstrained_indices(self):
     return self._one_hot_unconstrained_indices
 
-  def set_quasi_random_sampler_opts(self, **kwargs):
+  def set_quasi_random_sampler_opts(self, opts):
     """Input a dictionary of options for the quasi random sampler."""
     possible_quasi_random_samplers = ("latin_hypercube", "halton", "sobol", "uniform")
-    if "sampler" not in kwargs:
+    if "sampler" not in opts:
       raise AttributeError("Options must include sampler to define quasi-random points")
-    elif kwargs["sampler"] not in possible_quasi_random_samplers:
-      raise ValueError(f'The sampler {kwargs["sampler"]} does not exist')
+    elif opts["sampler"] not in possible_quasi_random_samplers:
+      raise ValueError(f'The sampler {opts["sampler"]} does not exist')
     else:
-      self._quasi_random_sampler_opts = kwargs
+      self._quasi_random_sampler_opts = opts
 
   def get_quasi_random_sampler_opts(self):
     """Recover the dictionary of options for the quasi random sampler."""

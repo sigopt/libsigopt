@@ -54,7 +54,7 @@ class TestValidateSchema(object):
     }
     with pytest.raises(InvalidTypeError):
       validate({"key_of_object": {"key_of_array": [["a"]]}}, schema)
-    validate({"key_of_object": {"key_of_array": ["a", "b"]}}, schema)
+    validate({"key_of_object": {"key_of_array": [[0], [1]]}}, schema)
 
   def test_array_maxItems(self):
     schema = {"type": "array", "maxItems": 1}

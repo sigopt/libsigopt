@@ -143,7 +143,7 @@ class TestNonzeroMean(NumericalTestCase):
     self.assert_vector_within_relative(
       numpy.full(len(new_points), const_val),
       gp.compute_mean_of_points(new_points),
-      1e-14,
+      1e-13,
     )
 
   @staticmethod

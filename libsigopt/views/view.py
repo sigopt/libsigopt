@@ -199,7 +199,7 @@ class View(object):
     )
 
     # invert and scale points_sampled_value and points_sampled_value_vars
-    assert not isinstance(self.scaled_optimized_lie_values, _UNSET_CLS)
+    assert not isinstance(self._mmi, _UNSET_CLS)
     self.scaled_optimized_lie_values = self._mmi.relative_objective_value(
       self._mmi.compute_lie_value(CONSTANT_LIAR_MIN)
     )

@@ -120,10 +120,10 @@ class TestSPENextPointsViews(object):
     num_being_sampled,
   ):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "double", "elements": [0, 5]},
-      {"var_type": "double", "elements": [-3, 1]},
-      {"var_type": "int", "elements": [3, 8]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "double", "elements": (0, 5)},
+      {"var_type": "double", "elements": (-3, 1)},
+      {"var_type": "int", "elements": (3, 8)},
       {"var_type": "categorical", "elements": [1, 3, 5]},
     ]
     constraint_list: list[DomainConstraint] = [
@@ -466,8 +466,8 @@ class TestSPENextPointsViews(object):
     )
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-200, 0]},
-        {"var_type": "double", "elements": [0, 1]},
+        {"var_type": "double", "elements": (-200, 0)},
+        {"var_type": "double", "elements": (0, 1)},
       ],
       priors=[
         peaky_normal_prior,

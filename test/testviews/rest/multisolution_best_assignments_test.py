@@ -33,8 +33,8 @@ class TestMultisolutionBestAssignments(object):
 
   def test_k_center_clustering_categoricals(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "int", "elements": [3, 8]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "int", "elements": (3, 8)},
       {"var_type": "categorical", "elements": [1, 5]},
     ]
     domain = CategoricalDomain(domain_components)

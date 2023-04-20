@@ -54,11 +54,11 @@ class TestRandomSearchNextPoints(object):
 
   def test_constraint_samples(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "int", "elements": [0, 5]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "int", "elements": (0, 5)},
       {"var_type": "categorical", "elements": [1, 3, 5]},
-      {"var_type": "int", "elements": [3, 8]},
-      {"var_type": "double", "elements": [-3, 1]},
+      {"var_type": "int", "elements": (3, 8)},
+      {"var_type": "double", "elements": (-3, 1)},
     ]
     constraint_list: list[DomainConstraint] = [
       {
@@ -85,7 +85,7 @@ class TestRandomSearchNextPoints(object):
       {"var_type": "quantized", "elements": [0, 0.3, 1.3]},
       {"var_type": "categorical", "elements": [1, 3, 5]},
       {"var_type": "quantized", "elements": [10.1, 10.5, 10.9]},
-      {"var_type": "int", "elements": [1, 200]},
+      {"var_type": "int", "elements": (1, 200)},
     ]
     domain = CategoricalDomain(domain_components)
     zs = ZigoptSimulator(
@@ -97,9 +97,9 @@ class TestRandomSearchNextPoints(object):
 
   def test_prior_samples(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [-5, -2]},
+      {"var_type": "double", "elements": (-5, -2)},
       {"var_type": "quantized", "elements": [-2.3, -1.2, 3.4, 4.5]},
-      {"var_type": "double", "elements": [10, 15]},
+      {"var_type": "double", "elements": (10, 15)},
     ]
     priors: list[AnyPrior] = [
       {"name": "normal", "params": {"mean": -3, "scale": 0.4}},
@@ -118,8 +118,8 @@ class TestRandomSearchNextPoints(object):
   @flaky(max_runs=2)
   def test_prior_samples_distribution(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [-5, -2]},
-      {"var_type": "double", "elements": [10, 15]},
+      {"var_type": "double", "elements": (-5, -2)},
+      {"var_type": "double", "elements": (10, 15)},
     ]
     priors: list[AnyPrior] = [
       {"name": "normal", "params": {"mean": -3, "scale": 0.4}},

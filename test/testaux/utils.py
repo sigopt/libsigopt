@@ -24,7 +24,7 @@ def form_random_unconstrained_categorical_domain(dim, categoricals_allowed=True,
         }
       )
     elif numpy.random.random() < 0.5:
-      bounds = [numpy.random.randint(-10, 0), numpy.random.randint(0, 10)]
+      bounds = (numpy.random.randint(-10, 0), numpy.random.randint(0, 10))
       domain_components.append({"var_type": "int", "elements": bounds})
     else:
       random_number = numpy.random.random()
@@ -34,10 +34,11 @@ def form_random_unconstrained_categorical_domain(dim, categoricals_allowed=True,
         random_values = numpy.random.gamma(0.3, 1.0, size=(2,))
       else:
         random_values = numpy.random.uniform(-34567, 12345, size=(2,))
+      sorted_values = sorted(random_values)
       domain_components.append(
         {
           "var_type": "double",
-          "elements": sorted(random_values),
+          "elements": (sorted_values[0], sorted_values[1]),
         }
       )
   return CategoricalDomain(domain_components)
@@ -59,7 +60,7 @@ def form_random_constrained_categorical_domain(n_double_param=5, n_int_param=5, 
   # Form domain components
   domain_components_unsorted: list[tuple[int, DomainComponent]] = []
   for i in idx_double:
-    bounds = [0, numpy.random.randint(1, 5)]
+    bounds = (0, numpy.random.randint(1, 5))
     domain_components_unsorted.append(
       (
         i,
@@ -70,7 +71,7 @@ def form_random_constrained_categorical_domain(n_double_param=5, n_int_param=5, 
       )
     )
   for i in idx_int:
-    bounds = [5, numpy.random.randint(10, 20)]
+    bounds = (5, numpy.random.randint(10, 20))
     domain_components_unsorted.append(
       (
         i,

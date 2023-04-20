@@ -41,9 +41,9 @@ class TestMultitaskAcquisitionFunction(NumericalTestCase):
   def _base_setup(cls):
     cls.domain = CategoricalDomain(
       [
-        {"var_type": "double", "elements": [-2, 3]},
-        {"var_type": "double", "elements": [-1, 1]},
-        {"var_type": "double", "elements": [0.1, 1.0]},
+        {"var_type": "double", "elements": (-2, 3)},
+        {"var_type": "double", "elements": (-1, 1)},
+        {"var_type": "double", "elements": (0.1, 1.0)},
       ]
     ).one_hot_domain
     cls.cov = SquareExponential([1.0, 0.3, 0.3, 0.4])

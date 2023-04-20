@@ -92,7 +92,7 @@ def form_one_hot_hyperparameter_domain(
       these_elements[0], these_elements[1] = numpy.log(these_elements)
 
   domain_components: list[DomainComponent] = [
-    {"var_type": "double", "elements": e} for e in hyperparameter_domain_elements
+    {"var_type": "double", "elements": e} for e in hyperparameter_domain_elements  # type: ignore
   ]
   return CategoricalDomain(domain_components).one_hot_domain
 

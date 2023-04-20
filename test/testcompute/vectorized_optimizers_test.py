@@ -62,7 +62,7 @@ class TestOptimizer(NumericalTestCase):
   def _base_setup(cls):
     """Set up a test case for optimizing a simple quadratic polynomial."""
     cls.dim = 3
-    domain_components: list[DomainComponent] = [{"var_type": "double", "elements": [-0.5, 0.5]}]
+    domain_components: list[DomainComponent] = [{"var_type": "double", "elements": (-0.5, 0.5)}]
     cat_domain = CategoricalDomain(domain_components * cls.dim)
     cls.domain = cat_domain.one_hot_domain
 
@@ -140,7 +140,7 @@ class TestOptimizer(NumericalTestCase):
     rhs = 0.0
 
     domain = CategoricalDomain(
-      domain_components=[{"var_type": "double", "elements": [-1, 1]}] * dim,
+      domain_components=[{"var_type": "double", "elements": (-1, 1)}] * dim,
       constraint_list=[
         {
           "weights": coeff_vector,
@@ -168,7 +168,7 @@ class TestOptimizer(NumericalTestCase):
     N = 5
     num_to_sample = 3
 
-    domain = CategoricalDomain([{"var_type": "double", "elements": [-1, 1]}] * dim)
+    domain = CategoricalDomain([{"var_type": "double", "elements": (-1, 1)}] * dim)
     x = domain.generate_quasi_random_points_in_domain(N)
     y = 6 - numpy.log(1 + numpy.sum(x**2, axis=1))
     data = HistoricalData(dim)

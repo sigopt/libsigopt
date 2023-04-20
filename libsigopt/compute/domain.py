@@ -325,9 +325,17 @@ class ContinuousDomain(object):
     return normal_draws
 
 
-class DomainComponent(TypedDict):
-  var_type: Literal["int", "double", "categorical", "quantized"]
+class IntervalDomainComponent(TypedDict):
+  var_type: Literal["int", "double"]
+  elements: tuple[float, float]
+
+
+class GridDomainComponent(TypedDict):
+  var_type: Literal["categorical", "quantized"]
   elements: Sequence[float | int]
+
+
+DomainComponent = IntervalDomainComponent | GridDomainComponent
 
 
 class DomainConstraint(TypedDict):

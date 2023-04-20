@@ -103,8 +103,8 @@ class TestNeighborsFeasibility(object):
     # Fails with no constraints
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
         {"var_type": "categorical", "elements": [1, 2, 3]},
       ]
     )
@@ -115,10 +115,10 @@ class TestNeighborsFeasibility(object):
     # Fails with only double constraints
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
         {"var_type": "categorical", "elements": [1, 2, 3]},
       ],
       constraint_list=[
@@ -136,11 +136,11 @@ class TestNeighborsFeasibility(object):
   def test_generate_neighboring_integers_points_exactly_test(self):
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
         {"var_type": "categorical", "elements": [1, 2, 3]},
       ],
       constraint_list=[
@@ -185,7 +185,7 @@ class TestNeighborsFeasibility(object):
   def test_generate_neighboring_integers_grid(self):
     d = numpy.random.randint(1, MAX_GRID_DIM)
     domain = CategoricalDomain(
-      domain_components=[{"var_type": "int", "elements": [2, 3 + d]} for _ in range(d)],
+      domain_components=[{"var_type": "int", "elements": (2, 3 + d)} for _ in range(d)],
       constraint_list=[
         {"weights": [0.5] * d, "rhs": 1, "var_type": "int"},
       ],
@@ -197,7 +197,7 @@ class TestNeighborsFeasibility(object):
   def test_generate_neighboring_integers_random(self):
     d = MAX_GRID_DIM + 1
     domain = CategoricalDomain(
-      domain_components=[{"var_type": "int", "elements": [0, 10]} for _ in range(d)],
+      domain_components=[{"var_type": "int", "elements": (0, 10)} for _ in range(d)],
       constraint_list=[
         {"weights": [1] * d, "rhs": d, "var_type": "int"},
       ],
@@ -209,14 +209,14 @@ class TestNeighborsFeasibility(object):
   def test_snap_constrained_integer_points(self):
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
         {"var_type": "categorical", "elements": [1, 2, 3]},
       ],
       constraint_list=[
@@ -316,14 +316,14 @@ class TestNeighborsFeasibility(object):
     )
     domain_borderline = CategoricalDomain(
       domain_components=[
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
-        {"var_type": "double", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
-        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
+        {"var_type": "double", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
+        {"var_type": "int", "elements": (0, 10)},
         {"var_type": "categorical", "elements": [1, 2, 3]},
       ],
       constraint_list=[
@@ -370,7 +370,7 @@ class TestNeighborsFeasibility(object):
     # test snap one hot using random instead of grid
     d = MAX_GRID_DIM + 1
     domain = CategoricalDomain(
-      domain_components=[{"var_type": "int", "elements": [1, 10]} for _ in range(d)],
+      domain_components=[{"var_type": "int", "elements": (1, 10)} for _ in range(d)],
       constraint_list=[
         {"weights": [1] * d, "rhs": d, "var_type": "int"},
       ],

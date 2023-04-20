@@ -40,11 +40,11 @@ class TestCategoricalTools(NumericalTestCase):
   def test_form_one_hot_hyperparameter_domain(self):
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
+        {"var_type": "double", "elements": (-2, 3.3)},
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {"var_type": "quantized", "elements": [1, 3, 5, 10]},
       ],
     )

@@ -111,7 +111,7 @@ class GaussianProcessTestCase(NumericalTestCase):
       [
         {
           "var_type": "double",
-          "elements": [lower_element, higher_element],
+          "elements": (lower_element, higher_element),
         }
       ]
       * dim

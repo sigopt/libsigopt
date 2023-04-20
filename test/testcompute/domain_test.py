@@ -214,8 +214,8 @@ class TestContinuousDomain(object):
     rhs = -0.0
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [0, 100]},
-        {"var_type": "double", "elements": [0, 100]},
+        {"var_type": "double", "elements": (0, 100)},
+        {"var_type": "double", "elements": (0, 100)},
       ],
       constraint_list=[
         {
@@ -237,11 +237,11 @@ class TestContinuousDomain(object):
 
   def test_restrict_points_to_domain_multiple_constraints(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "double", "elements": [0, 5]},
-      {"var_type": "double", "elements": [-3, 1]},
-      {"var_type": "int", "elements": [3, 8]},
-      {"var_type": "int", "elements": [0, 3]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "double", "elements": (0, 5)},
+      {"var_type": "double", "elements": (-3, 1)},
+      {"var_type": "int", "elements": (3, 8)},
+      {"var_type": "int", "elements": (0, 3)},
       {"var_type": "categorical", "elements": [1, 2, 3]},
       {
         "var_type": "quantized",
@@ -285,7 +285,7 @@ class TestContinuousDomain(object):
     tolerance = 1e-12
     larger_domain = ContinuousDomain([[-1.2, 1.2]] * dim)
     categorical_domain = CategoricalDomain(
-      domain_components=[{"var_type": "double", "elements": [0, 1]}] * dim,
+      domain_components=[{"var_type": "double", "elements": (0, 1)}] * dim,
       constraint_list=[
         {
           "weights": [1.0] * dim,
@@ -365,7 +365,7 @@ class TestContinuousDomain(object):
     tolerance = 1e-12
     std_dev = 0.1
     categorical_domain = CategoricalDomain(
-      domain_components=[{"var_type": "double", "elements": [0, 1]}] * dim,
+      domain_components=[{"var_type": "double", "elements": (0, 1)}] * dim,
       constraint_list=[
         {
           "weights": [1.0] * dim,
@@ -392,8 +392,8 @@ class TestContinuousDomain(object):
 class TestCategoricalDomain(object):
   def test_basics(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "int", "elements": [3, 8]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "int", "elements": (3, 8)},
       {"var_type": "categorical", "elements": [-3, 3, 7]},
       {"var_type": "quantized", "elements": [-0.1, 0.2, 2]},
     ]
@@ -442,16 +442,16 @@ class TestCategoricalDomain(object):
   def test_domain_equality(self):
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
+        {"var_type": "double", "elements": (-2, 3.3)},
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {
           "var_type": "quantized",
           "elements": [0.1, 0.2, 2.6, 10e3],
         },
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "int", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -479,12 +479,12 @@ class TestCategoricalDomain(object):
 
     other_domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.4]},
+        {"var_type": "double", "elements": (-2, 3.4)},
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
+        {"var_type": "int", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -508,16 +508,16 @@ class TestCategoricalDomain(object):
 
     other_domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
+        {"var_type": "double", "elements": (-2, 3.3)},
         {"var_type": "categorical", "elements": [0, 2, 1]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {
           "var_type": "quantized",
           "elements": [0.1, 0.2, 2.6, 10e3],
         },
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "int", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -541,16 +541,16 @@ class TestCategoricalDomain(object):
 
     other_domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
+        {"var_type": "double", "elements": (-2, 3.3)},
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {
           "var_type": "quantized",
           "elements": [0.1, 2.6, 0.2, 10e3],
         },
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "int", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -575,15 +575,15 @@ class TestCategoricalDomain(object):
     other_domain = CategoricalDomain(
       domain_components=[
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {
           "var_type": "quantized",
           "elements": [0.1, 0.2, 2.6, 10e3],
         },
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "int", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -607,16 +607,16 @@ class TestCategoricalDomain(object):
 
     other_domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
+        {"var_type": "double", "elements": (-2, 3.3)},
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "double", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "double", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {
           "var_type": "quantized",
           "elements": [0.1, 0.2, 2.6, 10e3],
         },
-        {"var_type": "double", "elements": [-4, 5]},
+        {"var_type": "double", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -640,16 +640,16 @@ class TestCategoricalDomain(object):
 
     other_domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
+        {"var_type": "double", "elements": (-2, 3.3)},
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {
           "var_type": "quantized",
           "elements": [0.1, 0.2, 2.6, 10e3],
         },
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "int", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -673,16 +673,16 @@ class TestCategoricalDomain(object):
 
     other_domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
+        {"var_type": "double", "elements": (-2, 3.3)},
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {
           "var_type": "quantized",
           "elements": [0.1, 0.2, 2.6, 10e3],
         },
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "int", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -707,16 +707,16 @@ class TestCategoricalDomain(object):
     # This domain is considered similar enough to be equal
     other_domain = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
+        {"var_type": "double", "elements": (-2, 3.3)},
         {"var_type": "categorical", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [-3.3, 6.1]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
         {
           "var_type": "quantized",
           "elements": [0.1, 0.2, 2.6, 10e3],
         },
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "int", "elements": (-4, 5)},
       ],
       constraint_list=[
         {
@@ -740,9 +740,9 @@ class TestCategoricalDomain(object):
 
   def test_reset_constraint_list(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 10]},
-      {"var_type": "double", "elements": [0, 10]},
-      {"var_type": "double", "elements": [0, 10]},
+      {"var_type": "double", "elements": (0, 10)},
+      {"var_type": "double", "elements": (0, 10)},
+      {"var_type": "double", "elements": (0, 10)},
     ]
     constraint_list: list[DomainConstraint] = [
       {
@@ -897,8 +897,8 @@ class TestCategoricalDomain(object):
   def test_integer_constraint_samples_satisfy_equality(self):
     # Check ability to return points that satisfy not just strict less than inequality but also equality
     domain_components: list[DomainComponent] = [
-      {"var_type": "int", "elements": [0, 10]},
-      {"var_type": "int", "elements": [0, 10]},
+      {"var_type": "int", "elements": (0, 10)},
+      {"var_type": "int", "elements": (0, 10)},
     ]
     less_than_constraints: list[DomainConstraint] = [
       {"weights": [-1, -1], "rhs": -10, "var_type": "int"},
@@ -921,8 +921,8 @@ class TestCategoricalDomain(object):
     all_cats = [1, 2, 6, 9]
     domain = CategoricalDomain(
       [
-        {"var_type": "int", "elements": [1, 5]},
-        {"var_type": "double", "elements": [-11.1, 4.234]},
+        {"var_type": "int", "elements": (1, 5)},
+        {"var_type": "double", "elements": (-11.1, 4.234)},
         {"var_type": "categorical", "elements": all_cats},
         {"var_type": "quantized", "elements": [1.0, 2.0, 5.3]},
       ]
@@ -967,8 +967,8 @@ class TestCategoricalDomain(object):
     all_cats = [1, 2, 6, 9]
     domain = CategoricalDomain(
       [
-        {"var_type": "int", "elements": [1, 5]},
-        {"var_type": "double", "elements": [-11.1, 4.234]},
+        {"var_type": "int", "elements": (1, 5)},
+        {"var_type": "double", "elements": (-11.1, 4.234)},
         {"var_type": "categorical", "elements": all_cats},
         {
           "var_type": "quantized",
@@ -1023,8 +1023,8 @@ class TestCategoricalDomain(object):
   def test_remove_points_outside_domain(self):
     domain = CategoricalDomain(
       [
-        {"var_type": "int", "elements": [10, 50]},
-        {"var_type": "int", "elements": [1, 5]},
+        {"var_type": "int", "elements": (10, 50)},
+        {"var_type": "int", "elements": (1, 5)},
         {"var_type": "categorical", "elements": [1, 3, 5]},
         {"var_type": "quantized", "elements": [1.0, 2.0, 5.3]},
       ]
@@ -1040,7 +1040,7 @@ class TestCategoricalDomain(object):
 
   def test_discrete_domain(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "int", "elements": [0, 2]},
+      {"var_type": "int", "elements": (0, 2)},
       {"var_type": "categorical", "elements": [-3, 3, 7]},
       {
         "var_type": "quantized",
@@ -1105,7 +1105,7 @@ class TestCategoricalDomain(object):
     assert len(distinct_points) == 10
 
     # This has previously given us issues with overflow
-    domain_components = [{"var_type": "int", "elements": [0, 10000]}] * 10
+    domain_components = [{"var_type": "int", "elements": (0, 10000)}] * 10
     domain = CategoricalDomain(domain_components)
     unique_random_points = domain.generate_distinct_random_points(num_points)
     assert len(unique_random_points) == num_points
@@ -1121,8 +1121,8 @@ class TestCategoricalDomain(object):
   @pytest.mark.parametrize("non_enum_elements", [[0.1, 0.5], ["a1", "b2"], ["1", "2"], [1.0, 2.0]])
   def test_non_enum_categoricals(self, non_enum_elements):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "int", "elements": [3, 8]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "int", "elements": (3, 8)},
       {
         "var_type": "categorical",
         "elements": non_enum_elements,
@@ -1133,9 +1133,9 @@ class TestCategoricalDomain(object):
 
   def test_all_double_domain(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "double", "elements": [3, 8]},
-      {"var_type": "double", "elements": [-4, -1]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "double", "elements": (3, 8)},
+      {"var_type": "double", "elements": (-4, -1)},
     ]
     domain = CategoricalDomain(domain_components)
 
@@ -1157,16 +1157,16 @@ class TestCategoricalDomain(object):
 
   def test_constraints(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "double", "elements": [0, 5]},
-      {"var_type": "double", "elements": [-3, 1]},
-      {"var_type": "int", "elements": [3, 8]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "double", "elements": (0, 5)},
+      {"var_type": "double", "elements": (-3, 1)},
+      {"var_type": "int", "elements": (3, 8)},
       {"var_type": "categorical", "elements": [1, 2, 3]},
       {
         "var_type": "quantized",
         "elements": [-0.2, -0.1, 1, 2.5, 10],
       },
-      {"var_type": "int", "elements": [0, 3]},
+      {"var_type": "int", "elements": (0, 3)},
     ]
 
     # Can't have categorical weights which are nonzero
@@ -1223,16 +1223,16 @@ class TestCategoricalDomain(object):
 
     # Properties for integer constraints should be set properly
     integer_domain: list[DomainComponent] = [
-      {"var_type": "int", "elements": [-4, 4]},
-      {"var_type": "double", "elements": [-2.1, 2.1]},
+      {"var_type": "int", "elements": (-4, 4)},
+      {"var_type": "double", "elements": (-2.1, 2.1)},
       {"var_type": "categorical", "elements": [1, 2, 3]},
-      {"var_type": "int", "elements": [-4, 4]},
+      {"var_type": "int", "elements": (-4, 4)},
       {
         "var_type": "quantized",
         "elements": [-0.2, -0.1, 1, 2.5, 10],
       },
-      {"var_type": "int", "elements": [-4, 4]},
-      {"var_type": "int", "elements": [-4, 4]},
+      {"var_type": "int", "elements": (-4, 4)},
+      {"var_type": "int", "elements": (-4, 4)},
     ]
     constraint_list = [
       {
@@ -1251,9 +1251,9 @@ class TestCategoricalDomain(object):
     assert categorical_domain.constrained_integer_indices == [0, 3, 6]
 
     domain_components = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "double", "elements": [0, 5]},
-      {"var_type": "double", "elements": [-3, 1]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "double", "elements": (0, 5)},
+      {"var_type": "double", "elements": (-3, 1)},
     ]
     constraint_list = [
       {"weights": [2, 3, 0], "rhs": 1, "var_type": "double"},
@@ -1281,8 +1281,8 @@ class TestCategoricalDomain(object):
     with pytest.raises(AssertionError):
       CategoricalDomain(
         domain_components=[
-          {"var_type": "double", "elements": [-2.1, 2.1]},
-          {"var_type": "double", "elements": [-2.1, 2.1]},
+          {"var_type": "double", "elements": (-2.1, 2.1)},
+          {"var_type": "double", "elements": (-2.1, 2.1)},
         ],
         constraint_list=[
           {
@@ -1295,8 +1295,8 @@ class TestCategoricalDomain(object):
     with pytest.raises(AssertionError):
       CategoricalDomain(
         domain_components=[
-          {"var_type": "int", "elements": [-4, 4]},
-          {"var_type": "int", "elements": [-4, 4]},
+          {"var_type": "int", "elements": (-4, 4)},
+          {"var_type": "int", "elements": (-4, 4)},
         ],
         constraint_list=[
           {
@@ -1311,8 +1311,8 @@ class TestCategoricalDomain(object):
     with pytest.raises(AssertionError):
       CategoricalDomain(
         domain_components=[
-          {"var_type": "int", "elements": [-4, 4]},
-          {"var_type": "double", "elements": [-2.1, 2.1]},
+          {"var_type": "int", "elements": (-4, 4)},
+          {"var_type": "double", "elements": (-2.1, 2.1)},
         ],
         constraint_list=[
           {
@@ -1327,8 +1327,8 @@ class TestCategoricalDomain(object):
     with pytest.raises(AssertionError):
       CategoricalDomain(
         domain_components=[
-          {"var_type": "int", "elements": [-4, 4]},
-          {"var_type": "double", "elements": [-2.1, 2.1]},
+          {"var_type": "int", "elements": (-4, 4)},
+          {"var_type": "double", "elements": (-2.1, 2.1)},
         ],
         constraint_list=[
           {"weights": [1.0, 1.0], "rhs": 0.3, "var_type": "WRONG"},  # type: ignore
@@ -1349,8 +1349,8 @@ class TestCategoricalDomain(object):
       {"name": "beta", "params": beta_params},
     ]
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [-4, 4]},
-      {"var_type": "double", "elements": [-2.1, 2.1]},
+      {"var_type": "double", "elements": (-4, 4)},
+      {"var_type": "double", "elements": (-2.1, 2.1)},
     ]
     domain_with_priors = CategoricalDomain(domain_components=domain_components, priors=priors)
     assert domains_approximately_equal(domain_with_priors, domain_with_priors)
@@ -1389,8 +1389,8 @@ class TestCategoricalDomain(object):
 class TestPriorSamplers(object):
   def test_fewer_priors_than_domain_components_raises_assertion_error(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [-4, 4]},
-      {"var_type": "double", "elements": [-2, 2]},
+      {"var_type": "double", "elements": (-4, 4)},
+      {"var_type": "double", "elements": (-2, 2)},
     ]
     priors: list[AnyPrior] = [
       {"name": "normal", "params": {"mean": 0, "scale": 1}},
@@ -1408,8 +1408,8 @@ class TestPriorSamplers(object):
   )
   def test_non_double_var_types_raise_assertion_error(self, var_type):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [-4, 4]},
-      {"var_type": "double", "elements": [-2, 2]},
+      {"var_type": "double", "elements": (-4, 4)},
+      {"var_type": "double", "elements": (-2, 2)},
     ]
     priors: list[AnyPrior] = [
       {"name": "normal", "params": {"mean": 0, "scale": 1}},
@@ -1421,16 +1421,16 @@ class TestPriorSamplers(object):
 
   def test_check_points_within_bounds(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [-4, 4]},
-      {"var_type": "double", "elements": [-2, 2]},
+      {"var_type": "double", "elements": (-4, 4)},
+      {"var_type": "double", "elements": (-2, 2)},
       {"var_type": "categorical", "elements": [1, 2, 3]},
       {"var_type": "categorical", "elements": [4, 5, 6]},
       {
         "var_type": "quantized",
         "elements": [-0.2, -0.1, 1, 2.5, 10],
       },
-      {"var_type": "double", "elements": [-4, 4]},
-      {"var_type": "int", "elements": [-4, 4]},
+      {"var_type": "double", "elements": (-4, 4)},
+      {"var_type": "int", "elements": (-4, 4)},
     ]
     priors: list[AnyPrior] = [
       {"name": "normal", "params": {"mean": 0, "scale": 1}},
@@ -1449,18 +1449,18 @@ class TestPriorSamplers(object):
 
   @flaky(max_runs=2)
   @pytest.mark.parametrize(
-    "mean, scale, domain_components",
+    "mean, scale, domain_elements",
     [
-      (0.05, 0.001, [0, 0.1]),
-      (1, 2, [0, 3]),
-      (0, 20, [10, 100]),
+      (0.05, 0.001, (0, 0.1)),
+      (1, 2, (0, 3)),
+      (0, 20, (10, 100)),
     ],
   )
   # The observed failure rate seems to be less than 1/10000
-  def test_check_normal_prior_satisfies_distribution(self, mean, scale, domain_components):
-    domain_components = [
-      {"var_type": "double", "elements": domain_components},
-      {"var_type": "int", "elements": [0, 10]},
+  def test_check_normal_prior_satisfies_distribution(self, mean, scale, domain_elements):
+    domain_components: list[DomainComponent] = [
+      {"var_type": "double", "elements": domain_elements},
+      {"var_type": "int", "elements": (0, 10)},
     ]
     n_samples = 200
     priors: list[AnyPrior] = [
@@ -1473,18 +1473,18 @@ class TestPriorSamplers(object):
 
   @flaky(max_runs=2)
   @pytest.mark.parametrize(
-    "shape_a, shape_b, domain_components",
+    "shape_a, shape_b, domain_elements",
     [
-      (2, 4, [0.01, 0.02]),
-      (5, 5, [-1, 1]),
-      (1, 3, [10, 100]),
+      (2, 4, (0.01, 0.02)),
+      (5, 5, (-1, 1)),
+      (1, 3, (10, 100)),
     ],
   )
   # The observed failure rate seems to be less than 1/10000
-  def test_check_unit_beta_prior_satisfies_distribution(self, shape_a, shape_b, domain_components):
-    domain_components = [
-      {"var_type": "double", "elements": domain_components},
-      {"var_type": "int", "elements": [0, 10]},
+  def test_check_unit_beta_prior_satisfies_distribution(self, shape_a, shape_b, domain_elements):
+    domain_components: list[DomainComponent] = [
+      {"var_type": "double", "elements": domain_elements},
+      {"var_type": "int", "elements": (0, 10)},
     ]
     n_samples = 200
     priors: list[AnyPrior] = [
@@ -1501,13 +1501,13 @@ class TestPriorSamplers(object):
 
 class TestInferUnconstrainedIndicesHalfspace(object):
   domain_components: list[DomainComponent] = [
-    {"var_type": "double", "elements": [-2, -1]},
-    {"var_type": "double", "elements": [-1, 0]},
-    {"var_type": "double", "elements": [0, 1]},
+    {"var_type": "double", "elements": (-2, -1)},
+    {"var_type": "double", "elements": (-1, 0)},
+    {"var_type": "double", "elements": (0, 1)},
     {"var_type": "categorical", "elements": [1, 2, 3]},
-    {"var_type": "double", "elements": [1, 2]},
-    {"var_type": "int", "elements": [-10, -2]},
-    {"var_type": "int", "elements": [2, 10]},
+    {"var_type": "double", "elements": (1, 2)},
+    {"var_type": "int", "elements": (-10, -2)},
+    {"var_type": "int", "elements": (2, 10)},
   ]
 
   @pytest.mark.parametrize(
@@ -1592,9 +1592,9 @@ class TestInferUnconstrainedIndicesHalfspace(object):
 
   def test_unconstrained_indices_all_constraints(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [-2, -1]},
-      {"var_type": "double", "elements": [-1, 0]},
-      {"var_type": "double", "elements": [0, 1]},
+      {"var_type": "double", "elements": (-2, -1)},
+      {"var_type": "double", "elements": (-1, 0)},
+      {"var_type": "double", "elements": (0, 1)},
     ]
     constraint_list: list[DomainConstraint] = [
       {
@@ -1618,9 +1618,9 @@ class TestInferUnconstrainedIndicesHalfspace(object):
 class TestHitandRunSampling(object):
   def test_all_constrained(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "double", "elements": [3, 5]},
-      {"var_type": "double", "elements": [-3, -1]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "double", "elements": (3, 5)},
+      {"var_type": "double", "elements": (-3, -1)},
     ]
     constraint_list: list[DomainConstraint] = [
       {"weights": [1, 1, 1], "rhs": 1, "var_type": "double"},
@@ -1631,15 +1631,15 @@ class TestHitandRunSampling(object):
 
   def test_some_constrained(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "double", "elements": [-2, 0]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "double", "elements": (-2, 0)},
       {"var_type": "categorical", "elements": [1, 2, 3]},
       {
         "var_type": "quantized",
         "elements": [-0.2, -0.1, 1, 2.5, 10],
       },
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "int", "elements": [-20, 2]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "int", "elements": (-20, 2)},
     ]
     constraint_list: list[DomainConstraint] = [
       {
@@ -1654,15 +1654,15 @@ class TestHitandRunSampling(object):
 
   def test_constrained_integers(self):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "int", "elements": [-2, 0]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "int", "elements": (-2, 0)},
       {"var_type": "categorical", "elements": [1, 2, 3]},
       {
         "var_type": "quantized",
         "elements": [-0.2, -0.1, 1, 2.5, 10],
       },
-      {"var_type": "int", "elements": [0, 10]},
-      {"var_type": "int", "elements": [-20, 2]},
+      {"var_type": "int", "elements": (0, 10)},
+      {"var_type": "int", "elements": (-20, 2)},
     ]
     constraint_list: list[DomainConstraint] = [
       {
@@ -1680,8 +1680,8 @@ class TestFixedIndicesOnContinuousDomain(object):
   def test_basics(self):
     cat_domain = CategoricalDomain(
       [
-        {"var_type": "double", "elements": [0, 1]},
-        {"var_type": "double", "elements": [-2, 3]},
+        {"var_type": "double", "elements": (0, 1)},
+        {"var_type": "double", "elements": (-2, 3)},
       ]
     )
     cn_domain = cat_domain.one_hot_domain

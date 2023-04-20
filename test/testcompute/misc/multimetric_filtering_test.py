@@ -19,10 +19,10 @@ class TestMultimetricFiltering(NumericalTestCase):
   mixed_domain = CategoricalDomain(
     [
       {"var_type": "categorical", "elements": [3, -1, 5]},
-      {"var_type": "int", "elements": [1, 5]},
-      {"var_type": "double", "elements": [-1, 7]},
-      {"var_type": "int", "elements": [11, 22]},
-      {"var_type": "double", "elements": [-11.1, 4.234]},
+      {"var_type": "int", "elements": (1, 5)},
+      {"var_type": "double", "elements": (-1, 7)},
+      {"var_type": "int", "elements": (11, 22)},
+      {"var_type": "double", "elements": (-11.1, 4.234)},
     ]
   )
 

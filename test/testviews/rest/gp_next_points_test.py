@@ -8,7 +8,13 @@ from mock import Mock
 from testviews.zigopt_input_utils import ZigoptSimulator, form_random_unconstrained_categorical_domain
 
 from libsigopt.aux.constant import PARALLEL_CONSTANT_LIAR, PARALLEL_QEI
-from libsigopt.compute.domain import CategoricalDomain, DomainComponent, DomainConstraint
+from libsigopt.compute.domain import (
+  CategoricalDomain,
+  DomainComponent,
+  DomainConstraint,
+  GridDomainComponent,
+  IntervalDomainComponent,
+)
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import HistoricalData
 from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
@@ -30,10 +36,10 @@ class TestCategoricalNextPoints(NumericalTestCase):
   mixed_domain = CategoricalDomain(
     [
       {"var_type": "categorical", "elements": [3, -1, 5]},
-      {"var_type": "int", "elements": [1, 5]},
-      {"var_type": "double", "elements": [-1, 7]},
-      {"var_type": "int", "elements": [11, 22]},
-      {"var_type": "double", "elements": [-11.1, 4.234]},
+      {"var_type": "int", "elements": (1, 5)},
+      {"var_type": "double", "elements": (-1, 7)},
+      {"var_type": "int", "elements": (11, 22)},
+      {"var_type": "double", "elements": (-11.1, 4.234)},
       {"var_type": "categorical", "elements": [1, 2, 6, 9]},
       {
         "var_type": "quantized",
@@ -161,10 +167,10 @@ class TestCategoricalNextPoints(NumericalTestCase):
     num_tasks,
   ):
     domain_components: list[DomainComponent] = [
-      {"var_type": "double", "elements": [0, 2]},
-      {"var_type": "double", "elements": [0, 5]},
-      {"var_type": "double", "elements": [-3, 1]},
-      {"var_type": "int", "elements": [3, 8]},
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "double", "elements": (0, 5)},
+      {"var_type": "double", "elements": (-3, 1)},
+      {"var_type": "int", "elements": (3, 8)},
       {"var_type": "categorical", "elements": [1, 3, 5]},
     ]
     constraint_list: list[DomainConstraint] = [
@@ -314,11 +320,11 @@ class TestCategoricalNextPoints(NumericalTestCase):
 class TestDiscreteNextPointsConversion(NumericalTestCase):
   mixed_domain = CategoricalDomain(
     [
-      {"var_type": "categorical", "elements": [3, -1, 5]},
-      {"var_type": "int", "elements": [1, 5]},
-      {"var_type": "double", "elements": [-1, 7]},
-      {"var_type": "int", "elements": [11, 22]},
-      {"var_type": "double", "elements": [-11.1, 4.234]},
+      {"var_type": "categorical", "elements": (3, -1, 5)},
+      {"var_type": "int", "elements": (1, 5)},
+      {"var_type": "double", "elements": (-1, 7)},
+      {"var_type": "int", "elements": (11, 22)},
+      {"var_type": "double", "elements": (-11.1, 4.234)},
       {"var_type": "categorical", "elements": [1, 2, 6, 9]},
       {
         "var_type": "quantized",
@@ -369,9 +375,9 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
     assert all(self.mixed_domain.one_hot_domain.check_point_acceptable(p) for p in neighboring_categorical_points)
 
   def test_discrete_conversion_option(self):
-    continuous_component = DomainComponent(var_type="double", elements=[0, 2])
-    int_component = DomainComponent(var_type="int", elements=[3, 8])
-    cat_component = DomainComponent(var_type="int", elements=[1, 3, 5])
+    continuous_component = IntervalDomainComponent(var_type="double", elements=(0, 2))
+    int_component = IntervalDomainComponent(var_type="int", elements=(3, 8))
+    cat_component = GridDomainComponent(var_type="categorical", elements=[1, 3, 5])
 
     continuous_only_domain = CategoricalDomain([continuous_component] * 5)
     option = get_discrete_conversion_option(continuous_only_domain)
@@ -527,14 +533,14 @@ class TestAugmentedDomain:
   tasks = numpy.array([0.5, 0.2, 1.0])
 
   def test_no_acquisition_function(self):
-    domain = CategoricalDomain([{"var_type": "double", "elements": [-2, 3.3]}])
+    domain = CategoricalDomain([{"var_type": "double", "elements": (-2, 3.3)}])
     computed_domain = form_augmented_domain(domain)
     assert domains_approximately_equal(domain, computed_domain)
 
     augmented_domain_with_tasks = CategoricalDomain(
       [
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "double", "elements": [0.2, 1]},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "double", "elements": (0.2, 1)},
       ]
     )
     computed_domain = form_augmented_domain(domain, task_cost_populated=True, task_options=self.tasks)
@@ -542,10 +548,10 @@ class TestAugmentedDomain:
 
     domain_with_constraint = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "double", "elements": [-2.3, 2.2]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "int", "elements": [5, 10]},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "double", "elements": (-2.3, 2.2)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "int", "elements": (5, 10)},
       ],
       constraint_list=[
         {
@@ -565,11 +571,11 @@ class TestAugmentedDomain:
 
     augmented_domain_with_constraint_with_tasks = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "double", "elements": [-2.3, 2.2]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "int", "elements": [5, 10]},
-        {"var_type": "double", "elements": [0.2, 1]},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "double", "elements": (-2.3, 2.2)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "int", "elements": (5, 10)},
+        {"var_type": "double", "elements": (0.2, 1)},
       ],
       constraint_list=[
         {
@@ -590,10 +596,10 @@ class TestAugmentedDomain:
   def test_with_acquisition_function(self):
     domain = CategoricalDomain(
       [
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "int", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "categorical", "elements": [0, 1, 2]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
       ]
     )
 
@@ -605,11 +611,11 @@ class TestAugmentedDomain:
 
     domain_with_appended_tasks = CategoricalDomain(
       [
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "int", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "double", "elements": [0.2, 1.0]},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "categorical", "elements": [0, 1, 2]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (0.2, 1.0)},
       ]
     )
     af = Mock(dim=7, num_points_to_sample=1)
@@ -625,12 +631,12 @@ class TestAugmentedDomain:
   def test_with_constraints(self):
     domain_with_constraints = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-4.5, -2.1]},
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "int", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "int", "elements": [-3, 6]},
+        {"var_type": "double", "elements": (-4.5, -2.1)},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "categorical", "elements": [0, 1, 2]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "int", "elements": (-3, 6)},
       ],
       constraint_list=[
         {
@@ -660,12 +666,12 @@ class TestAugmentedDomain:
 
     domain_using_hitandrun = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-4.5, -2.1]},
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "int", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "int", "elements": [-3, 6]},
+        {"var_type": "double", "elements": (-4.5, -2.1)},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "categorical", "elements": [0, 1, 2]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "int", "elements": (-3, 6)},
       ],
       constraint_list=[
         {
@@ -697,18 +703,18 @@ class TestAugmentedDomain:
     # Technically, the ordering of constraints shouldn't matter (weight ordering matters) ... something to fix
     domain_with_two_points_with_constraints = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-4.5, -2.1]},
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "int", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "int", "elements": [-3, 6]},
-        {"var_type": "double", "elements": [-4.5, -2.1]},
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "int", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "int", "elements": [-3, 6]},
+        {"var_type": "double", "elements": (-4.5, -2.1)},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "categorical", "elements": [0, 1, 2]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "int", "elements": (-3, 6)},
+        {"var_type": "double", "elements": (-4.5, -2.1)},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "categorical", "elements": [0, 1, 2]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "int", "elements": (-3, 6)},
       ],
       constraint_list=[
         {
@@ -759,13 +765,13 @@ class TestAugmentedDomain:
 
     domain_with_constraints_and_tasks = CategoricalDomain(
       domain_components=[
-        {"var_type": "double", "elements": [-4.5, -2.1]},
-        {"var_type": "double", "elements": [-2, 3.3]},
-        {"var_type": "int", "elements": [0, 1, 2]},
-        {"var_type": "double", "elements": [-4, 1.1]},
-        {"var_type": "int", "elements": [-4, 5]},
-        {"var_type": "int", "elements": [-3, 6]},
-        {"var_type": "double", "elements": [0.2, 1.0]},
+        {"var_type": "double", "elements": (-4.5, -2.1)},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "categorical", "elements": [0, 1, 2]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "int", "elements": (-3, 6)},
+        {"var_type": "double", "elements": (0.2, 1.0)},
       ],
       constraint_list=[
         {

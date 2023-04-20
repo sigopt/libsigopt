@@ -8,6 +8,7 @@ import numpy
 from libsigopt.aux.constant import CATEGORICAL_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import C4RadialMatern
 from libsigopt.compute.covariance_base import HyperparameterInvalidError
+from libsigopt.compute.domain import SamplerOpts
 from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_IN_BOUNDS_POINTS, MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
 from libsigopt.compute.misc.multimetric import filter_multimetric_points_sampled_spe
 from libsigopt.compute.optimization import LBFGSBOptimizer, MultistartOptimizer, SLSQPOptimizer
@@ -207,7 +208,7 @@ class SPENextPoints(View):
     max_value = sigopt_parzen_estimator.evaluate_expected_improvement(numpy.atleast_2d(max_location))[2][0]
 
     uniform_domain = deepcopy(domain.one_hot_domain)
-    uniform_domain.set_quasi_random_sampler_opts({"sampler": "uniform"})
+    uniform_domain.set_quasi_random_sampler_opts(SamplerOpts(sampler="uniform"))
 
     num_rejection_samples = 0
     samples = numpy.empty((0, domain.one_hot_dim))

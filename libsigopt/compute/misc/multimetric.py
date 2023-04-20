@@ -24,12 +24,12 @@ class ConvexCombinationParams:
   weights: numpy.ndarray
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class OptimizingMetricParams:
   optimizing_metric: int
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class ConstraintMetricParams:
   constraint_metric: int
 

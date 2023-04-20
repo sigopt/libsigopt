@@ -24,6 +24,9 @@ class MetricMidpointInfo(object):
 
   def __init__(self):
     self.force_skip = False
+    self.midpoint = numpy.array([])
+    self.scale = numpy.array([])
+    self.negate = numpy.array([])
 
   def __repr__(self):
     return f"{self.__class__.__name__}(mid={self.midpoint}, scale={self.scale}, skip={self.skip})"

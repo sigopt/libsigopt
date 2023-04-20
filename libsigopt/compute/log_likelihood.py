@@ -140,9 +140,13 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
         The log_scaling accounts for d/da L(exp(a)) = L'(exp(a)) * exp(a).
 
         """
-    assert self.gp.P is not None
-    assert self.gp.K_inv_P is not None
     assert self.gp.K_inv_demeaned_y is not None
+
+    gp_params = None
+    if not self.gp.has_zero_mean and include_nonzero_correction:
+      assert self.gp.P is not None
+      assert self.gp.K_inv_P is not None
+      gp_params = self.gp.P, self.gp.K_inv_P, self.gp.K_inv_demeaned_y
 
     grad_hyperparameter_cov_tensor = self.covariance.build_kernel_hparam_grad_tensor(self.gp.points_sampled)
     if self.use_auto_noise:
@@ -159,10 +163,8 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
       dKKinvy_Pb = numpy.dot(dK, Kinvy_Pb)
       grad_log_marginal[k] = -numpy.dot(Kinvy_Pb, dKKinvy_Pb)
       grad_log_marginal[k] += numpy.trace(scipy.linalg.cho_solve(K_chol, dK, overwrite_b=True))
-      if not self.gp.has_zero_mean and include_nonzero_correction:
-        P = self.gp.P
-        KinvP = self.gp.K_inv_P
-        PKP_chol = self.gp.PKP_chol
+      if gp_params is not None:
+        P, KinvP, PKP_chol = gp_params
         temp = -numpy.dot(
           P,
           scipy.linalg.cho_solve(PKP_chol, numpy.dot(KinvP.T, numpy.dot(dK, Kinvy_Pb))),

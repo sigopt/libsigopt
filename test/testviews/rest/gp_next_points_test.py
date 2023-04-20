@@ -29,12 +29,12 @@ from testcompute.domain_test import domains_approximately_equal
 class TestCategoricalNextPoints(NumericalTestCase):
   mixed_domain = CategoricalDomain(
     [
-      {"var_type": "int", "elements": [3, -1, 5]},
+      {"var_type": "categorical", "elements": [3, -1, 5]},
       {"var_type": "int", "elements": [1, 5]},
       {"var_type": "double", "elements": [-1, 7]},
       {"var_type": "int", "elements": [11, 22]},
       {"var_type": "double", "elements": [-11.1, 4.234]},
-      {"var_type": "int", "elements": [1, 2, 6, 9]},
+      {"var_type": "categorical", "elements": [1, 2, 6, 9]},
       {
         "var_type": "quantized",
         "elements": [-0.1, 0.2, 0.5, 9.0],
@@ -165,7 +165,7 @@ class TestCategoricalNextPoints(NumericalTestCase):
       {"var_type": "double", "elements": [0, 5]},
       {"var_type": "double", "elements": [-3, 1]},
       {"var_type": "int", "elements": [3, 8]},
-      {"var_type": "int", "elements": [1, 3, 5]},
+      {"var_type": "categorical", "elements": [1, 3, 5]},
     ]
     constraint_list: list[DomainConstraint] = [
       {
@@ -314,12 +314,12 @@ class TestCategoricalNextPoints(NumericalTestCase):
 class TestDiscreteNextPointsConversion(NumericalTestCase):
   mixed_domain = CategoricalDomain(
     [
-      {"var_type": "int", "elements": [3, -1, 5]},
+      {"var_type": "categorical", "elements": [3, -1, 5]},
       {"var_type": "int", "elements": [1, 5]},
       {"var_type": "double", "elements": [-1, 7]},
       {"var_type": "int", "elements": [11, 22]},
       {"var_type": "double", "elements": [-11.1, 4.234]},
-      {"var_type": "int", "elements": [1, 2, 6, 9]},
+      {"var_type": "categorical", "elements": [1, 2, 6, 9]},
       {
         "var_type": "quantized",
         "elements": [-0.1, 0.2, 0.5, 9.0],

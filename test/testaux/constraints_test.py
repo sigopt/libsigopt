@@ -4,11 +4,6 @@
 import numpy
 import pytest
 
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-)
 from libsigopt.aux.geometry_utils import find_interior_point
 from libsigopt.compute.domain import DEFAULT_NUM_RANDOM_NEIGHBORS, MAX_GRID_DIM, CategoricalDomain
 
@@ -108,9 +103,9 @@ class TestNeighborsFeasibility(object):
     # Fails with no constraints
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "categorical", "elements": [1, 2, 3]},
       ]
     )
     with pytest.raises(AssertionError):
@@ -120,17 +115,17 @@ class TestNeighborsFeasibility(object):
     # Fails with only double constraints
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "categorical", "elements": [1, 2, 3]},
       ],
       constraint_list=[
         {
           "weights": [0.0, 0.0, 0.2, 0.2, 0.0],
           "rhs": 1,
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
         },
       ],
     )
@@ -141,28 +136,28 @@ class TestNeighborsFeasibility(object):
   def test_generate_neighboring_integers_points_exactly_test(self):
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "categorical", "elements": [1, 2, 3]},
       ],
       constraint_list=[
         {
           "weights": [0.2, 0.2, 0.0, 0, 0, 0],
           "rhs": 1,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0.0, 0.2, 0.2, 0, 0, 0],
           "rhs": 1,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0.0, 0.0, 0.0, 1, 1, 0],
           "rhs": 1,
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
         },
       ],
     )
@@ -190,9 +185,9 @@ class TestNeighborsFeasibility(object):
   def test_generate_neighboring_integers_grid(self):
     d = numpy.random.randint(1, MAX_GRID_DIM)
     domain = CategoricalDomain(
-      domain_components=[{"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [2, 3 + d]} for _ in range(d)],
+      domain_components=[{"var_type": "int", "elements": [2, 3 + d]} for _ in range(d)],
       constraint_list=[
-        {"weights": [0.5] * d, "rhs": 1, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {"weights": [0.5] * d, "rhs": 1, "var_type": "int"},
       ],
     )
     one_hot_point = numpy.array([2.5 + d for _ in range(d)])
@@ -202,9 +197,9 @@ class TestNeighborsFeasibility(object):
   def test_generate_neighboring_integers_random(self):
     d = MAX_GRID_DIM + 1
     domain = CategoricalDomain(
-      domain_components=[{"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]} for _ in range(d)],
+      domain_components=[{"var_type": "int", "elements": [0, 10]} for _ in range(d)],
       constraint_list=[
-        {"weights": [1] * d, "rhs": d, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {"weights": [1] * d, "rhs": d, "var_type": "int"},
       ],
     )
     one_hot_point = numpy.ones(d)
@@ -214,46 +209,46 @@ class TestNeighborsFeasibility(object):
   def test_snap_constrained_integer_points(self):
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "categorical", "elements": [1, 2, 3]},
       ],
       constraint_list=[
         {
           "weights": [0.25, 0.25, 0, 0, 0, 0, 0, 0, 0],
           "rhs": 2,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0, 0.25, 0.25, 0, 0, 0, 0, 0, 0],
           "rhs": 2,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0, 0, 0.25, 0, 0, 0, 0.25, 0, 0],
           "rhs": 2,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0, 0, 0, 0, 0, 0, 0.25, 0.25, 0],
           "rhs": 2,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0, 0, 0, 1.5, 1.5, 0, 0, 0, 0],
           "rhs": 2,
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
         },
         {
           "weights": [0, 0, 0, 0, 1.5, 1.5, 0, 0, 0],
           "rhs": 2,
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
         },
       ],
     )
@@ -321,46 +316,46 @@ class TestNeighborsFeasibility(object):
     )
     domain_borderline = CategoricalDomain(
       domain_components=[
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 3]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "double", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "int", "elements": [0, 10]},
+        {"var_type": "categorical", "elements": [1, 2, 3]},
       ],
       constraint_list=[
         {
           "weights": [0.25, 0.2, 0, 0, 0, 0, 0, 0, 0],
           "rhs": 2,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0, 0.2, 0.2, 0, 0, 0, 0, 0, 0],
           "rhs": 2,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0, 0, 0.2, 0, 0, 0, 0.2, 0, 0],
           "rhs": 2,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0, 0, 0, 0, 0, 0, 0.2, 0.2, 0],
           "rhs": 2,
-          "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "int",
         },
         {
           "weights": [0, 0, 0, 1.5, 1.5, 0, 0, 0, 0],
           "rhs": 2,
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
         },
         {
           "weights": [0, 0, 0, 0, 1.5, 1.5, 0, 0, 0],
           "rhs": 2,
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
         },
       ],
     )
@@ -375,9 +370,9 @@ class TestNeighborsFeasibility(object):
     # test snap one hot using random instead of grid
     d = MAX_GRID_DIM + 1
     domain = CategoricalDomain(
-      domain_components=[{"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [1, 10]} for _ in range(d)],
+      domain_components=[{"var_type": "int", "elements": [1, 10]} for _ in range(d)],
       constraint_list=[
-        {"weights": [1] * d, "rhs": d, "var_type": INT_EXPERIMENT_PARAMETER_NAME},
+        {"weights": [1] * d, "rhs": d, "var_type": "int"},
       ],
     )
     one_hot_next_points = numpy.array(

@@ -43,6 +43,8 @@ repos:
     hooks:
       - id: mypy
         entry: mypy
+        additional_dependencies:
+          - types-mock
   - repo: local
     hooks:
       - id: pylint

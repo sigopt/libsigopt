@@ -6,14 +6,7 @@ import pytest
 from flaky import flaky
 from testviews.zigopt_input_utils import ZigoptSimulator
 
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-  QUANTIZED_EXPERIMENT_PARAMETER_NAME,
-  ParameterPriorNames,
-)
-from libsigopt.compute.domain import CategoricalDomain
+from libsigopt.compute.domain import AnyPrior, CategoricalDomain, DomainComponent, DomainConstraint
 from libsigopt.views.rest.random_search_next_points import RandomSearchNextPoints
 
 from testcompute.domain_test import samples_satisfy_kolmogorov_smirnov_test
@@ -34,9 +27,9 @@ class TestRandomSearchNextPoints(object):
 
     for pt in points_to_sample:
       for i, dc in enumerate(domain):
-        if dc["var_type"] in [QUANTIZED_EXPERIMENT_PARAMETER_NAME, CATEGORICAL_EXPERIMENT_PARAMETER_NAME]:
+        if dc["var_type"] in ["quantized", "categorical"]:
           assert pt[i] in dc["elements"]
-        elif dc["var_type"] == INT_EXPERIMENT_PARAMETER_NAME:
+        elif dc["var_type"] == "int":
           assert int(pt[i]) == pt[i]
 
     task_options = numpy.array(view_input["task_options"])
@@ -60,23 +53,23 @@ class TestRandomSearchNextPoints(object):
     self.assert_call_successful(zs)
 
   def test_constraint_samples(self):
-    domain_components = [
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 5]},
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 3, 5]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 1]},
+    domain_components: list[DomainComponent] = [
+      {"var_type": "double", "elements": [0, 2]},
+      {"var_type": "int", "elements": [0, 5]},
+      {"var_type": "categorical", "elements": [1, 3, 5]},
+      {"var_type": "int", "elements": [3, 8]},
+      {"var_type": "double", "elements": [-3, 1]},
     ]
-    constraint_list = [
+    constraint_list: list[DomainConstraint] = [
       {
         "weights": [1, 0, 0, 0, 1],
         "rhs": 1,
-        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        "var_type": "double",
       },
       {
         "weights": [0, 1, 0, 1, 0],
         "rhs": 4,
-        "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+        "var_type": "int",
       },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
@@ -88,11 +81,11 @@ class TestRandomSearchNextPoints(object):
     self.assert_call_successful(zs, domain=domain)
 
   def test_discretized_samples(self):
-    domain_components = [
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [0, 0.3, 1.3]},
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 3, 5]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [10.1, 10.5, 10.9]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [1, 200]},
+    domain_components: list[DomainComponent] = [
+      {"var_type": "quantized", "elements": [0, 0.3, 1.3]},
+      {"var_type": "categorical", "elements": [1, 3, 5]},
+      {"var_type": "quantized", "elements": [10.1, 10.5, 10.9]},
+      {"var_type": "int", "elements": [1, 200]},
     ]
     domain = CategoricalDomain(domain_components)
     zs = ZigoptSimulator(
@@ -103,15 +96,15 @@ class TestRandomSearchNextPoints(object):
     self.assert_call_successful(zs, domain=domain)
 
   def test_prior_samples(self):
-    domain_components = [
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-5, -2]},
-      {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [-2.3, -1.2, 3.4, 4.5]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [10, 15]},
+    domain_components: list[DomainComponent] = [
+      {"var_type": "double", "elements": [-5, -2]},
+      {"var_type": "quantized", "elements": [-2.3, -1.2, 3.4, 4.5]},
+      {"var_type": "double", "elements": [10, 15]},
     ]
-    priors = [
-      {"name": ParameterPriorNames.NORMAL, "params": {"mean": -3, "scale": 0.4}},
-      {"name": None, "params": None},
-      {"name": ParameterPriorNames.BETA, "params": {"shape_a": 0.8, "shape_b": 0.2}},
+    priors: list[AnyPrior] = [
+      {"name": "normal", "params": {"mean": -3, "scale": 0.4}},
+      {"name": None, "params": None},  # type: ignore
+      {"name": "beta", "params": {"shape_a": 0.8, "shape_b": 0.2}},
     ]
 
     domain = CategoricalDomain(domain_components, priors=priors)
@@ -124,13 +117,13 @@ class TestRandomSearchNextPoints(object):
 
   @flaky(max_runs=2)
   def test_prior_samples_distribution(self):
-    domain_components = [
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-5, -2]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [10, 15]},
+    domain_components: list[DomainComponent] = [
+      {"var_type": "double", "elements": [-5, -2]},
+      {"var_type": "double", "elements": [10, 15]},
     ]
-    priors = [
-      {"name": ParameterPriorNames.NORMAL, "params": {"mean": -3, "scale": 0.4}},
-      {"name": ParameterPriorNames.BETA, "params": {"shape_a": 0.8, "shape_b": 0.2}},
+    priors: list[AnyPrior] = [
+      {"name": "normal", "params": {"mean": -3, "scale": 0.4}},
+      {"name": "beta", "params": {"shape_a": 0.8, "shape_b": 0.2}},
     ]
 
     domain = CategoricalDomain(domain_components, priors=priors)

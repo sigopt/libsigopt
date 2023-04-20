@@ -174,7 +174,7 @@ class TestExpectedImprovement(GaussianProcessTestCase):
         assert abs(ei_mean_eapl - true_result) < 2 * ei_std_eapl
         assert abs(ei_mean_caf - true_result) < 2 * ei_std_caf
         std_results.append(ei_std_eapl)
-      assert all(numpy.diff(std_results) < 0) or any(std_results == 0)
+      assert all(numpy.diff(std_results) < 0) or any(numpy.array(std_results) == 0)
 
   def test_multistart_analytic_expected_improvement_optimization(self):
     """

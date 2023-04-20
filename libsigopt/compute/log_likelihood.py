@@ -115,6 +115,9 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
         Because our optimization tool maximizes things, but we want to minimize this, we return the negative.
 
         """
+    assert self.gp.K_chol is not None
+    assert self.gp.demeaned_y is not None
+    assert self.gp.K_inv_demeaned_y is not None
 
     y_Pb = self.gp.demeaned_y
     Kinvy_Pb = self.gp.K_inv_demeaned_y
@@ -137,6 +140,10 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
         The log_scaling accounts for d/da L(exp(a)) = L'(exp(a)) * exp(a).
 
         """
+    assert self.gp.P is not None
+    assert self.gp.K_inv_P is not None
+    assert self.gp.K_inv_demeaned_y is not None
+
     grad_hyperparameter_cov_tensor = self.covariance.build_kernel_hparam_grad_tensor(self.gp.points_sampled)
     if self.use_auto_noise:
       grad_hyperparameter_cov_tensor = numpy.concatenate(

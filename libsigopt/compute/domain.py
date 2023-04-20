@@ -1,12 +1,16 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
+from __future__ import annotations
+
 import copy
 from collections import OrderedDict
+from typing import Literal, Sequence
 
 import numpy
 from scipy.spatial.distance import cdist
 from scipy.stats import beta, truncnorm
+from typing_extensions import NotRequired, TypedDict
 
 from libsigopt.aux.constant import (
   CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
@@ -27,7 +31,6 @@ from libsigopt.aux.samplers import (
 )
 
 
-DEFAULT_QUASI_RANDOM_SAMPLER = "latin_hypercube"
 DEFAULT_SAFETY_MARGIN_FOR_CONSTRAINTS = 1e-8
 MAX_DISCRETE_DOMAIN_UNIQUENESS_SEARCH = 100000
 DEFAULT_ONE_HOT_SNAPPING_TEMPERATURE = 0.2
@@ -63,6 +66,10 @@ def find_indexes_of_unique_points(points, compare_points, scaling_vector, tolera
   return unique_indexes
 
 
+class SamplerOpts(TypedDict):
+  sampler: Literal["latin_hypercube", "halton", "sobol", "uniform"]
+
+
 class ContinuousDomain(object):
   def __init__(self, domain_bounds):
     """Construct a ContinuousDomain with the specified bounds."""
@@ -71,7 +78,7 @@ class ContinuousDomain(object):
     assert bounds_shape[1] == 2
     assert numpy.all(numpy.diff(domain_bounds, axis=1) >= 0)
     self.domain_bounds = numpy.copy(domain_bounds)
-    self._quasi_random_sampler_opts = {"sampler": DEFAULT_QUASI_RANDOM_SAMPLER}
+    self._quasi_random_sampler_opts = SamplerOpts(sampler="latin_hypercube")
     self._constraint_list = []
     self._one_hot_unconstrained_indices = list(range(self.dim))
     self._halfspaces = None
@@ -104,15 +111,15 @@ class ContinuousDomain(object):
   def one_hot_unconstrained_indices(self):
     return self._one_hot_unconstrained_indices
 
-  def set_quasi_random_sampler_opts(self, **kwargs):
+  def set_quasi_random_sampler_opts(self, opts: SamplerOpts):
     """Input a dictionary of options for the quasi random sampler."""
     possible_quasi_random_samplers = ("latin_hypercube", "halton", "sobol", "uniform")
-    if "sampler" not in kwargs:
+    if "sampler" not in opts:
       raise AttributeError("Options must include sampler to define quasi-random points")
-    elif kwargs["sampler"] not in possible_quasi_random_samplers:
-      raise ValueError(f'The sampler {kwargs["sampler"]} does not exist')
+    elif opts["sampler"] not in possible_quasi_random_samplers:
+      raise ValueError(f'The sampler {opts["sampler"]} does not exist')
     else:
-      self._quasi_random_sampler_opts = kwargs
+      self._quasi_random_sampler_opts = opts
 
   def get_quasi_random_sampler_opts(self):
     """Recover the dictionary of options for the quasi random sampler."""
@@ -127,11 +134,13 @@ class ContinuousDomain(object):
     if not self.is_constrained:
       return numpy.any(numpy.abs(point - self.domain_bounds.T) <= tol)
 
+    assert self._halfspaces is not None
     return any(numpy.abs(numpy.dot(self._halfspaces[:, :-1], point) + self._halfspaces[:, -1]) <= tol)
 
   def check_point_satisfies_constraints(self, point):
     if not self.is_constrained:
       return True
+    assert self._halfspaces is not None
     A = self._halfspaces[:, :-1]
     b = -self._halfspaces[:, -1]
     return all(list(numpy.dot(A, point) <= b))
@@ -201,6 +210,7 @@ class ContinuousDomain(object):
     if self._quasi_random_sampler_opts.get("sampler") is None:
       raise AttributeError("You must call set_quasi_random_sampler_opts before generating quasi-random points.")
     elif self.is_constrained:
+      assert self._halfspaces is not None
       x0 = self._cheby_center
       A = self._halfspaces[:, :-1]
       b = -self._halfspaces[:, -1]
@@ -251,6 +261,7 @@ class ContinuousDomain(object):
   def restrict_points_using_constraints(self, points, viable_point=None, on_constraint=False):
     if not self.is_constrained:
       return
+    assert self._halfspaces is not None
 
     if viable_point is None or not self.check_point_acceptable(viable_point):
       viable_point = self._cheby_center
@@ -314,13 +325,52 @@ class ContinuousDomain(object):
     return normal_draws
 
 
+class DomainComponent(TypedDict):
+  var_type: Literal["int", "double", "categorical", "quantized"]
+  elements: Sequence[float | int]
+
+
+class DomainConstraint(TypedDict):
+  type: NotRequired[Literal["ineq"]]
+  weights: Sequence[float | int]
+  rhs: float
+  var_type: Literal["int", "double"]
+
+
+class NormalPriorParams(TypedDict):
+  mean: float
+  scale: float
+
+
+class NormalPrior(TypedDict):
+  name: Literal["normal"]
+  params: NormalPriorParams
+
+
+class BetaPriorParams(TypedDict):
+  shape_a: float
+  shape_b: float
+
+
+class BetaPrior(TypedDict):
+  name: Literal["beta"]
+  params: BetaPriorParams
+
+
+AnyPrior = NormalPrior | BetaPrior
+
+
 class CategoricalDomain(object):
+  domain_components: list[DomainComponent]
+  constraint_list: list[DomainConstraint]
+  priors: list[AnyPrior]
+
   def __init__(
     self,
-    domain_components,
-    constraint_list=None,
+    domain_components: Sequence[DomainComponent],
+    constraint_list: Sequence[DomainConstraint] | None = None,
     force_hitandrun_sampling=False,
-    priors=None,
+    priors: Sequence[AnyPrior] | None = None,
   ):
     """Construct a mixed continuous/categorical domain with the specified info.
 
@@ -337,9 +387,9 @@ class CategoricalDomain(object):
         """
     assert constraint_list or not force_hitandrun_sampling
     self._verify_domain_components(domain_components, constraint_list, priors)
-    self.domain_components = copy.deepcopy(domain_components)
-    self.constraint_list = copy.deepcopy(constraint_list or [])
-    self.priors = copy.deepcopy(priors or [])
+    self.domain_components = [copy.deepcopy(c) for c in domain_components]
+    self.constraint_list = [copy.deepcopy(c) for c in constraint_list] if constraint_list else []
+    self.priors = [copy.deepcopy(p) for p in priors] if priors else []
 
     self.one_hot_domain, self.one_hot_to_categorical_mapping = self.form_one_hot_domain(self.domain_components)
     self.one_hot_domain.force_hitandrun_sampling = force_hitandrun_sampling
@@ -460,8 +510,8 @@ class CategoricalDomain(object):
     ]
 
   def _form_constrained_variable_indices(self):
-    constrained_integer_indices = []
-    constrained_double_indices = []
+    constrained_integer_indices: list[int] = []
+    constrained_double_indices: list[int] = []
     if self.constraint_list:
       for constraint in self.constraint_list:
         if constraint["var_type"] == DOUBLE_EXPERIMENT_PARAMETER_NAME:
@@ -557,7 +607,7 @@ class CategoricalDomain(object):
     points = self.map_categorical_points_to_enumeration(test_points)
     compare_points = None if compare_points is None else self.map_categorical_points_to_enumeration(compare_points)
 
-    scaling_vector = []
+    scaling_vector: list[float] = []
     for dc in self.domain_components:
       if dc["var_type"] == CATEGORICAL_EXPERIMENT_PARAMETER_NAME:
         scaling_vector.append(len(dc["elements"]))
@@ -864,7 +914,7 @@ class CategoricalDomain(object):
     categorical_points = []
     for one_hot_point in one_hot_points:
       assert len(one_hot_point) == self.one_hot_dim
-      this_cat_point = [None] * self.dim
+      this_cat_point: list[int | None] = [None] * self.dim
       for this_cat_dim_map in self.one_hot_to_categorical_mapping:
         if this_cat_dim_map["var_type"] == DOUBLE_EXPERIMENT_PARAMETER_NAME:
           this_cat_point[this_cat_dim_map["output_ind"]] = one_hot_point[this_cat_dim_map["input_ind"]]
@@ -878,8 +928,9 @@ class CategoricalDomain(object):
           one_hot_indexes, categories = zip(*this_cat_dim_map["input_ind_value_map"].items())
           values = one_hot_point[numpy.array(one_hot_indexes, dtype=int)]
           this_cat_point[this_cat_dim_map["output_ind"]] = numpy.random.choice(categories, p=rel_prob_func(values))
-      assert not any(p is None for p in this_cat_point)
-      categorical_points.append(this_cat_point)
+      not_none_points = [p for p in this_cat_point if p is not None]
+      assert len(not_none_points) == self.dim
+      categorical_points.append(not_none_points)
     return numpy.array(categorical_points, dtype=float)
 
   def round_one_hot_points_integer_values(self, one_hot_points):

@@ -31,9 +31,9 @@ MINIMUM_KRIGING_VARIANCE = 1e-100  # Just something really small
 
 @dataclass(frozen=True, slots=True)
 class PosteriorCoreComponents:
-  K_eval: numpy.ndarray
-  grad_K_eval: numpy.ndarray
-  cardinal_functions_at_points_to_sample: numpy.ndarray
+  K_eval: numpy.ndarray | None
+  grad_K_eval: numpy.ndarray | None
+  cardinal_functions_at_points_to_sample: numpy.ndarray | None
 
 
 class GaussianProcess(Predictor):
@@ -172,6 +172,7 @@ class GaussianProcess(Predictor):
       self.K_inv_P = cho_solve(self.K_chol, self.P)
       PT_K_inv_P = numpy.dot(self.P.T, self.K_inv_P)
       self.PKP_chol = cho_factor(PT_K_inv_P, lower=True, overwrite_a=True)
+      assert self.K_inv_y is not None
       self.poly_coef = cho_solve(self.PKP_chol, numpy.dot(self.P.T, self.K_inv_y))
       nonzero_gp_mean = numpy.dot(self.P, self.poly_coef)
       self.demeaned_y = self.points_sampled_value - nonzero_gp_mean
@@ -184,6 +185,7 @@ class GaussianProcess(Predictor):
       if option == "all":
         cardinal_functions_at_points_to_sample = cho_solve(self.K_chol, K_eval.T).T
     if option in ("grad_K_eval", "all"):
+      assert isinstance(self.covariance, DifferentiableCovariance)
       grad_K_eval = self.covariance.build_kernel_grad_tensor(self.points_sampled, points_to_sample=points_to_sample)
     return PosteriorCoreComponents(K_eval, grad_K_eval, cardinal_functions_at_points_to_sample)
 
@@ -199,6 +201,8 @@ class GaussianProcess(Predictor):
 
   def _compute_mean_of_points(self, points_to_sample, K_eval):
     P_eval = build_polynomial_matrix(self.mean_poly_indices, points_to_sample)
+    assert self.K_inv_demeaned_y is not None
+    assert self.poly_coef is not None
     return numpy.dot(K_eval, self.K_inv_demeaned_y) + numpy.dot(P_eval, self.poly_coef)
 
   def compute_variance_of_points(self, points_to_sample):
@@ -215,6 +219,7 @@ class GaussianProcess(Predictor):
   def _compute_variance_of_points(self, points_to_sample, K_eval, cardinal_functions_at_points_to_sample=None):
     K_x_x_array = self.covariance.covariance(points_to_sample, points_to_sample)
     if cardinal_functions_at_points_to_sample is None:
+      assert self.K_chol is not None
       V = solve_triangular(
         self.K_chol[0],
         K_eval.T,
@@ -238,6 +243,8 @@ class GaussianProcess(Predictor):
     return self._compute_grad_mean_of_points(points_to_sample, posterior_core_components.grad_K_eval)
 
   def _compute_grad_mean_of_points(self, points_to_sample, grad_K_eval):
+    assert self.K_inv_demeaned_y is not None
+    assert self.poly_coef is not None
     grad_P_eval = build_grad_polynomial_tensor(self.mean_poly_indices, points=points_to_sample)
     return numpy.einsum("ijk, j", grad_K_eval, self.K_inv_demeaned_y) + numpy.einsum(
       "ijk, j", grad_P_eval, self.poly_coef
@@ -280,6 +287,7 @@ class GaussianProcess(Predictor):
     if self.num_sampled == 0:
       return numpy.diag(numpy.diag(K_eval_var))
 
+    assert self.K_chol is not None
     K_eval = self.covariance.build_kernel_matrix(self.points_sampled, points_to_sample=points_to_sample)
     V = solve_triangular(
       self.K_chol[0],

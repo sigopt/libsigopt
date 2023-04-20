@@ -7,6 +7,7 @@ import numpy
 from scipy.stats import multivariate_normal, norm
 
 from libsigopt.compute.acquisition_function import AcquisitionFunction
+from libsigopt.compute.gaussian_process import GaussianProcess
 from libsigopt.compute.probabilistic_failures import ProbabilisticFailuresBase, ProductOfListOfProbabilisticFailures
 from libsigopt.compute.python_utils import compute_cholesky_for_gp_sampling
 
@@ -26,10 +27,12 @@ MINIMUM_ACCEPTABLE_FAILURE_BEST_POINT_PROBABILITY = 0.5
 @dataclass(frozen=True, slots=True)
 class PenaltyComponents:
   penalty: numpy.ndarray
-  grad_penalty: numpy.ndarray
+  grad_penalty: numpy.ndarray | None
 
 
 class ExpectedImprovement(AcquisitionFunction):
+  predictor: GaussianProcess
+
   def _evaluate_at_point_list(self, points_to_evaluate):
     return self._evaluate_at_point_list_normalized(self.compute_core_components(points_to_evaluate, "func"))
 
@@ -221,7 +224,7 @@ class ExpectedParallelImprovement(AcquisitionFunction):
     num_mc_iterations_executed = 0
     while num_mc_iterations_executed < self.num_mc_iterations:
       normals = numpy.random.normal(size=(num_mc_iterations_per_loop, covariance_size))
-      posterior_predictions = numpy.tensordot(chol_cov_tensor, normals, [[1], [1]])
+      posterior_predictions = numpy.tensordot(chol_cov_tensor, normals, axes=([1], [1]))
       posterior_predictions[:num_to_sample, :, :] += self.best_value - mean_to_evaluate[:, :, None]
 
       if self.num_points_being_sampled:
@@ -243,6 +246,7 @@ class ExpectedParallelImprovement(AcquisitionFunction):
     mu_star = self.predictor.compute_mean_of_points(union_of_points)
     var_star = self.predictor.compute_covariance_of_points(union_of_points)
     num_points = len(mu_star)
+    assert self.best_value is not None
     best_so_far = self.best_value
 
     def singlevar_norm_pdf(mean, var, param):
@@ -413,7 +417,7 @@ class ExpectedParallelImprovementWithFailures(ExpectedParallelImprovement):
     while num_mc_iterations_executed < self.num_mc_iterations:
       normals = numpy.random.normal(size=(num_mc_iterations_per_loop, covariance_size))
 
-      posterior_predictions = numpy.tensordot(chol_cov_tensor, normals, [[1], [1]])
+      posterior_predictions = numpy.tensordot(chol_cov_tensor, normals, ([1], [1]))
       posterior_predictions[: self.num_points_to_sample, :, :] += mean_to_evaluate[:, :, None]
       # TODO(RTL-36): investigate if these can be rewritten to be more efficient.
       if self.num_points_being_sampled:
@@ -428,7 +432,7 @@ class ExpectedParallelImprovementWithFailures(ExpectedParallelImprovement):
         )
       )
       for i, pf in enumerate(self.failure_model.list_of_probabilistic_failures):
-        posterior_predictions_failures[i] = numpy.tensordot(chol_cov_tensor_failures[i], normals, [[1], [1]])
+        posterior_predictions_failures[i] = numpy.tensordot(chol_cov_tensor_failures[i], normals, ([1], [1]))
         posterior_predictions_failures[i, : self.num_points_to_sample, :, :] += mean_to_evaluate_failures[i, :, :, None]
         if self.num_points_being_sampled:
           posterior_predictions_failures[i, -self.num_points_being_sampled :, :, :] += mean_being_sampled_failures[

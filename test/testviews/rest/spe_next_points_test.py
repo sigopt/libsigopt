@@ -7,13 +7,7 @@ from flaky import flaky
 from testviews.zigopt_input_utils import ZigoptSimulator
 
 from libsigopt.aux.adapter_info_containers import MetricsInfo
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-  ParameterPriorNames,
-)
-from libsigopt.compute.domain import CategoricalDomain
+from libsigopt.compute.domain import BetaPrior, CategoricalDomain, DomainComponent, DomainConstraint, NormalPrior
 from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
 from libsigopt.views.rest.spe_next_points import (
   COMPLETION_PHASE,
@@ -125,23 +119,23 @@ class TestSPENextPointsViews(object):
     num_optimized_metrics,
     num_being_sampled,
   ):
-    domain_components = [
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 5]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3, 1]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 3, 5]},
+    domain_components: list[DomainComponent] = [
+      {"var_type": "double", "elements": [0, 2]},
+      {"var_type": "double", "elements": [0, 5]},
+      {"var_type": "double", "elements": [-3, 1]},
+      {"var_type": "int", "elements": [3, 8]},
+      {"var_type": "categorical", "elements": [1, 3, 5]},
     ]
-    constraint_list = [
+    constraint_list: list[DomainConstraint] = [
       {
         "weights": [1, 1, 0, 0, 0],
         "rhs": 1,
-        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        "var_type": "double",
       },
       {
         "weights": [1, 1, 1, 0, 0],
         "rhs": 2,
-        "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+        "var_type": "double",
       },
     ]
     domain = CategoricalDomain(domain_components, constraint_list)
@@ -462,18 +456,18 @@ class TestSPENextPointsViews(object):
   ):  # Check that priors are used in spe_next_points initialization
     n_samples = 500
     zs = ZigoptSimulator(dim=2, num_sampled=10, num_to_sample=n_samples)
-    peaky_normal_prior = {
-      "name": ParameterPriorNames.NORMAL,
-      "params": {"mean": -100, "scale": 0.001},
-    }
-    heavy_tailed_beta_prior = {
-      "name": ParameterPriorNames.BETA,
-      "params": {"shape_a": 2, "shape_b": 50},
-    }
+    peaky_normal_prior = NormalPrior(
+      name="normal",
+      params={"mean": -100, "scale": 0.001},
+    )
+    heavy_tailed_beta_prior = BetaPrior(
+      name="beta",
+      params={"shape_a": 2, "shape_b": 50},
+    )
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-200, 0]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]},
+        {"var_type": "double", "elements": [-200, 0]},
+        {"var_type": "double", "elements": [0, 1]},
       ],
       priors=[
         peaky_normal_prior,

@@ -5,7 +5,6 @@ import numpy
 import pytest
 from testviews.zigopt_input_utils import form_points_sampled, form_random_hyperparameter_dict
 
-from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import SquareExponential
 from libsigopt.compute.domain import CategoricalDomain, ContinuousDomain
 from libsigopt.compute.gaussian_process import GaussianProcess
@@ -32,31 +31,28 @@ def fill_random_domain_bounds(lower_bound_interval, upper_bound_interval, dim):
   return domain_bounds
 
 
-GP_FIXTURE_SCOPE = "module"
-
-
 class GaussianProcessTestCase(NumericalTestCase):
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def domain_list(self):
     dim_list = [1, 3, 5, 9]
     return [self.form_continous_and_uniform_domain(dim=dim, lower_element=-1, higher_element=1) for dim in dim_list]
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def one_hot_domain_list(self, domain_list):
     return [domain.one_hot_domain for domain in domain_list]
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def any_domain_list(self):
     random_dim_list = sorted(numpy.random.choice(range(2, 25), 10, replace=False))
     return [
       self.form_continous_and_uniform_domain(dim=dim, lower_element=-1, higher_element=1) for dim in random_dim_list
     ]
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def any_one_hot_domain_list(self, any_domain_list):
     return [domain.one_hot_domain for domain in any_domain_list]
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def gaussian_process_list(self, domain_list):
     num_sampled = [4, 8, 15, 16]
     return [
@@ -64,22 +60,28 @@ class GaussianProcessTestCase(NumericalTestCase):
       for domain, num_sampled in zip(domain_list, num_sampled)
     ]
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def any_gaussian_process_list(self, any_domain_list):
-    return [self.form_gaussian_process_and_data(domain, num_sampled) for num_sampled, domain in zip(any_domain_list)]
+    return [  # type: ignore
+      self.form_gaussian_process_and_data(
+        domain,  # type: ignore
+        num_sampled,  # type: ignore
+      )
+      for num_sampled, domain in zip(any_domain_list)
+    ]
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def gaussian_process_and_domain(self):
     dim = numpy.random.randint(1, 9)
     domain = self.form_continous_and_uniform_domain(dim)
     gaussian_process = self.form_gaussian_process_and_data(domain)
     return gaussian_process, domain
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def deterministic_gaussian_process(self):
     return self.form_deterministic_gaussian_process(dim=3, num_sampled=10)
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def probabilistic_failures_list(self, gaussian_process_list):
     pf_list = []
     for gp in gaussian_process_list:
@@ -90,7 +92,7 @@ class GaussianProcessTestCase(NumericalTestCase):
       pf_list.append(pf)
     return pf_list
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE, params=[True, False])
+  @pytest.fixture(scope="module", params=[True, False])
   def list_probabilistic_failures_list(self, request, domain_list):
     num_gps_list = [1, 2, 4, 8]
     num_sampled_list = [8, 14, 26, 48]
@@ -99,7 +101,7 @@ class GaussianProcessTestCase(NumericalTestCase):
       for domain, num_sampled, num_gp in zip(domain_list, num_gps_list, num_sampled_list)
     ]
 
-  @pytest.fixture(scope=GP_FIXTURE_SCOPE)
+  @pytest.fixture(scope="module")
   def product_of_list_probabilistic_failures_list(self, list_probabilistic_failures_list):
     return [ProductOfListOfProbabilisticFailures(list_of_pfs) for list_of_pfs in list_probabilistic_failures_list]
 
@@ -108,7 +110,7 @@ class GaussianProcessTestCase(NumericalTestCase):
     return CategoricalDomain(
       [
         {
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
           "elements": [lower_element, higher_element],
         }
       ]

@@ -18,9 +18,12 @@ MINIMUM_METRIC_HALF_WIDTH = 1.0e-8
 
 
 class MetricMidpointInfo(object):
+  midpoint: numpy.ndarray
+  scale: numpy.ndarray
+  negate: numpy.ndarray
+
   def __init__(self):
     self.force_skip = False
-    self.midpoint = self.scale = self.negate = None
 
   def __repr__(self):
     return f"{self.__class__.__name__}(mid={self.midpoint}, scale={self.scale}, skip={self.skip})"

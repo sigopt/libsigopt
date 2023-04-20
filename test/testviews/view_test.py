@@ -6,13 +6,7 @@ import pytest
 from testviews.zigopt_input_utils import ZigoptSimulator, form_points_sampled
 
 from libsigopt.aux.adapter_info_containers import MetricsInfo
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-  PARALLEL_CONSTANT_LIAR,
-  PARALLEL_QEI,
-)
+from libsigopt.aux.constant import PARALLEL_CONSTANT_LIAR, PARALLEL_QEI
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import CONSTANT_LIAR_MIN, NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import MultiMetricMidpointInfo, SingleMetricMidpointInfo
@@ -32,19 +26,19 @@ from testaux.numerical_test_case import NumericalTestCase
 class TestView(NumericalTestCase):
   mixed_domain = CategoricalDomain(
     [
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [3, -1, 5]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [1, 5]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-1, 7]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [11, 22]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 2, 6, 9]},
+      {"var_type": "categorical", "elements": [3, -1, 5]},
+      {"var_type": "int", "elements": [1, 5]},
+      {"var_type": "double", "elements": [-1, 7]},
+      {"var_type": "int", "elements": [11, 22]},
+      {"var_type": "double", "elements": [-11.1, 4.234]},
+      {"var_type": "categorical", "elements": [1, 2, 6, 9]},
     ]
   )
 
   metrics_info = MetricsInfo(
     requires_pareto_frontier_optimization=True,
     observation_budget=numpy.random.randint(40, 100),
-    user_specified_thresholds=(None, None),
+    user_specified_thresholds=[None, None],
     objectives=["maximize", "minimize"],
     optimized_metrics_index=[0, 1],
     constraint_metrics_index=[],

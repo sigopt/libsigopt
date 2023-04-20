@@ -3,35 +3,29 @@
 # SPDX-License-Identifier: Apache License 2.0
 import numpy
 
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-  QUANTIZED_EXPERIMENT_PARAMETER_NAME,
-)
-from libsigopt.compute.domain import CategoricalDomain
+from libsigopt.compute.domain import CategoricalDomain, DomainComponent, DomainConstraint
 
 
 def form_random_unconstrained_categorical_domain(dim, categoricals_allowed=True, quantized_allowed=True):
-  domain_components = []
+  domain_components: list[DomainComponent] = []
   for _ in range(dim):
     if numpy.random.random() < 0.1 and quantized_allowed:
       domain_components.append(
         {
-          "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "quantized",
           "elements": list(sorted(numpy.random.choice(50, 4, replace=False) / 10 - 2.2)),
         }
       )
     elif numpy.random.random() < 0.25 and categoricals_allowed:
       domain_components.append(
         {
-          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "categorical",
           "elements": list(range(numpy.random.randint(2, 5))),
         }
       )
     elif numpy.random.random() < 0.5:
       bounds = [numpy.random.randint(-10, 0), numpy.random.randint(0, 10)]
-      domain_components.append({"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": bounds})
+      domain_components.append({"var_type": "int", "elements": bounds})
     else:
       random_number = numpy.random.random()
       if random_number < 0.333:
@@ -42,7 +36,7 @@ def form_random_unconstrained_categorical_domain(dim, categoricals_allowed=True,
         random_values = numpy.random.uniform(-34567, 12345, size=(2,))
       domain_components.append(
         {
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
           "elements": sorted(random_values),
         }
       )
@@ -63,32 +57,33 @@ def form_random_constrained_categorical_domain(n_double_param=5, n_int_param=5, 
   idx_quantized = idx_shuffled[n_double_param + n_int_param + n_cat_param :]
 
   # Form domain components
-  domain_components = [None] * dim
+  domain_components: list[DomainComponent] = []
   for i in idx_double:
     bounds = [0, numpy.random.randint(1, 5)]
     domain_components[i] = {
-      "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+      "var_type": "double",
       "elements": bounds,
     }
   for i in idx_int:
     bounds = [5, numpy.random.randint(10, 20)]
     domain_components[i] = {
-      "var_type": INT_EXPERIMENT_PARAMETER_NAME,
+      "var_type": "int",
       "elements": bounds,
     }
   for i in idx_cat:
     domain_components[i] = {
-      "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+      "var_type": "categorical",
       "elements": list(range(numpy.random.randint(2, 5))),
     }
   for i in idx_quantized:
     domain_components[i] = {
-      "var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME,
+      "var_type": "quantized",
       "elements": list(sorted(numpy.random.choice(50, 4, replace=False) / 10 - 2.2)),
     }
+  assert len(domain_components) == dim
 
   # Form constraints
-  constraint_list = []
+  constraint_list: list[DomainConstraint] = []
   constraint_weights_int = [0] * dim
   idx_constraint = numpy.random.choice(idx_int, 2, replace=False)
   for i in idx_constraint:
@@ -105,7 +100,7 @@ def form_random_constrained_categorical_domain(n_double_param=5, n_int_param=5, 
     {"weights": constraint_weights_int, "rhs": 12, "var_type": "int"},
   )
 
-  constraint_weights_double = [0] * dim
+  constraint_weights_double = [0.0] * dim
   idx_constraint = numpy.random.choice(idx_double, 2, replace=False)
   for i in idx_constraint:
     constraint_weights_double[i] = -1
@@ -113,7 +108,7 @@ def form_random_constrained_categorical_domain(n_double_param=5, n_int_param=5, 
     {"weights": constraint_weights_double, "rhs": -1.5, "var_type": "double"},
   )
 
-  constraint_weights_double = [0] * dim
+  constraint_weights_double = [0.0] * dim
   idx_constraint = numpy.random.choice(idx_double, 2, replace=False)
   for i in idx_constraint:
     constraint_weights_double[i] = 1

@@ -1,6 +1,7 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
+import random
 
 import numpy
 import pytest
@@ -28,10 +29,10 @@ class TestSigoptParzenEstimator(NumericalTestCase):
   def form_multimetric_info(self):
     def _form_multimetric_info(method_name):
       if method_name == CONVEX_COMBINATION:
-        phase = numpy.random.choice([CONVEX_COMBINATION_RANDOM_SPREAD, CONVEX_COMBINATION_SEQUENTIAL])
+        phase = random.choice([CONVEX_COMBINATION_RANDOM_SPREAD, CONVEX_COMBINATION_SEQUENTIAL])
         phase_kwargs = {"fraction_of_phase_completed": numpy.random.random()}
       elif method_name == EPSILON_CONSTRAINT:
-        phase = numpy.random.choice(
+        phase = random.choice(
           [
             EPSILON_CONSTRAINT_OPTIMIZE_0,
             EPSILON_CONSTRAINT_OPTIMIZE_1,
@@ -39,7 +40,7 @@ class TestSigoptParzenEstimator(NumericalTestCase):
         )
         phase_kwargs = {"fraction_of_phase_completed": numpy.random.random()}
       elif method_name == OPTIMIZING_ONE_METRIC:
-        phase = numpy.random.choice(
+        phase = random.choice(
           [
             OPTIMIZING_ONE_METRIC_OPTIMIZE_0,
             OPTIMIZING_ONE_METRIC_OPTIMIZE_1,
@@ -163,6 +164,8 @@ class TestSigoptParzenEstimator(NumericalTestCase):
       points_sorted[: len(points_sorted) // 2],
       points_sorted[len(points_sorted) // 2 :],
     )
+    assert spe.lower_points is not None
+    assert spe.greater_points is not None
     assert sorted([tuple(l) for l in spe.lower_points]) == sorted([tuple(l) for l in lower])
     assert sorted([tuple(l) for l in spe.greater_points]) == sorted([tuple(l) for l in greater])
 
@@ -240,6 +243,8 @@ class TestSigoptParzenEstimator(NumericalTestCase):
       points_sampled_values,
       gamma,
     )
+    assert spe.lower_points is not None
+    assert spe.greater_points is not None
     old_num_lower_points = len(spe.lower_points)
     old_num_greater_points = len(spe.greater_points)
     points_being_sampled_points = domain.generate_quasi_random_points_in_domain(15)

@@ -7,10 +7,10 @@ import numpy
 
 from libsigopt.compute.misc.constant import CATEGORICAL_POINT_UNIQUENESS_TOLERANCE, DEFAULT_MAX_SIMULTANEOUS_EI_POINTS
 from libsigopt.compute.optimization_auxiliary import DEParameters, OptimizerInfo
-from libsigopt.compute.search import ProbabilityOfImprovementSearch, SearchAcquisitionFunction
+from libsigopt.compute.search import ProbabilityOfImprovementSearch
 from libsigopt.compute.vectorized_optimizers import DEOptimizer
 from libsigopt.views.rest.gp_next_points_categorical import GpNextPointsCategorical, convert_from_one_hot
-from libsigopt.views.view import GPView
+from libsigopt.views.view import _UNSET_CLS, GPView
 
 
 RESOLVE_PHASE_PROB = 0.8
@@ -40,10 +40,10 @@ def get_distance_parameter(dim):
 
 
 def search_strategy_optimization(
-  acquisition_function,
+  acquisition_function: ProbabilityOfImprovementSearch,
   num_to_sample,
 ):
-  assert isinstance(acquisition_function, SearchAcquisitionFunction)
+  assert isinstance(acquisition_function, ProbabilityOfImprovementSearch)
   domain = acquisition_function.domain
   initial_repulsor_points = numpy.copy(acquisition_function.repulsor_points)
   initial_distance_parameter = acquisition_function.distance_parameter
@@ -58,7 +58,7 @@ def search_strategy_optimization(
       batch_size=DEFAULT_MAX_SIMULTANEOUS_EI_POINTS,
     )
     best_af_location = pretest_locations[numpy.argmax(random_af_values), :]
-    search_optimizer = DEFAULT_SEARCH_OPTIMIZER_INFO.optimizer(
+    search_optimizer = DEOptimizer(
       domain=domain.one_hot_domain,
       acquisition_function=acquisition_function,
       num_multistarts=DEFAULT_SEARCH_OPTIMIZER_INFO.num_multistarts,
@@ -125,6 +125,7 @@ class SearchNextPoints(GPView):
     return proposed_next_points
 
   def search_next_points_expected_improvement_with_failures(self):
+    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
     if len(self.constraint_metrics_index) == 1:
       return self.search_next_points_expected_improvement()
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
@@ -135,6 +136,7 @@ class SearchNextPoints(GPView):
     return GpNextPointsCategorical(view_input).view()
 
   def search_next_points_expected_improvement(self):
+    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
     view_input = deepcopy(self.params)
     view_input["metrics_info"].optimized_metrics_index = [optimized_metric]

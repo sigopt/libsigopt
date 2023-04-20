@@ -15,7 +15,7 @@ known_first_party="libsigopt"
 known_third_party="numpy"
 line_length=120
 lines_after_imports=2
-sections="STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER,TEST"
+sections="FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER,TEST"
 use_parentheses=true
 
 # Prefer Vertical Hanging Indent style (3)

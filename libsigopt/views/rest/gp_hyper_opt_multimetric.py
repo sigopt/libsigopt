@@ -7,12 +7,11 @@ import numpy
 
 from libsigopt.aux.constant import (
   CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
   INT_EXPERIMENT_PARAMETER_NAME,
   MINIMUM_VALUE_VAR,
   QUANTIZED_EXPERIMENT_PARAMETER_NAME,
 )
-from libsigopt.compute.domain import CategoricalDomain
+from libsigopt.compute.domain import CategoricalDomain, DomainComponent
 from libsigopt.compute.log_likelihood import GaussianProcessLogMarginalLikelihood
 from libsigopt.compute.misc.constant import (
   DEFAULT_COVARIANCE_KERNEL,
@@ -23,7 +22,7 @@ from libsigopt.compute.misc.constant import (
 from libsigopt.compute.misc.data_containers import HistoricalData
 from libsigopt.compute.optimization import MultistartOptimizer, SLSQPOptimizer
 from libsigopt.compute.optimization_auxiliary import OptimizerInfo, SLSQPParameters
-from libsigopt.views.view import GPView
+from libsigopt.views.view import _UNSET_CLS, GPView
 
 
 SELECT_HYPER_OPT_IN_LOG_DOMAIN = False
@@ -92,8 +91,8 @@ def form_one_hot_hyperparameter_domain(
     for these_elements in hyperparameter_domain_elements:
       these_elements[0], these_elements[1] = numpy.log(these_elements)
 
-  domain_components = [
-    {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": e} for e in hyperparameter_domain_elements
+  domain_components: list[DomainComponent] = [
+    {"var_type": "double", "elements": e} for e in hyperparameter_domain_elements
   ]
   return CategoricalDomain(domain_components).one_hot_domain
 
@@ -115,6 +114,7 @@ class GpHyperOptMultimetricView(GPView):
     successful_indexes = numpy.logical_not(self.points_sampled_failures)
     one_hot_points_sampled_points = self.one_hot_points_sampled_points[successful_indexes, :]
     if self.has_optimization_metrics:
+      assert not isinstance(self.optimized_metrics_index, _UNSET_CLS)
       for i, index in enumerate(self.optimized_metrics_index):
         points_sampled_values = self.points_sampled_for_af_values[successful_indexes, i]
         if self.should_skip_hyperopt(points_sampled_values):
@@ -129,6 +129,7 @@ class GpHyperOptMultimetricView(GPView):
         )
 
     if self.has_constraint_metrics:
+      assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
       for i, index in enumerate(self.constraint_metrics_index):
         points_sampled_values = self.points_sampled_for_pf_values[successful_indexes, i]
         if self.should_skip_hyperopt(points_sampled_values):

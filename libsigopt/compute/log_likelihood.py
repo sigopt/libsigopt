@@ -141,12 +141,14 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
 
         """
     assert self.gp.K_inv_demeaned_y is not None
+    assert self.gp.K_chol is not None
 
     gp_params = None
     if not self.gp.has_zero_mean and include_nonzero_correction:
       assert self.gp.P is not None
       assert self.gp.K_inv_P is not None
-      gp_params = self.gp.P, self.gp.K_inv_P, self.gp.K_inv_demeaned_y
+      assert self.gp.PKP_chol is not None
+      gp_params = self.gp.P, self.gp.K_inv_P, self.gp.PKP_chol
 
     grad_hyperparameter_cov_tensor = self.covariance.build_kernel_hparam_grad_tensor(self.gp.points_sampled)
     if self.use_auto_noise:

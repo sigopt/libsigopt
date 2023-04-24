@@ -11,7 +11,6 @@ from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import CONSTANT_LIAR_MIN, NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import MultiMetricMidpointInfo, SingleMetricMidpointInfo
 from libsigopt.views.view import (
-  _UNSET,
   GPView,
   View,
   filter_points_sampled,
@@ -67,8 +66,8 @@ class TestView(NumericalTestCase):
     assert (mps_value_vars == ps.value_vars).all()
     assert (mps_failures == ps.failures).all()
     assert (mps_task_costs == ps.task_costs).all()
-    assert mps_constraint_values is _UNSET
-    assert mps_constraint_value_vars is _UNSET
+    assert mps_constraint_values is None
+    assert mps_constraint_value_vars is None
 
   def test_form_metric_midpoint_info(self):
     ps = form_points_sampled(
@@ -292,11 +291,11 @@ class TestView(NumericalTestCase):
     view_input, _ = zigopt_simulator.form_search_next_points_categorical_inputs(parallelism_method)
     view = View(view_input)
     assert not view.has_optimization_metrics
-    assert view.optimized_metrics_objectives is _UNSET
-    assert view.optimized_metrics_index is _UNSET
-    assert view.optimized_metrics_thresholds is _UNSET
-    assert view.points_sampled_for_af_values is _UNSET
-    assert view.points_sampled_for_af_value_vars is _UNSET
+    assert view.optimized_metrics_objectives is None
+    assert view.optimized_metrics_index is None
+    assert view.optimized_metrics_thresholds is None
+    assert view.points_sampled_for_af_values is None
+    assert view.points_sampled_for_af_value_vars is None
 
   @pytest.mark.parametrize("dim", [7])
   @pytest.mark.parametrize("num_sampled", [27])

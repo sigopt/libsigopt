@@ -10,7 +10,7 @@ from libsigopt.compute.optimization_auxiliary import DEParameters, OptimizerInfo
 from libsigopt.compute.search import ProbabilityOfImprovementSearch
 from libsigopt.compute.vectorized_optimizers import DEOptimizer
 from libsigopt.views.rest.gp_next_points_categorical import GpNextPointsCategorical, convert_from_one_hot
-from libsigopt.views.view import _UNSET_CLS, GPView
+from libsigopt.views.view import GPView
 
 
 RESOLVE_PHASE_PROB = 0.8
@@ -86,7 +86,8 @@ def identify_search_phase(
 ):
   INITIALIZATION_FRACTION = 0.2
   EXPLOITATION_FRACTION = 0.4
-  adjusted_budget = max(observation_budget - failure_count, max(num_open_suggestions, 1))
+  bounded_below_num_open_suggestions = max(num_open_suggestions, 1)
+  adjusted_budget = max(observation_budget - failure_count, bounded_below_num_open_suggestions)
   fraction_served = (observation_count + num_open_suggestions) / adjusted_budget
 
   if fraction_served <= INITIALIZATION_FRACTION:
@@ -125,7 +126,7 @@ class SearchNextPoints(GPView):
     return proposed_next_points
 
   def search_next_points_expected_improvement_with_failures(self):
-    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
+    assert self.constraint_metrics_index is not None
     if len(self.constraint_metrics_index) == 1:
       return self.search_next_points_expected_improvement()
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
@@ -136,7 +137,7 @@ class SearchNextPoints(GPView):
     return GpNextPointsCategorical(view_input).view()
 
   def search_next_points_expected_improvement(self):
-    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
+    assert self.constraint_metrics_index is not None
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
     view_input = deepcopy(self.params)
     view_input["metrics_info"].optimized_metrics_index = [optimized_metric]

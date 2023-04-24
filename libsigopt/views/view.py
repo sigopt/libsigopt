@@ -50,11 +50,6 @@ from libsigopt.compute.probabilistic_failures import (
 from libsigopt.compute.python_utils import validate_polynomial_indices
 
 
-class _UNSET_CLS:
-  pass
-
-
-_UNSET = _UNSET_CLS()
 # Level of noise at which Augmented Expected Improvement should be used
 AUGMENTED_EI_THRESHOLD = 1e-7
 
@@ -69,10 +64,10 @@ def filter_points_sampled(points_sampled, metrics_info):
 
   return (
     points_sampled.points,
-    points_sampled.values[:, optimized_metrics_index] if has_optimization_metrics else _UNSET,
-    points_sampled.value_vars[:, optimized_metrics_index] if has_optimization_metrics else _UNSET,
-    points_sampled.values[:, constraint_metrics_index] if has_constraint_metrics else _UNSET,
-    points_sampled.value_vars[:, constraint_metrics_index] if has_constraint_metrics else _UNSET,
+    points_sampled.values[:, optimized_metrics_index] if has_optimization_metrics else None,
+    points_sampled.value_vars[:, optimized_metrics_index] if has_optimization_metrics else None,
+    points_sampled.values[:, constraint_metrics_index] if has_constraint_metrics else None,
+    points_sampled.value_vars[:, constraint_metrics_index] if has_constraint_metrics else None,
     points_sampled.failures,
     points_sampled.task_costs,
   )
@@ -114,8 +109,8 @@ def get_relevant_expected_improvement(predictor):
 
 class View(object):
   view_name: str
-  optimized_metrics_index: list | _UNSET_CLS
-  optimized_metrics_objectives: list | _UNSET_CLS
+  optimized_metrics_index: list | None
+  optimized_metrics_objectives: list | None
   multimetric_info: MultimetricInfo
   constraint_thresholds: numpy.ndarray
 
@@ -128,16 +123,16 @@ class View(object):
     self.task_options = numpy.array(self.params["task_options"])
     self.task_cost_populated = self.task_options.size
 
-    self.optimized_metrics_index = _UNSET
-    self.optimized_metrics_objectives = _UNSET
-    self._mmi = _UNSET
-    self.optimized_metrics_thresholds = _UNSET
-    self.scaled_optimized_lie_values = _UNSET
+    self.optimized_metrics_index = None
+    self.optimized_metrics_objectives = None
+    self._mmi = None
+    self.optimized_metrics_thresholds = None
+    self.scaled_optimized_lie_values = None
 
-    self.constraint_metrics_index = _UNSET
-    self.constraint_metrics_objectives = _UNSET
-    self._constraint_mmi = _UNSET
-    self.scaled_constraint_lie_values = _UNSET
+    self.constraint_metrics_index = None
+    self.constraint_metrics_objectives = None
+    self._constraint_mmi = None
+    self.scaled_constraint_lie_values = None
 
     self.has_optimization_metrics = self.params["metrics_info"].has_optimization_metrics
     self.has_constraint_metrics = self.params["metrics_info"].has_constraint_metrics
@@ -174,8 +169,8 @@ class View(object):
       self.points_sampled_task_costs,
     )
 
-    self._one_hot_points_being_sampled_points = _UNSET
-    self._one_hot_points_to_evaluate_points = _UNSET
+    self._one_hot_points_being_sampled_points = None
+    self._one_hot_points_to_evaluate_points = None
     self.dim_with_task = self.one_hot_points_sampled_points.shape[1]
     assert self.dim_with_task == self.domain.one_hot_dim + (1 if self.task_cost_populated else 0)
 
@@ -184,13 +179,13 @@ class View(object):
   # TODO: these two preprocess functions have a lot of overlap, consolidate this later.
   def _preprocess_optimization_metrics(self):
     self.optimized_metrics_index = self.params["metrics_info"].optimized_metrics_index
-    assert not isinstance(self.optimized_metrics_index, _UNSET_CLS)
+    assert self.optimized_metrics_index is not None
     assert len(self.optimized_metrics_index) >= 1
     self.optimized_metrics_objectives = numpy.asarray(
       self.params["metrics_info"].objectives,
       dtype=str,
     )[self.optimized_metrics_index].tolist()
-    assert not isinstance(self.optimized_metrics_objectives, _UNSET_CLS)
+    assert self.optimized_metrics_objectives is not None
     assert len(self.optimized_metrics_objectives) == len(self.optimized_metrics_index)
     self._mmi = form_metric_midpoint_info(
       self.points_sampled_for_af_values,
@@ -199,7 +194,7 @@ class View(object):
     )
 
     # invert and scale points_sampled_value and points_sampled_value_vars
-    assert not isinstance(self._mmi, _UNSET_CLS)
+    assert self._mmi is not None
     self.scaled_optimized_lie_values = self._mmi.relative_objective_value(
       self._mmi.compute_lie_value(CONSTANT_LIAR_MIN)
     )
@@ -214,7 +209,7 @@ class View(object):
 
   def _preprocess_constraint_metrics(self):
     self.constraint_metrics_index = self.params["metrics_info"].constraint_metrics_index
-    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
+    assert self.constraint_metrics_index is not None
     assert len(self.constraint_metrics_index) >= 1
     self.constraint_metrics_objectives = numpy.asarray(
       self.params["metrics_info"].objectives,
@@ -242,7 +237,7 @@ class View(object):
 
   @property
   def one_hot_points_to_evaluate_points(self):
-    if self._one_hot_points_to_evaluate_points is _UNSET:
+    if self._one_hot_points_to_evaluate_points is None:
       self._one_hot_points_to_evaluate_points = form_one_hot_points_with_tasks(
         self.domain,
         self.params["points_to_evaluate"].points,
@@ -252,7 +247,7 @@ class View(object):
 
   @property
   def one_hot_points_being_sampled_points(self):
-    if self._one_hot_points_being_sampled_points is _UNSET:
+    if self._one_hot_points_being_sampled_points is None:
       self._one_hot_points_being_sampled_points = form_one_hot_points_with_tasks(
         self.domain,
         self.params["points_being_sampled"].points,
@@ -263,11 +258,11 @@ class View(object):
   def create_compute_log_line(self, log_type, content):
     self.log.info(
       "%s",
-      dict(
-        endpoint=self.view_name,
-        type=log_type,
-        content=content,
-      ),
+      {
+        "endpoint": self.view_name,
+        "type": log_type,
+        "content": content,
+      },
     )
 
   def call(self):
@@ -301,11 +296,11 @@ class GPView(View):
   def __init__(self, params, logging_service=None):
     super().__init__(params, logging_service)
     assert isinstance(self.params["model_info"], GPModelInfo)
-    self._polynomial_indices = _UNSET
+    self._polynomial_indices = None
 
   @property
   def polynomial_indices(self):
-    if self._polynomial_indices is _UNSET:
+    if self._polynomial_indices is None:
       self._polynomial_indices = self._compute_polynomial_indices()
     return self._polynomial_indices
 
@@ -386,7 +381,7 @@ class GPView(View):
       self.scaled_optimized_lie_values,
     )
     num_models = filtered_points_sampled_values.ndim
-    assert not isinstance(self.optimized_metrics_index, _UNSET_CLS)
+    assert self.optimized_metrics_index is not None
     if self.multimetric_info.method == CONVEX_COMBINATION:
       gaussian_process_list = []
       for i, metric_index in enumerate(self.optimized_metrics_index):
@@ -418,20 +413,22 @@ class GPView(View):
     return main_gaussian_process
 
   def _form_gp_for_probabilistic_failures(self, relative_index, for_af_values=True):
-    metric_indexes = self.optimized_metrics_index
     points_sampled_values = self.points_sampled_for_af_values
     points_sampled_value_vars = self.points_sampled_for_af_value_vars
     if for_af_values:
       assert relative_index in (0, 1)
-      assert not isinstance(self.scaled_optimized_lie_values, _UNSET_CLS)
+      assert self.scaled_optimized_lie_values is not None
+      assert self.optimized_metrics_index is not None
       scaled_lie_values = self.scaled_optimized_lie_values
+      metric_indexes = self.optimized_metrics_index
     else:
-      assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
+      assert self.constraint_metrics_index is not None
       assert relative_index in range(len(self.constraint_metrics_index))
+      assert self.constraint_metrics_index is not None
       metric_indexes = self.constraint_metrics_index
       points_sampled_values = self.points_sampled_for_pf_values
       points_sampled_value_vars = self.points_sampled_for_pf_value_vars
-      assert not isinstance(self.scaled_constraint_lie_values, _UNSET_CLS)
+      assert self.scaled_constraint_lie_values is not None
       scaled_lie_values = self.scaled_constraint_lie_values
 
     return self.form_single_gaussian_process(
@@ -459,7 +456,7 @@ class GPView(View):
     )
 
     threshold_0 = threshold_1 = None
-    assert not isinstance(self.optimized_metrics_thresholds, _UNSET_CLS)
+    assert self.optimized_metrics_thresholds is not None
     if not numpy.any(numpy.isnan(self.optimized_metrics_thresholds)) and len(self.optimized_metrics_thresholds) == 2:
       threshold_0, threshold_1 = self.optimized_metrics_thresholds
     if constraint_metrics_index == 0:
@@ -486,7 +483,7 @@ class GPView(View):
   def _form_list_of_probabilistic_failures_for_constraint_metrics(self):
     list_of_probabilistic_failures = []
 
-    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
+    assert self.constraint_metrics_index is not None
     for i in range(len(self.constraint_metrics_index)):
       gp = self._form_gp_for_probabilistic_failures(i, for_af_values=False)
       threshold = self.constraint_thresholds[i]

@@ -14,7 +14,7 @@ from libsigopt.views.rest.search_next_points import (
   identify_search_phase,
 )
 from libsigopt.views.rest.spe_next_points import SPE_CAT_LENGTH_SCALE, SPENextPoints
-from libsigopt.views.view import _UNSET_CLS, View, identify_scaled_values_exceeding_scaled_upper_thresholds
+from libsigopt.views.view import View, identify_scaled_values_exceeding_scaled_upper_thresholds
 
 
 class SPESearchNextPoints(View):
@@ -34,7 +34,7 @@ class SPESearchNextPoints(View):
     return results
 
   def single_metric_spe_next_points(self):
-    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
+    assert self.constraint_metrics_index is not None
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
     view_input = deepcopy(self.params)
     view_input["metrics_info"].optimized_metrics_index = [optimized_metric]
@@ -42,7 +42,7 @@ class SPESearchNextPoints(View):
     return SPENextPoints(view_input).view()
 
   def metric_constraints_spe_next_points(self):
-    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
+    assert self.constraint_metrics_index is not None
     if len(self.constraint_metrics_index) == 1:
       return self.single_metric_spe_next_points()
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
@@ -99,7 +99,7 @@ class SPESearchNextPoints(View):
 
   def spe_search_next_points(self):
     num_to_sample = self.params["num_to_sample"]
-    assert not isinstance(self.constraint_metrics_index, _UNSET_CLS)
+    assert self.constraint_metrics_index is not None
     random_pf_metric_index = numpy.random.choice(len(self.constraint_metrics_index))
     sigopt_parzen_estimator = self.form_sigopt_parzen_estimator_for_search(
       self.one_hot_points_sampled_points,

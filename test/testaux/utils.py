@@ -58,51 +58,38 @@ def form_random_constrained_categorical_domain(n_double_param=5, n_int_param=5, 
   idx_quantized = idx_shuffled[n_double_param + n_int_param + n_cat_param :]
 
   # Form domain components
-  domain_components_unsorted: list[tuple[int, DomainComponent]] = []
+  domain_components_maybe_none: list[DomainComponent | None] = [None] * dim
   for i in idx_double:
     bounds = (0, numpy.random.randint(1, 5))
-    domain_components_unsorted.append(
-      (
-        i,
-        {
-          "var_type": "double",
-          "elements": bounds,
-        },
-      )
+    domain_components_maybe_none.append(
+      {
+        "var_type": "double",
+        "elements": bounds,
+      }
     )
   for i in idx_int:
     bounds = (5, numpy.random.randint(10, 20))
-    domain_components_unsorted.append(
-      (
-        i,
-        {
-          "var_type": "int",
-          "elements": bounds,
-        },
-      )
+    domain_components_maybe_none.append(
+      {
+        "var_type": "int",
+        "elements": bounds,
+      }
     )
   for i in idx_cat:
-    domain_components_unsorted.append(
-      (
-        i,
-        {
-          "var_type": "categorical",
-          "elements": list(range(numpy.random.randint(2, 5))),
-        },
-      )
+    domain_components_maybe_none.append(
+      {
+        "var_type": "categorical",
+        "elements": list(range(numpy.random.randint(2, 5))),
+      }
     )
   for i in idx_quantized:
-    domain_components_unsorted.append(
-      (
-        i,
-        {
-          "var_type": "quantized",
-          "elements": list(sorted(numpy.random.choice(50, 4, replace=False) / 10 - 2.2)),
-        },
-      )
+    domain_components_maybe_none.append(
+      {
+        "var_type": "quantized",
+        "elements": list(sorted(numpy.random.choice(50, 4, replace=False) / 10 - 2.2)),
+      }
     )
-  domain_components_unsorted.sort()
-  domain_components = [c for _, c in domain_components_unsorted]
+  domain_components = [c for c in domain_components_maybe_none if c is not None]
   assert len(domain_components) == dim
 
   # Form constraints

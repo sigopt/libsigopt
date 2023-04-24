@@ -85,7 +85,8 @@ def identify_multimetric_phase(
   POLISH_ONE_METRIC_FRAC = CONVEX_SPREAD_FRAC if has_optimized_metric_thresholds else 0.65
   EPSILON_CONSTRAINT_FRAC = 0.95
 
-  adjusted_budget = max(observation_budget - failure_count, max(num_open_suggestions, 1))
+  bounded_below_num_open_suggestions = max(num_open_suggestions, 1)
+  adjusted_budget = max(observation_budget - failure_count, bounded_below_num_open_suggestions)
 
   fraction_served = (observation_count + num_open_suggestions) / adjusted_budget
   fraction_completed = observation_count / adjusted_budget

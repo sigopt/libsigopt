@@ -936,9 +936,9 @@ class CategoricalDomain(object):
           one_hot_indexes, categories = zip(*this_cat_dim_map["input_ind_value_map"].items())
           values = one_hot_point[numpy.array(one_hot_indexes, dtype=int)]
           this_cat_point[this_cat_dim_map["output_ind"]] = numpy.random.choice(categories, p=rel_prob_func(values))
-      not_none_points = [p for p in this_cat_point if p is not None]
-      assert len(not_none_points) == self.dim
-      categorical_points.append(not_none_points)
+      categorical_point = [p for p in this_cat_point if p is not None]
+      assert len(categorical_point) == self.dim
+      categorical_points.append(categorical_point)
     return numpy.array(categorical_points, dtype=float)
 
   def round_one_hot_points_integer_values(self, one_hot_points):

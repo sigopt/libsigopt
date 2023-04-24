@@ -922,7 +922,7 @@ class CategoricalDomain(object):
     categorical_points = []
     for one_hot_point in one_hot_points:
       assert len(one_hot_point) == self.one_hot_dim
-      this_cat_point: list[int | None] = [None] * self.dim
+      this_cat_point: list[float | None] = [None] * self.dim
       for this_cat_dim_map in self.one_hot_to_categorical_mapping:
         if this_cat_dim_map["var_type"] == DOUBLE_EXPERIMENT_PARAMETER_NAME:
           this_cat_point[this_cat_dim_map["output_ind"]] = one_hot_point[this_cat_dim_map["input_ind"]]

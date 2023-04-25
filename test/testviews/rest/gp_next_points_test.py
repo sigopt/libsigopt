@@ -12,8 +12,8 @@ from libsigopt.compute.domain import (
   CategoricalDomain,
   DomainComponent,
   DomainConstraint,
-  GridDomainComponent,
   IntervalDomainComponent,
+  SequentialDomainComponent,
 )
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE
 from libsigopt.compute.misc.data_containers import HistoricalData
@@ -377,7 +377,7 @@ class TestDiscreteNextPointsConversion(NumericalTestCase):
   def test_discrete_conversion_option(self):
     continuous_component = IntervalDomainComponent(var_type="double", elements=(0, 2))
     int_component = IntervalDomainComponent(var_type="int", elements=(3, 8))
-    cat_component = GridDomainComponent(var_type="categorical", elements=[1, 3, 5])
+    cat_component = SequentialDomainComponent(var_type="categorical", elements=[1, 3, 5])
 
     continuous_only_domain = CategoricalDomain([continuous_component] * 5)
     option = get_discrete_conversion_option(continuous_only_domain)

@@ -330,12 +330,12 @@ class IntervalDomainComponent(TypedDict):
   elements: tuple[float, float]
 
 
-class GridDomainComponent(TypedDict):
+class SequentialDomainComponent(TypedDict):
   var_type: Literal["categorical", "quantized"]
   elements: Sequence[float | int]
 
 
-DomainComponent = IntervalDomainComponent | GridDomainComponent
+DomainComponent = IntervalDomainComponent | SequentialDomainComponent
 
 
 class DomainConstraint(TypedDict):

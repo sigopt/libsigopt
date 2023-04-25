@@ -5,13 +5,8 @@ import numpy
 import pytest
 from testviews.zigopt_input_utils import form_random_unconstrained_categorical_domain
 
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-)
 from libsigopt.aux.geometry_utils import compute_distance_matrix_squared
-from libsigopt.compute.domain import CategoricalDomain
+from libsigopt.compute.domain import CategoricalDomain, DomainComponent
 from libsigopt.compute.search import convert_one_hot_to_search_hypercube_points
 from libsigopt.views.rest.multisolution_best_assignments import k_center_clustering
 
@@ -37,10 +32,10 @@ class TestMultisolutionBestAssignments(object):
         k_center_clustering(numpy.random.randn(10, 2), first_center_index=i, k=3)
 
   def test_k_center_clustering_categoricals(self):
-    domain_components = [
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 2]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [3, 8]},
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [1, 5]},
+    domain_components: list[DomainComponent] = [
+      {"var_type": "double", "elements": (0, 2)},
+      {"var_type": "int", "elements": (3, 8)},
+      {"var_type": "categorical", "elements": [1, 5]},
     ]
     domain = CategoricalDomain(domain_components)
 

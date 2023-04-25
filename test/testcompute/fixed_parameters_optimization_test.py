@@ -5,7 +5,6 @@
 import numpy
 import pytest
 
-from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import C2RadialMatern, SquareExponential
 from libsigopt.compute.domain import CategoricalDomain, FixedIndicesOnContinuousDomain
 from libsigopt.compute.expected_improvement import AugmentedExpectedImprovement, ExpectedImprovement
@@ -21,7 +20,7 @@ from testcompute.vectorized_optimizers_test import QuadraticFunction
 
 class TestVectorizedOptimizersWithFixedParameters(NumericalTestCase):
   def test_basic_optimization(self):
-    cat_domain = CategoricalDomain([{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 2]}] * 5)
+    cat_domain = CategoricalDomain([{"var_type": "double", "elements": (-2, 2)}] * 5)
     fixed_indices = {0: 1, 3: -1}
     domain = FixedIndicesOnContinuousDomain(cat_domain.one_hot_domain, fixed_indices)
 
@@ -35,11 +34,11 @@ class TestVectorizedOptimizersWithFixedParameters(NumericalTestCase):
 
   def test_constrained_optimization(self):
     cat_domain = CategoricalDomain(
-      domain_components=[{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 2]}] * 5,
+      domain_components=[{"var_type": "double", "elements": (-2, 2)}] * 5,
       constraint_list=[
         {
           "rhs": 1,
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
           "weights": [0, 1, 1, 0, 1],
         },
       ],
@@ -58,6 +57,13 @@ class TestVectorizedOptimizersWithFixedParameters(NumericalTestCase):
 
 
 class TestAcquisitionFunctionWithFixedParameters(NumericalTestCase):
+  domain: CategoricalDomain
+  cov: SquareExponential
+  mtcov: MultitaskTensorCovariance
+  data: HistoricalData
+  mpi: list
+  gp: GaussianProcess
+
   @classmethod
   @pytest.fixture(autouse=True, scope="class")
   def base_setup(cls):
@@ -67,9 +73,9 @@ class TestAcquisitionFunctionWithFixedParameters(NumericalTestCase):
   def _base_setup(cls):
     cls.domain = CategoricalDomain(
       [
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 3]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-1, 1]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 1.0]},
+        {"var_type": "double", "elements": (-2, 3)},
+        {"var_type": "double", "elements": (-1, 1)},
+        {"var_type": "double", "elements": (0.1, 1.0)},
       ]
     ).one_hot_domain
 

@@ -25,6 +25,8 @@ TODO(RTL-60): Eventually, I will need to consider a more complicated hyperparame
 
 class MultitaskTensorCovariance(DifferentiableCovariance):
   covariance_type = "multitask_tensor"
+  physical_covariance: DifferentiableCovariance
+  task_covariance: DifferentiableCovariance
 
   def __init__(self, hyperparameters, physical_covariance_class, task_covariance_class):
     """
@@ -38,8 +40,6 @@ class MultitaskTensorCovariance(DifferentiableCovariance):
     self.physical_covariance_class = physical_covariance_class
     self.task_covariance_class = task_covariance_class
 
-    self.physical_covariance = None
-    self.task_covariance = None
     self.set_hyperparameters(hyperparameters)
 
   def __repr__(self):

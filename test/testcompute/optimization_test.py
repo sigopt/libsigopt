@@ -71,6 +71,11 @@ class QuadraticFunction(ScipyOptimizable):
 
 
 class TestOptimizer(NumericalTestCase):
+  dim: int
+  domain: ContinuousDomain
+  large_domain: ContinuousDomain
+  polynomial: QuadraticFunction
+
   @classmethod
   @pytest.fixture(autouse=True, scope="class")
   def base_setup(cls):

@@ -2,16 +2,15 @@
 #
 # SPDX-License-Identifier: Apache License 2.0
 import copy
-from functools import namedtuple
+from collections import namedtuple
 
 import numpy
 import pytest
 from flaky import flaky
 from scipy.stats import norm
 
-from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import C2RadialMatern
-from libsigopt.compute.domain import CategoricalDomain
+from libsigopt.compute.domain import CategoricalDomain, ContinuousDomain
 from libsigopt.compute.expected_improvement import (
   AugmentedExpectedImprovement,
   ExpectedImprovement,
@@ -32,6 +31,9 @@ ExpectedResults = namedtuple("ExpectedResults", "mean var grad_mean grad_var cov
 
 class TestGaussianProcessSum(NumericalTestCase):
   fixed_dims = False
+  domains: list[ContinuousDomain]
+  gaussian_process_lists: list[list[GaussianProcess]]
+  weights_lists: list[numpy.ndarray]
 
   @classmethod
   @pytest.fixture(autouse=True, scope="class")
@@ -40,11 +42,8 @@ class TestGaussianProcessSum(NumericalTestCase):
 
   @classmethod
   def _base_setup(cls):
-    dims = [7] * 10 if cls.fixed_dims else numpy.random.randint(2, 25, size=(10,))
-    cls.domains = [
-      CategoricalDomain([{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1]}] * d).one_hot_domain
-      for d in dims
-    ]
+    dims: list[int] | numpy.ndarray = [7] * 10 if cls.fixed_dims else numpy.random.randint(2, 25, size=(10,))
+    cls.domains = [CategoricalDomain([{"var_type": "double", "elements": (0, 1)}] * d).one_hot_domain for d in dims]
     cls.gaussian_process_lists = []
     cls.weights_lists = []
     list_size = 3

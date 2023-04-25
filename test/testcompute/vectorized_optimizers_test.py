@@ -6,10 +6,9 @@ from collections import namedtuple
 import numpy
 import pytest
 
-from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.acquisition_function import AcquisitionFunction
 from libsigopt.compute.covariance import SquareExponential
-from libsigopt.compute.domain import CategoricalDomain
+from libsigopt.compute.domain import CategoricalDomain, DomainComponent
 from libsigopt.compute.expected_improvement import ExpectedParallelImprovement
 from libsigopt.compute.gaussian_process import GaussianProcess
 from libsigopt.compute.misc.data_containers import HistoricalData
@@ -50,6 +49,10 @@ class QuadraticFunction(AcquisitionFunction):
 
 
 class TestOptimizer(NumericalTestCase):
+  dim: int
+  domain: CategoricalDomain
+  af: QuadraticFunction
+
   @classmethod
   @pytest.fixture(autouse=True, scope="class")
   def base_setup(cls):
@@ -59,7 +62,7 @@ class TestOptimizer(NumericalTestCase):
   def _base_setup(cls):
     """Set up a test case for optimizing a simple quadratic polynomial."""
     cls.dim = 3
-    domain_components = [{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-0.5, 0.5]}]
+    domain_components: list[DomainComponent] = [{"var_type": "double", "elements": (-0.5, 0.5)}]
     cat_domain = CategoricalDomain(domain_components * cls.dim)
     cls.domain = cat_domain.one_hot_domain
 
@@ -120,7 +123,7 @@ class TestOptimizer(NumericalTestCase):
 
   @pytest.mark.parametrize("optimizer_class", [DEOptimizer, AdamOptimizer])
   def test_optimizer_invalid_parameter_type(self, optimizer_class):
-    parameter_type = namedtuple("Parameter_type", ["invalid_p"])
+    parameter_type = namedtuple("parameter_type", ["invalid_p"])
     with pytest.raises(TypeError):
       optimizer_class(
         acquisition_function=self.af,
@@ -137,12 +140,12 @@ class TestOptimizer(NumericalTestCase):
     rhs = 0.0
 
     domain = CategoricalDomain(
-      domain_components=[{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-1, 1]}] * dim,
+      domain_components=[{"var_type": "double", "elements": (-1, 1)}] * dim,
       constraint_list=[
         {
           "weights": coeff_vector,
           "rhs": rhs,
-          "var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "double",
         },
       ],
     )
@@ -165,7 +168,7 @@ class TestOptimizer(NumericalTestCase):
     N = 5
     num_to_sample = 3
 
-    domain = CategoricalDomain([{"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-1, 1]}] * dim)
+    domain = CategoricalDomain([{"var_type": "double", "elements": (-1, 1)}] * dim)
     x = domain.generate_quasi_random_points_in_domain(N)
     y = 6 - numpy.log(1 + numpy.sum(x**2, axis=1))
     data = HistoricalData(dim)

@@ -6,7 +6,6 @@ import numpy
 import pytest
 from flaky import flaky
 
-from libsigopt.aux.constant import DOUBLE_EXPERIMENT_PARAMETER_NAME
 from libsigopt.compute.covariance import SquareExponential
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.expected_improvement import (
@@ -24,6 +23,15 @@ from testaux.numerical_test_case import NumericalTestCase
 
 
 class TestMultitaskAcquisitionFunction(NumericalTestCase):
+  domain: CategoricalDomain
+  cov: SquareExponential
+  data: HistoricalData
+  gp: GaussianProcess
+  ei: ExpectedImprovement
+  eif: ExpectedImprovementWithFailures
+  aei: AugmentedExpectedImprovement
+  qei: ExpectedParallelImprovement
+
   @classmethod
   @pytest.fixture(autouse=True, scope="class")
   def base_setup(cls):
@@ -33,9 +41,9 @@ class TestMultitaskAcquisitionFunction(NumericalTestCase):
   def _base_setup(cls):
     cls.domain = CategoricalDomain(
       [
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 3]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-1, 1]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [0.1, 1.0]},
+        {"var_type": "double", "elements": (-2, 3)},
+        {"var_type": "double", "elements": (-1, 1)},
+        {"var_type": "double", "elements": (0.1, 1.0)},
       ]
     ).one_hot_domain
     cls.cov = SquareExponential([1.0, 0.3, 0.3, 0.4])

@@ -7,6 +7,8 @@ import numpy
 
 
 class Optimizer(object):
+  optimizer_name: str
+
   def optimize(self, **kwargs):
     raise NotImplementedError()
 

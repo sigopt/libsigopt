@@ -22,10 +22,14 @@ class FailureComponents:
 @dataclass(frozen=True, slots=True)
 class FailureListProductComponents:
   poss: numpy.ndarray
-  grad_poss: numpy.ndarray
+  grad_poss: numpy.ndarray | None
 
 
 class ProbabilisticFailuresBase(object):
+  @property
+  def differentiable(self) -> bool:
+    raise NotImplementedError()
+
   @property
   def info_for_logs(self):
     raise NotImplementedError()
@@ -145,7 +149,7 @@ class ProbabilisticFailuresCDF(HasPredictor, ProbabilisticFailuresBase):
   def compute_failure_components(self, points_to_evaluate, option):
     self.verify_points_to_evaluate(points_to_evaluate)
     core_components = self.compute_core_components(points_to_evaluate, option)
-    return FailureComponents(0, 0, core_components)
+    return FailureComponents(numpy.array(0), numpy.array(0), core_components)
 
   def _compute_probability_of_success(self, failure_components):
     assert isinstance(failure_components, FailureComponents)
@@ -195,12 +199,14 @@ class ProductOfListOfProbabilisticFailures(ProbabilisticFailuresBase):
       poss = numpy.zeros((self.num_pfs, len(points_to_evaluate)))
       for i, pf in enumerate(self.list_of_probabilistic_failures):
         poss[i] = pf.compute_probability_of_success(points_to_evaluate)
+      return FailureListProductComponents(poss, None)
     if option in ("grad", "both"):
       poss = numpy.zeros((self.num_pfs, len(points_to_evaluate)))
       grad_poss = numpy.zeros((self.num_pfs, len(points_to_evaluate), self.dim))
       for i, pf in enumerate(self.list_of_probabilistic_failures):
         poss[i], grad_poss[i] = pf.joint_function_gradient_eval(points_to_evaluate)
-    return FailureListProductComponents(poss, grad_poss)
+      return FailureListProductComponents(poss, grad_poss)
+    raise NotImplementedError(option)
 
   def _compute_probability_of_success(self, failure_components):
     assert isinstance(failure_components, FailureListProductComponents)
@@ -209,6 +215,7 @@ class ProductOfListOfProbabilisticFailures(ProbabilisticFailuresBase):
   def _compute_grad_probability_of_success(self, failure_components):
     assert isinstance(failure_components, FailureListProductComponents)
     poss = failure_components.poss
+    assert failure_components.grad_poss is not None
     grad_poss = failure_components.grad_poss
     grad = numpy.zeros(grad_poss[0].shape)
     for i in range(self.num_pfs):

@@ -1,15 +1,10 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
-import copy
-
 import numpy
 from flaky import flaky
 
-from libsigopt.compute.gaussian_process import GaussianProcess
 from libsigopt.compute.misc.constant import CONSTANT_LIAR_MAX, CONSTANT_LIAR_MEAN
-from libsigopt.compute.misc.data_containers import HistoricalData
-from libsigopt.compute.predictor import HasPredictor
 
 from testcompute.gaussian_process_test_case import GaussianProcessTestCase
 
@@ -98,69 +93,3 @@ class TestGaussianProcess(GaussianProcessTestCase):
       gp.append_lie_data(x_append, CONSTANT_LIAR_MEAN)
       assert gp.num_sampled == num_sampled + 7 + 5 + 3
       assert numpy.all(gp.points_sampled_value[-3:] == mean_value)
-
-
-class TestHasPredictor(GaussianProcessTestCase):
-  def test_update_data(self, gaussian_process_and_domain):
-    gaussian_process, domain = gaussian_process_and_domain
-    gaussian_process = copy.deepcopy(gaussian_process)
-
-    old_data = gaussian_process.historical_data
-    old_min_index = numpy.argmin(old_data.points_sampled_value)
-    old_best_observed_value = old_data.points_sampled_value[old_min_index]
-    old_best_observed_location = old_data.points_sampled[old_min_index, :]
-    hpred = HasPredictor(gaussian_process)
-    self.assert_scalar_within_relative(old_best_observed_value, gaussian_process.best_observed_value, 1e-15)
-    self.assert_scalar_within_relative(old_best_observed_value, hpred.predictor.best_observed_value, 1e-15)
-    self.assert_vector_within_relative_norm(old_best_observed_location, gaussian_process.best_observed_location, 1e-15)
-    self.assert_vector_within_relative_norm(old_best_observed_location, hpred.predictor.best_observed_location, 1e-15)
-
-    gaussian_process = self.form_gaussian_process_and_data(domain)
-    new_data = gaussian_process.historical_data
-    new_min_index = numpy.argmin(new_data.points_sampled_value)
-    new_best_observed_value = new_data.points_sampled_value[new_min_index]
-    new_best_observed_location = new_data.points_sampled[new_min_index, :]
-    self.assert_scalar_within_relative(new_best_observed_value, gaussian_process.best_observed_value, 1e-15)
-    self.assert_vector_within_relative_norm(new_best_observed_location, gaussian_process.best_observed_location, 1e-15)
-
-    hpred.predictor.update_historical_data(new_data)
-    confirm_new_data = hpred.predictor.historical_data
-    assert old_data is not new_data
-    assert new_data.num_sampled == confirm_new_data.num_sampled
-    self.assert_scalar_within_relative(new_best_observed_value, hpred.predictor.best_observed_value, 1e-15)
-    self.assert_vector_within_relative_norm(new_best_observed_location, hpred.predictor.best_observed_location, 1e-15)
-
-  def test_predictions(self, gaussian_process_and_domain):
-    gaussian_process, domain = gaussian_process_and_domain
-    gaussian_process = copy.deepcopy(gaussian_process)
-    xt = domain.generate_quasi_random_points_in_domain(171)
-    mean, var = gaussian_process.compute_mean_and_variance_of_points(xt)
-    hpred = HasPredictor(gaussian_process)
-
-    has_gp_mean, has_gp_var = hpred.predictor.compute_mean_and_variance_of_points(xt)
-
-    self.assert_vector_within_relative_norm(has_gp_mean, mean, 1e-15)
-    self.assert_vector_within_relative_norm(has_gp_var, var, 1e-15)
-
-  def test_predictions_after_update_data(self, gaussian_process_and_domain):
-    gaussian_process, domain = gaussian_process_and_domain
-    gaussian_process = copy.deepcopy(gaussian_process)
-    hpred = HasPredictor(gaussian_process)
-
-    new_data = HistoricalData(domain.dim)
-    num_sampled = numpy.random.randint(50, 150)
-    x = domain.generate_quasi_random_points_in_domain(num_sampled)
-    y = numpy.sum((x - 0.5) ** 2, axis=1)
-    v = numpy.full_like(y, 10 ** -numpy.random.uniform(-4, -1))
-    new_data.append_historical_data(x, y, v)
-
-    cov = gaussian_process.covariance
-    new_gaussian_process = GaussianProcess(cov, new_data, [[0] * domain.dim])
-    xt = domain.generate_quasi_random_points_in_domain(171)
-    mean, var = new_gaussian_process.compute_mean_and_variance_of_points(xt)
-
-    hpred.predictor.update_historical_data(new_data)
-    has_gp_mean, has_gp_var = hpred.predictor.compute_mean_and_variance_of_points(xt)
-
-    self.assert_vector_within_relative_norm(has_gp_mean, mean, 1e-15)
-    self.assert_vector_within_relative_norm(has_gp_var, var, 1e-15)

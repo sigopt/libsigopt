@@ -29,6 +29,9 @@ class SPEInsufficientDataError(Exception):
 # forget_factor: the proportion of the earlier data to be "forgotten" when finding lower/greater
 #                the points are assumed to be ordered with the earliest points in the first rows
 class SigOptParzenEstimator(ScipyOptimizable):
+  lower_points: numpy.ndarray
+  greater_points: numpy.ndarray
+
   def __init__(
     self,
     lower_covariance,
@@ -43,8 +46,8 @@ class SigOptParzenEstimator(ScipyOptimizable):
     self.gamma = gamma
     self.forget_factor = forget_factor
     self.dim = len(points_sampled_points[0])
-    self.lower_points = None
-    self.greater_points = None
+    self.lower_points = numpy.array([])
+    self.greater_points = numpy.array([])
 
     # This is a list of 1D numpy.arrays full of lies to tell the model
     self.lower_lies = []

@@ -8,7 +8,6 @@ from libsigopt.compute.domain import ContinuousDomain, FixedIndicesOnContinuousD
 from libsigopt.compute.misc.constant import ADAM_OPTIMIZER, DE_OPTIMIZER
 from libsigopt.compute.optimization_auxiliary import (
   DEFAULT_VECOPT_MAXITER,
-  OPTIMIZATION_PARAMETERS_TO_DEFAULTS,
   AdamParameters,
   DEParameters,
   OptimizationResults,
@@ -17,8 +16,8 @@ from libsigopt.compute.optimization_auxiliary import (
 
 
 class VectorizedOptimizer(Optimizer):
-  optimizer_name = NotImplemented
-  optimizer_parameters_type = NotImplemented
+  optimizer_name: str
+  optimizer_parameters_type: type
 
   def __init__(self, domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter):
     """
@@ -34,7 +33,7 @@ class VectorizedOptimizer(Optimizer):
     self.num_multistarts = num_multistarts
     self.maxiter = maxiter if maxiter is not None else DEFAULT_VECOPT_MAXITER
 
-    optimizer_parameters = optimizer_parameters or OPTIMIZATION_PARAMETERS_TO_DEFAULTS[self.optimizer_parameters_type]
+    optimizer_parameters = optimizer_parameters or self.optimizer_parameters_type()
     # pylint: disable=isinstance-second-argument-not-valid-type
     if not isinstance(optimizer_parameters, self.optimizer_parameters_type):
       raise TypeError(
@@ -138,6 +137,7 @@ class DEOptimizer(VectorizedOptimizer):
   optimizer_name = DE_OPTIMIZER
   optimizer_parameters_type = DEParameters
   requires_gradients = False
+  optimizer_parameters: DEParameters
 
   def __init__(
     self,
@@ -212,6 +212,7 @@ class AdamOptimizer(VectorizedOptimizer):
   optimizer_name = ADAM_OPTIMIZER
   optimizer_parameters_type = AdamParameters
   requires_gradients = True
+  optimizer_parameters: AdamParameters
 
   def __init__(
     self,

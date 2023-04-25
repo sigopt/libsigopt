@@ -14,13 +14,15 @@ from libsigopt.compute.optimization_auxiliary import AdamParameters, DEParameter
 from libsigopt.compute.vectorized_optimizers import AdamOptimizer, DEOptimizer
 
 
+DEFAULT_NEXT_POINTS_ES_OPTIMIZER = DEOptimizer
 DEFAULT_NEXT_POINTS_ES_OPTIMIZER_INFO = OptimizerInfo(
-  optimizer=DEOptimizer,
+  optimizer=DEFAULT_NEXT_POINTS_ES_OPTIMIZER,
   parameters=DEParameters(),
   num_multistarts=500,
   num_random_samples=10000,
 )
 
+DEFAULT_NEXT_POINTS_GB_OPTIMIZER = AdamOptimizer
 DEFAULT_NEXT_POINTS_GB_OPTIMIZER_INFO = OptimizerInfo(
   optimizer=AdamOptimizer,
   parameters=AdamParameters(),
@@ -28,6 +30,7 @@ DEFAULT_NEXT_POINTS_GB_OPTIMIZER_INFO = OptimizerInfo(
   num_random_samples=50,
 )
 
+VECTORIZED_NEXT_POINTS_QEI_OPTIMIZER = DEOptimizer
 VECTORIZED_NEXT_POINTS_QEI_OPTIMIZER_INFO = OptimizerInfo(
   optimizer=DEOptimizer,
   parameters=DEParameters(),
@@ -130,7 +133,7 @@ def qei_acquisition_function_optimization(
   domain,
   acquisition_function,
 ):
-  qei_optimizer = VECTORIZED_NEXT_POINTS_QEI_OPTIMIZER_INFO.optimizer(
+  qei_optimizer = VECTORIZED_NEXT_POINTS_QEI_OPTIMIZER(
     domain=domain,
     acquisition_function=acquisition_function,
     num_multistarts=VECTORIZED_NEXT_POINTS_QEI_OPTIMIZER_INFO.num_multistarts,
@@ -167,14 +170,14 @@ def constant_liar_acquisition_function_optimization(
   )
 
   for _ in range(num_to_sample):
-    es_af_optimizer = DEFAULT_NEXT_POINTS_ES_OPTIMIZER_INFO.optimizer(
+    es_af_optimizer = DEFAULT_NEXT_POINTS_ES_OPTIMIZER(
       domain=domain,
       acquisition_function=af,
       num_multistarts=DEFAULT_NEXT_POINTS_ES_OPTIMIZER_INFO.num_multistarts,
       optimizer_parameters=DEFAULT_NEXT_POINTS_ES_OPTIMIZER_INFO.parameters,
       maxiter=es_maxiter,
     )
-    gd_af_optimizer = DEFAULT_NEXT_POINTS_GB_OPTIMIZER_INFO.optimizer(
+    gd_af_optimizer = DEFAULT_NEXT_POINTS_GB_OPTIMIZER(
       domain=domain,
       acquisition_function=af,
       num_multistarts=DEFAULT_NEXT_POINTS_GB_OPTIMIZER_INFO.num_multistarts,

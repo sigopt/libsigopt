@@ -34,6 +34,7 @@ class SPESearchNextPoints(View):
     return results
 
   def single_metric_spe_next_points(self):
+    assert self.constraint_metrics_index is not None
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
     view_input = deepcopy(self.params)
     view_input["metrics_info"].optimized_metrics_index = [optimized_metric]
@@ -41,6 +42,7 @@ class SPESearchNextPoints(View):
     return SPENextPoints(view_input).view()
 
   def metric_constraints_spe_next_points(self):
+    assert self.constraint_metrics_index is not None
     if len(self.constraint_metrics_index) == 1:
       return self.single_metric_spe_next_points()
     optimized_metric = numpy.random.choice(self.constraint_metrics_index)
@@ -97,6 +99,7 @@ class SPESearchNextPoints(View):
 
   def spe_search_next_points(self):
     num_to_sample = self.params["num_to_sample"]
+    assert self.constraint_metrics_index is not None
     random_pf_metric_index = numpy.random.choice(len(self.constraint_metrics_index))
     sigopt_parzen_estimator = self.form_sigopt_parzen_estimator_for_search(
       self.one_hot_points_sampled_points,

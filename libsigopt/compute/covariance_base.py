@@ -22,8 +22,8 @@ class HyperparameterInvalidError(ValueError):
 class CovarianceBase(object):
   r"""Base class for covariance kernels; the functions that all covariance kernels must have."""
 
-  covariance_type = NotImplemented
-  process_variance = None
+  covariance_type: str
+  process_variance: float
 
   @property
   def num_hyperparameters(self):
@@ -182,13 +182,12 @@ class RadialCovariance(CovarianceBase):
 
     """
 
-  def __init__(self, hyperparameters):
-    self._hyperparameters = None
-    self._length_scales = None
-    self._length_scales_squared = None
-    self._length_scales_cubed = None
-    self.process_variance = None
+  _hyperparameters: numpy.ndarray
+  _length_scales: numpy.ndarray
+  _length_scales_squared: numpy.ndarray
+  _length_scales_cubed: numpy.ndarray
 
+  def __init__(self, hyperparameters):
     self.set_hyperparameters(hyperparameters)
 
   def __str__(self):

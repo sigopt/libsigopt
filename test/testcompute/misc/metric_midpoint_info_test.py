@@ -231,6 +231,7 @@ class TestMultiMetricMidpointInfo(NumericalTestCase):
     )
     assert not mmi.skip
     assert (mmi.midpoint == numpy.array([4.5, -4.5])).all()
+    assert mmi.scale is not None
     assert (mmi.scale == 0.2 / 9.0).all()
 
     assert (mmi.relative_objective_value(numpy.array([0.0, 0.0])) == numpy.array([0.1, -0.1])).all()
@@ -249,6 +250,7 @@ class TestMultiMetricMidpointInfo(NumericalTestCase):
     values = numpy.array([[0.0, 0.0], [5.0, 5.0], [10.0, 10.0]])
     mmi = MultiMetricMidpointInfo(values, numpy.full(3, False, dtype=bool), metric_objectives)
 
+    assert mmi.negate is not None
     assert mmi.negate.shape[0] == 2
     assert mmi.negate[0] == 1
     assert mmi.negate[1] == -1

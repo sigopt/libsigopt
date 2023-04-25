@@ -9,6 +9,8 @@ from libsigopt.aux.samplers import *
 
 class TestGridSampler(object):
   def test_grid_generation(self):
+    points_per_dimension: list[int] | int
+
     domain_bounds = numpy.array([[0.0, 1.0], [-2.0, 3.0], [2.71, 3.14]])
     points_per_dimension = [7, 11, 8]
 

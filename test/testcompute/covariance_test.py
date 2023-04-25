@@ -9,6 +9,7 @@ TODO(RTL-86): Think about the need viability of a test specifically for radial k
 """
 import inspect
 import itertools
+from typing import Callable
 
 import numpy
 import pytest
@@ -23,6 +24,13 @@ from testaux.numerical_test_case import NumericalTestCase
 
 
 class CovariancesTestBase(NumericalTestCase):
+  all_covariance_bases: list
+  all_covariances: list[Callable]
+  differentiable_covariances: list
+  test_x: list[numpy.ndarray]
+  test_z: list[numpy.ndarray]
+  test_hparams: list[numpy.ndarray]
+
   @classmethod
   @pytest.fixture(autouse=True, scope="class")
   def base_setup(cls):
@@ -31,9 +39,7 @@ class CovariancesTestBase(NumericalTestCase):
   @classmethod
   def _base_setup(cls):
     cls.all_covariance_bases = [
-      f[1]
-      for f in inspect.getmembers(covariance, inspect.isclass)
-      if getattr(f[1], "covariance_type") != NotImplemented
+      f[1] for f in inspect.getmembers(covariance, inspect.isclass) if hasattr(f[1], "covariance_type")
     ]
     cls.all_covariances = []
     for covariance_base in cls.all_covariance_bases:
@@ -235,9 +241,11 @@ class TestMultitaskCovariance(CovariancesTestBase):
     assert numpy.all(cov.hyperparameters == [2.3, 4.5, 6.7])
     assert cov.process_variance == 2.3
     assert cov.dim == 2
+    assert cov.physical_covariance is not None
     assert numpy.all(cov.physical_covariance.hyperparameters == [1.0, 4.5])
     assert cov.physical_covariance.process_variance == 1.0
     assert cov.physical_covariance.dim == 1
+    assert cov.task_covariance is not None
     assert numpy.all(cov.task_covariance.hyperparameters == [1.0, 6.7])
     assert cov.task_covariance.process_variance == 1.0
     assert cov.task_covariance.dim == 1

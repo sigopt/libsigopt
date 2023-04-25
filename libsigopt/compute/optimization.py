@@ -7,13 +7,7 @@ import numpy
 import scipy.optimize
 
 from libsigopt.compute.misc.constant import L_BFGS_B_OPTIMIZER, SLSQP_OPTIMIZER
-from libsigopt.compute.optimization_auxiliary import (
-  OPTIMIZATION_PARAMETERS_TO_DEFAULTS,
-  LBFGSBParameters,
-  OptimizationResults,
-  Optimizer,
-  SLSQPParameters,
-)
+from libsigopt.compute.optimization_auxiliary import LBFGSBParameters, OptimizationResults, Optimizer, SLSQPParameters
 
 
 MINIMUM_SUCCESSFUL_MULTISTARTS_NUMBER = 0
@@ -157,8 +151,7 @@ class _ScipyOptimizerWrapper(Optimizer):
   """Wrapper class to construct an optimizer from scipy optimization methods."""
 
   # Type of the optimizer_parameters object, specified in subclass
-  optimizer_parameters_type = ()
-  optimizer_name = None
+  optimizer_parameters_type: type
 
   def __init__(self, domain, optimizable, optimizer_parameters):
     self.domain = domain
@@ -167,7 +160,7 @@ class _ScipyOptimizerWrapper(Optimizer):
     self.optimization_results = None
 
     if optimizer_parameters is None:
-      optimizer_parameters = OPTIMIZATION_PARAMETERS_TO_DEFAULTS[self.optimizer_parameters_type]
+      optimizer_parameters = self.optimizer_parameters_type()
     if not isinstance(optimizer_parameters, self.optimizer_parameters_type):
       raise TypeError(
         f"optimization_paramters is of type: {optimizer_parameters.__class__},"
@@ -213,6 +206,7 @@ class _ScipyOptimizerWrapper(Optimizer):
 class LBFGSBOptimizer(_ScipyOptimizerWrapper):
   optimizer_parameters_type = LBFGSBParameters
   optimizer_name = L_BFGS_B_OPTIMIZER
+  optimizer_parameters: LBFGSBParameters
 
   def __init__(self, domain, optimizable, optimizer_parameters=None):
     super().__init__(domain, optimizable, optimizer_parameters)
@@ -245,6 +239,7 @@ class LBFGSBOptimizer(_ScipyOptimizerWrapper):
 class SLSQPOptimizer(_ScipyOptimizerWrapper):
   optimizer_parameters_type = SLSQPParameters
   optimizer_name = SLSQP_OPTIMIZER
+  optimizer_parameters: SLSQPParameters
 
   def __init__(self, domain, optimizable, optimizer_parameters=None):
     super().__init__(domain, optimizable, optimizer_parameters)

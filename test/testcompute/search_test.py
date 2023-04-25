@@ -5,11 +5,6 @@ import numpy
 import pytest
 from testviews.zigopt_input_utils import form_random_unconstrained_categorical_domain
 
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-)
 from libsigopt.aux.geometry_utils import compute_distance_matrix_squared
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.probabilistic_failures import ProbabilisticFailuresCDF
@@ -64,12 +59,12 @@ class TestSearch(GaussianProcessTestCase):
     first_cat_elements = [1, 3, 5]
     domain = CategoricalDomain(
       [
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [0, 10]},
+        {"var_type": "int", "elements": (0, 10)},
         {
-          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "categorical",
           "elements": first_cat_elements,
         },
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-5, 5]},
+        {"var_type": "double", "elements": (-5, 5)},
       ]
     )
     gp = self.form_gaussian_process_and_data(
@@ -125,16 +120,16 @@ class TestSearch(GaussianProcessTestCase):
     second_cat_elements = [1, 2, 3]
     domain = CategoricalDomain(
       [
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [2, 5]},
+        {"var_type": "int", "elements": (2, 5)},
         {
-          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "categorical",
           "elements": first_cat_elements,
         },
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-10, -1]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [100, 120]},
+        {"var_type": "double", "elements": (-11.1, 4.234)},
+        {"var_type": "double", "elements": (-10, -1)},
+        {"var_type": "double", "elements": (100, 120)},
         {
-          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "categorical",
           "elements": second_cat_elements,
         },
       ]
@@ -157,16 +152,16 @@ class TestSearch(GaussianProcessTestCase):
     second_cat_elements = [1, 5, 50, 100]
     domain = CategoricalDomain(
       [
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-5, -1]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [10, 20]},
+        {"var_type": "int", "elements": (-5, -1)},
+        {"var_type": "double", "elements": (10, 20)},
         {
-          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "categorical",
           "elements": first_cat_elements,
         },
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, -1]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-5, 5]},
+        {"var_type": "double", "elements": (-2, -1)},
+        {"var_type": "double", "elements": (-5, 5)},
         {
-          "var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
+          "var_type": "categorical",
           "elements": second_cat_elements,
         },
       ]

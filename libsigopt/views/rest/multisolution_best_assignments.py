@@ -41,14 +41,15 @@ class MultisolutionBestAssignments(View):
     _, partition = k_center_clustering(search_points, first_center_index, k=num_solutions)
 
     # Get the best index for each partition
-    best_index_partition = [None] * num_solutions
-    best_value_partition = [None] * num_solutions
+    best_index_partition: list[None | int] = [None] * num_solutions
+    best_value_partition: list = [None] * num_solutions
     for i, p in enumerate(partition):
       if best_value_partition[p] is None or values[i] < best_value_partition[p]:
         best_value_partition[p] = values[i]
         best_index_partition[p] = i
 
-    best_indices = best_index_partition
+    best_indices = [v for v in best_index_partition if v is not None]
+    assert len(best_indices) == len(best_index_partition)
     assert all(isinstance(i, int) for i in best_indices)
     assert len(numpy.unique(best_indices)) == num_solutions
     assert min(best_indices) >= 0 and max(best_indices) <= len(search_points) - 1

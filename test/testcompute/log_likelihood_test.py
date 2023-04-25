@@ -203,7 +203,7 @@ class TestGaussianProcessLogMarginalLikelihood(GaussianProcessTestCase):
     lml.hyperparameters = best_hyperparameters
     gradient = lml.compute_grad_log_likelihood()
     if not domain.check_point_on_boundary(best_hyperparameters, 1e-4):
-      self.assert_vector_within_relative_norm(gradient, numpy.zeros(self.num_hyperparameters), tolerance)
+      self.assert_vector_within_relative_norm(gradient, numpy.zeros(num_hyperparameters), tolerance)
 
     # Check that output is in the domain
     assert domain.check_point_acceptable(best_hyperparameters) is True

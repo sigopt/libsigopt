@@ -1,17 +1,13 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
+import random
 from unittest.mock import patch
 
 import numpy
 import pytest
 from testviews.zigopt_input_utils import form_points_sampled
 
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-)
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import MULTIMETRIC_MIN_NUM_SUCCESSFUL_POINTS
 from libsigopt.compute.misc.multimetric import *
@@ -22,11 +18,11 @@ from testaux.numerical_test_case import NumericalTestCase
 class TestMultimetricFiltering(NumericalTestCase):
   mixed_domain = CategoricalDomain(
     [
-      {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [3, -1, 5]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [1, 5]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-1, 7]},
-      {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [11, 22]},
-      {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-11.1, 4.234]},
+      {"var_type": "categorical", "elements": [3, -1, 5]},
+      {"var_type": "int", "elements": (1, 5)},
+      {"var_type": "double", "elements": (-1, 7)},
+      {"var_type": "int", "elements": (11, 22)},
+      {"var_type": "double", "elements": (-11.1, 4.234)},
     ]
   )
 
@@ -34,10 +30,10 @@ class TestMultimetricFiltering(NumericalTestCase):
   def _form_multimetric_info(method_name):
     method = method_name
     if method == CONVEX_COMBINATION:
-      phase = numpy.random.choice([CONVEX_COMBINATION_RANDOM_SPREAD, CONVEX_COMBINATION_SEQUENTIAL])
+      phase = random.choice([CONVEX_COMBINATION_RANDOM_SPREAD, CONVEX_COMBINATION_SEQUENTIAL])
       phase_kwargs = {"fraction_of_phase_completed": numpy.random.random()}
     elif method in (EPSILON_CONSTRAINT, PROBABILISTIC_FAILURES):
-      phase = numpy.random.choice(
+      phase = random.choice(
         [
           EPSILON_CONSTRAINT_OPTIMIZE_0,
           EPSILON_CONSTRAINT_OPTIMIZE_1,
@@ -45,7 +41,7 @@ class TestMultimetricFiltering(NumericalTestCase):
       )
       phase_kwargs = {"fraction_of_phase_completed": numpy.random.random()}
     elif method == OPTIMIZING_ONE_METRIC:
-      phase = numpy.random.choice(
+      phase = random.choice(
         [
           OPTIMIZING_ONE_METRIC_OPTIMIZE_0,
           OPTIMIZING_ONE_METRIC_OPTIMIZE_1,
@@ -448,6 +444,7 @@ class TestMultimetricFiltering(NumericalTestCase):
       points_sampled.failures,
       lie_values,
     )
+    assert isinstance(multimetric_info.params, OptimizingMetricParams)
     optimizing_metric = multimetric_info.params.optimizing_metric
     expected_values = points_sampled.values[: num_points // 2, optimizing_metric]
     expected_points = points_sampled.points[: num_points // 2, :]

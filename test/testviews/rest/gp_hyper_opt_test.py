@@ -8,12 +8,6 @@ import pytest
 from mock import Mock
 from testviews.zigopt_input_utils import ZigoptSimulator
 
-from libsigopt.aux.constant import (
-  CATEGORICAL_EXPERIMENT_PARAMETER_NAME,
-  DOUBLE_EXPERIMENT_PARAMETER_NAME,
-  INT_EXPERIMENT_PARAMETER_NAME,
-  QUANTIZED_EXPERIMENT_PARAMETER_NAME,
-)
 from libsigopt.compute.domain import CategoricalDomain
 from libsigopt.compute.misc.constant import NONZERO_MEAN_CONSTANT_MEAN_TYPE, QUANTIZED_LENGTH_SCALE_LOWER_FACTOR
 from libsigopt.views.rest.gp_hyper_opt_multimetric import (
@@ -38,7 +32,7 @@ class TestCategoricalTools(NumericalTestCase):
     assert len(length_scales) == domain.dim
     for domain_component, ls in zip(domain, length_scales):
       assert all(l > 0 for l in ls)
-      if domain_component["var_type"] == CATEGORICAL_EXPERIMENT_PARAMETER_NAME:
+      if domain_component["var_type"] == "categorical":
         assert len(ls) == len(domain_component["elements"])
       else:
         assert len(ls) == 1
@@ -46,12 +40,12 @@ class TestCategoricalTools(NumericalTestCase):
   def test_form_one_hot_hyperparameter_domain(self):
     domain = CategoricalDomain(
       domain_components=[
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-2, 3.3]},
-        {"var_type": CATEGORICAL_EXPERIMENT_PARAMETER_NAME, "elements": [0, 1, 2]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 1.1]},
-        {"var_type": INT_EXPERIMENT_PARAMETER_NAME, "elements": [-4, 5]},
-        {"var_type": DOUBLE_EXPERIMENT_PARAMETER_NAME, "elements": [-3.3, 6.1]},
-        {"var_type": QUANTIZED_EXPERIMENT_PARAMETER_NAME, "elements": [1, 3, 5, 10]},
+        {"var_type": "double", "elements": (-2, 3.3)},
+        {"var_type": "categorical", "elements": [0, 1, 2]},
+        {"var_type": "double", "elements": (-4, 1.1)},
+        {"var_type": "int", "elements": (-4, 5)},
+        {"var_type": "double", "elements": (-3.3, 6.1)},
+        {"var_type": "quantized", "elements": [1, 3, 5, 10]},
       ],
     )
     historical_data = Mock(points_sampled_value=[1, 2, 3, 4, 5, 6, 7])

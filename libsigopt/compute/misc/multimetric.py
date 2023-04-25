@@ -1,6 +1,7 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
+import random
 from dataclasses import dataclass
 
 import numpy
@@ -19,27 +20,37 @@ MULTIMETRIC_INITIALIZATION = "initialization"
 
 
 @dataclass(frozen=True, slots=True)
-class MultimetricInfo:
-  method: str
-  params: object
-
-
-@dataclass(frozen=True, slots=True)
 class ConvexCombinationParams:
   weights: numpy.ndarray
 
 
-@dataclass(frozen=True, slots=True)
-class OptimizeOneMetricParams:
+@dataclass(frozen=True, kw_only=True)
+class OptimizingMetricParams:
   optimizing_metric: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class ConstraintMetricParams:
   constraint_metric: int
 
 
-@dataclass(frozen=True, slots=True)
-class ProbabilisticFailuresParams:
-  optimizing_metric: int
-  constraint_metric: int
+@dataclass(frozen=True, slots=True, kw_only=True)
+class OptimizeOneMetricParams(OptimizingMetricParams, ConstraintMetricParams):
+  pass
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProbabilisticFailuresParams(OptimizingMetricParams, ConstraintMetricParams):
   epsilon: float
+
+
+AnyParams = ConvexCombinationParams | OptimizeOneMetricParams | ProbabilisticFailuresParams
+
+
+@dataclass(frozen=True, slots=True)
+class MultimetricInfo:
+  method: str | None
+  params: AnyParams | None
 
 
 MULTIMETRIC_INFO_NOT_MULTIMETRIC = MultimetricInfo(method=None, params=None)
@@ -74,7 +85,8 @@ def identify_multimetric_phase(
   POLISH_ONE_METRIC_FRAC = CONVEX_SPREAD_FRAC if has_optimized_metric_thresholds else 0.65
   EPSILON_CONSTRAINT_FRAC = 0.95
 
-  adjusted_budget = max(observation_budget - failure_count, max(num_open_suggestions, 1))
+  bounded_below_num_open_suggestions = max(num_open_suggestions, 1)
+  adjusted_budget = max(observation_budget - failure_count, bounded_below_num_open_suggestions)
 
   fraction_served = (observation_count + num_open_suggestions) / adjusted_budget
   fraction_completed = observation_count / adjusted_budget
@@ -139,10 +151,11 @@ def form_epsilon_constraint_epsilon(fraction_of_phase_completed):
 
 
 def form_multimetric_info_from_phase(phase, phase_kwargs):
+  params: AnyParams
   if phase == NOT_MULTIMETRIC:
     multimetric_info = MULTIMETRIC_INFO_NOT_MULTIMETRIC
   elif phase == INITIALIZATION:
-    initialization_phase = numpy.random.choice((OPTIMIZING_ONE_METRIC_OPTIMIZE_0, OPTIMIZING_ONE_METRIC_OPTIMIZE_1))
+    initialization_phase = random.choice((OPTIMIZING_ONE_METRIC_OPTIMIZE_0, OPTIMIZING_ONE_METRIC_OPTIMIZE_1))
     multimetric_info = form_multimetric_info_from_phase(initialization_phase, {})
   elif phase in (OPTIMIZING_ONE_METRIC_OPTIMIZE_0, OPTIMIZING_ONE_METRIC_OPTIMIZE_1):
     if phase == OPTIMIZING_ONE_METRIC_OPTIMIZE_0:
@@ -164,7 +177,7 @@ def form_multimetric_info_from_phase(phase, phase_kwargs):
     multimetric_info = MultimetricInfo(method=EPSILON_CONSTRAINT, params=params)
   else:
     assert phase == COMPLETION
-    completion_phase = numpy.random.choice((EPSILON_CONSTRAINT_OPTIMIZE_0, EPSILON_CONSTRAINT_OPTIMIZE_1))
+    completion_phase = random.choice((EPSILON_CONSTRAINT_OPTIMIZE_0, EPSILON_CONSTRAINT_OPTIMIZE_1))
     phase_kwargs = {"fraction_of_phase_completed": numpy.random.random()}
     multimetric_info = form_multimetric_info_from_phase(completion_phase, phase_kwargs)
 

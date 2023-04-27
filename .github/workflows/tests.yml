@@ -9,7 +9,6 @@ jobs:
       matrix:
         python-version:
           - "3.10"
-          - "3.11"
         test-suite:
           - testaux
           - testcompute

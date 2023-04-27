@@ -10,6 +10,10 @@ jobs:
         python-version:
           - "3.10"
           - "3.11"
+        test-suite:
+          - testaux
+          - testcompute
+          - testviews
     env:
       OMP_NUM_THREADS: "1"
       OPENBLAS_NUM_THREADS: "1"

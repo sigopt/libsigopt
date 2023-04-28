@@ -29,7 +29,7 @@ from libsigopt.compute.python_utils import (
 MINIMUM_KRIGING_VARIANCE = 1e-100  # Just something really small
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class PosteriorCoreComponents:
   K_eval: numpy.ndarray | None
   grad_K_eval: numpy.ndarray | None

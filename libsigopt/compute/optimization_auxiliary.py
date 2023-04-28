@@ -13,7 +13,7 @@ class Optimizer(object):
     raise NotImplementedError()
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class OptimizerInfo:
   optimizer: type[Optimizer]
   parameters: object
@@ -21,7 +21,7 @@ class OptimizerInfo:
   num_random_samples: int
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class OptimizationResults:
   starting_points: numpy.ndarray
   ending_points: numpy.ndarray
@@ -33,7 +33,7 @@ class OptimizationResults:
 ####
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class AdamParameters:
   beta_1: float = 0.9
   beta_2: float = 0.9
@@ -41,7 +41,7 @@ class AdamParameters:
   learning_rate: float = 0.01
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class DEParameters:
   crossover_probability: float = 0.7
   mutation: float = 0.8
@@ -53,7 +53,7 @@ class DEParameters:
 ####
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class LBFGSBParameters:
   approx_grad: bool = False  # if true, BFGS will approximate the gradient
   maxfun: int = 15000  # maximum number of objective function calls to make
@@ -66,7 +66,7 @@ class LBFGSBParameters:
     return asdict(self)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class SLSQPParameters:
   approx_grad: bool = False  # use a finite difference gradient approximation
   maxiter: int = 150  # maximum number of SLSQP iterations to take

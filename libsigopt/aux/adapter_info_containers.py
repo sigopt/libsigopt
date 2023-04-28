@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import numpy
 
 
-@dataclass(slots=True)
+@dataclass
 class PointsContainer:
   points: numpy.ndarray
   values: numpy.ndarray | None = None
@@ -15,7 +15,7 @@ class PointsContainer:
   task_costs: numpy.ndarray | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class DomainInfo:
   constraint_list: list
   domain_components: list | None = None
@@ -29,7 +29,7 @@ class DomainInfo:
     return len(self.domain_components)
 
 
-@dataclass(slots=True)
+@dataclass
 class MetricsInfo:
   requires_pareto_frontier_optimization: bool
   observation_budget: int
@@ -53,7 +53,7 @@ class MetricsInfo:
     return any(self.user_specified_thresholds[i] is not None for i in self.optimized_metrics_index)
 
 
-@dataclass(slots=True)
+@dataclass
 class GPModelInfo:
   hyperparameters: list[dict]
   max_simultaneous_af_points: int

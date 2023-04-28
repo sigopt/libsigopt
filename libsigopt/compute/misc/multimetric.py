@@ -19,7 +19,7 @@ OPTIMIZING_ONE_METRIC = "optimizing_one_metric"
 MULTIMETRIC_INITIALIZATION = "initialization"
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ConvexCombinationParams:
   weights: numpy.ndarray
 
@@ -34,12 +34,12 @@ class ConstraintMetricParams:
   constraint_metric: int
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True)
 class OptimizeOneMetricParams(OptimizingMetricParams, ConstraintMetricParams):
   pass
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True)
 class ProbabilisticFailuresParams(OptimizingMetricParams, ConstraintMetricParams):
   epsilon: float
 
@@ -47,7 +47,7 @@ class ProbabilisticFailuresParams(OptimizingMetricParams, ConstraintMetricParams
 AnyParams = ConvexCombinationParams | OptimizeOneMetricParams | ProbabilisticFailuresParams
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class MultimetricInfo:
   method: str | None
   params: AnyParams | None

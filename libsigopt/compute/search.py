@@ -12,7 +12,7 @@ from libsigopt.compute.predictor import Predictor
 from libsigopt.compute.probabilistic_failures import ProbabilisticFailuresBase
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class SearchCoreComponents:
   search_points_to_evaluate: numpy.ndarray
   pi: numpy.ndarray

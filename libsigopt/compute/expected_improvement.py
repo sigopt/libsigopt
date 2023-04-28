@@ -24,7 +24,7 @@ AUGMENTED_EI_QUANTILE = 0.75
 MINIMUM_ACCEPTABLE_FAILURE_BEST_POINT_PROBABILITY = 0.5
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class PenaltyComponents:
   penalty: numpy.ndarray
   grad_penalty: numpy.ndarray | None

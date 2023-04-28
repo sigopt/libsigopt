@@ -7,7 +7,7 @@ import numpy
 from scipy.stats import norm
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class PredictorCoreComponents:
   x: numpy.ndarray
   mean: numpy.ndarray

@@ -12,14 +12,14 @@ POSITIVE_EXPONENT_CAP = 40.0
 DEFAULT_KAPPA = 1
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class FailureComponents:
   exponential: numpy.ndarray
   denominator: numpy.ndarray
   core_components: PredictorCoreComponents
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class FailureListProductComponents:
   poss: numpy.ndarray
   grad_poss: numpy.ndarray | None

@@ -25,7 +25,7 @@ SPDX-License-Identifier: Apache License 2.0
 
 ## What will you find in this library?
 
-We expect users and contributors of this library to have a certain level of familiarity with Bayesian Optimization, Active Learning, and Machine learning concepts. If these words don't make sense to you, consider using our other higher-level services and tools: `app.sigopt.com`, [`sigopt-python`](https://github.com/sigopt/sigopt-python), [`sigopt-server`](https://github.com/sigopt/sigopt-server) and [`sigoptlite`](https://github.com/sigopt/sigoptlite)
+We expect users and contributors of this library to have a certain level of familiarity with [Bayesian Optimization](https://bayesoptbook.com/), [Kernel-Based Approximation Methods](https://www.mathworks.com/academia/books/kernel-based-approximation-methods-using-matlab-fasshauer.html), [Gaussian Process and Machine Learning](https://gaussianprocess.org/) concepts. If these words don't make sense to you, consider using our other higher-level services and tools: [`app.sigopt.com`](app.sigopt.com), [`sigopt-python`](https://github.com/sigopt/sigopt-python), [`sigopt-server`](https://github.com/sigopt/sigopt-server) and [`sigoptlite`](https://github.com/sigopt/sigoptlite).
 
 We welcome contributions to `libsigopt`. Our goal for this library is to be lightweight, have minimal requirements, and implement the computation methods in NumPy. If you want to leverage [`pytorch`](https://github.com/pytorch/pytorch), consider contributing to [`botorch`](https://github.com/pytorch/botorch).
 

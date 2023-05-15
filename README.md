@@ -5,7 +5,10 @@ SPDX-License-Identifier: Apache License 2.0
 -->
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/sigopt/libsigopt/main.svg)](https://results.pre-commit.ci/latest/github/sigopt/libsigopt/main)
 
-![SigOpt Logo](https://github.com/sigopt/libsigopt/blob/main/img/sigoopt-horz-blue.png)
+<p align="center">
+  <img src="https://github.com/sigopt/libsigopt/blob/main/img/sigoopt-horz-blue.png?raw=true" alt="SigOpt's logo"/>
+</p>
+
 
 --------------------------------------------------------------------------------
 

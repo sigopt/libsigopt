@@ -165,12 +165,12 @@ class SearchNextPoints(GPView):
     search_phase = self.get_search_phase()
     self.tag.update({"search_phase": search_phase})
 
-    if search_phase is SEARCH_INITIALIZATION_PHASE:
+    if search_phase == SEARCH_INITIALIZATION_PHASE:
       return self.search_next_points_expected_improvement()
-    elif search_phase is SEARCH_EXPLOITATION_PHASE:
+    elif search_phase == SEARCH_EXPLOITATION_PHASE:
       return self.search_next_points_expected_improvement_with_failures()
     else:
-      assert search_phase is SEARCH_EXPLORE_RESOLVE_PHASE
+      assert search_phase == SEARCH_EXPLORE_RESOLVE_PHASE
       if numpy.random.random() < RESOLVE_PHASE_PROB:
         proposed_next_points = self.next_points_probability_improvement()
       else:

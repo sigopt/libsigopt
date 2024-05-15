@@ -15,8 +15,8 @@ from libsigopt.compute.probabilistic_failures import ProbabilisticFailuresBase
 @dataclass(frozen=True, slots=True)
 class SearchCoreComponents:
   search_points_to_evaluate: numpy.ndarray
-  pi: numpy.ndarray
-  pi_grad: numpy.ndarray
+  pi: numpy.ndarray | None
+  pi_grad: numpy.ndarray | None
 
 
 class FakePredictor(Predictor):
@@ -66,6 +66,7 @@ class SearchAcquisitionFunction(AcquisitionFunction):
     assert len(eval_shape) == 2 and eval_shape[1] == self.dim
     search_points_to_evaluate = convert_one_hot_to_search_hypercube_points(self.domain, points_to_evaluate)
     pi_grad = None
+    pi = None
     if option in ("func",):
       pi = self.failure_model.compute_probability_of_success(points_to_evaluate)
     return SearchCoreComponents(search_points_to_evaluate, pi, pi_grad)

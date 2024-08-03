@@ -100,7 +100,7 @@ class VectorizedOptimizer(Optimizer):
 
     return values, gradients
 
-  def optimize(self, selected_starts=None):
+  def optimize(self, selected_starts=None, **kwargs):
     if selected_starts is None:
       starting_points = self.domain.generate_quasi_random_points_in_domain(self.num_multistarts)
     else:

@@ -1,5 +1,5 @@
 jsonschema>=3.0.1,<5
 numpy>=1.22.4,<1.23
-qmcpy==1.2
+qmcpy==1.5
 scipy>=1.10.1,<2
 typing-extensions>=4.5.0,<5

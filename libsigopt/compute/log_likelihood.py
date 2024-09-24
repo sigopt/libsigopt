@@ -30,6 +30,7 @@ class GaussianProcessLogMarginalLikelihood(ScipyOptimizable):
     covariance,
     historical_data,
     mean_poly_indices=None,
+    *,
     use_auto_noise=False,
     log_domain=False,
     scaling_factor=DEFAULT_LOG_LIKELIHOOD_SCALING_FACTOR,

@@ -341,7 +341,7 @@ class ExpectedParallelImprovementWithFailures(ExpectedParallelImprovement):
     super().__init__(
       predictor,
       num_points_to_sample,
-      points_being_sampled,
+      points_being_sampled=points_being_sampled,
       num_mc_iterations=num_mc_iterations,
       num_mc_iterations_per_loop=num_mc_iterations_per_loop,
     )

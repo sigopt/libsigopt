@@ -328,6 +328,7 @@ def force_minimum_successful_points(optimizing_metric, points_sampled_values, po
 
   return modified_points_sampled_failures
 
+
 # pylint: disable=too-many-positional-arguments
 def filter_convex_combination(
   multimetric_info,
@@ -567,5 +568,6 @@ def filter_multimetric_points_sampled_spe(
   if multimetric_info.method != EPSILON_CONSTRAINT:
     modified_points_sampled_values[points_sampled_failures] = modified_lie_value
   return modified_points_sampled_points, modified_points_sampled_values
+
 
 # pylint: enable=too-many-positional-arguments

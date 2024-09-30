@@ -58,7 +58,7 @@ class NumericalTestCase(object):
     assert err / mag < tol, f"error = {err} / magnitude = {mag} > tol = {tol}"
 
   @staticmethod
-  def check_gradient_with_finite_difference(x, func, grad, fd_step, tol, use_complex=False):
+  def check_gradient_with_finite_difference(x, func, grad, fd_step, tol, *, use_complex=False):
     """
         Approximate gradient using finite difference using either the centered method or complex step.
         """

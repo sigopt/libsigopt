@@ -1,6 +1,7 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
+# pylint: disable=too-many-positional-arguments
 import random
 
 import numpy
@@ -94,20 +95,20 @@ class TestSigoptParzenEstimator(NumericalTestCase):
       assert phase == EPSILON_CONSTRAINT
       with pytest.raises(SPEInsufficientDataError):
         SigOptParzenEstimator(
-          C0RadialMatern(hparams),
-          greater_covariance,
-          points_sampled.points,
-          points_sampled.values,
-          gamma,
+          lower_covariance=C0RadialMatern(hparams),
+          greater_covariance=greater_covariance,
+          points_sampled_points=points_sampled.points,
+          points_sampled_values=points_sampled.values,
+          gamma=gamma,
         )
       return
 
     spe = SigOptParzenEstimator(
-      C0RadialMatern(hparams),
-      greater_covariance,
-      points_sampled.points,
-      points_sampled.values,
-      gamma,
+      lower_covariance=C0RadialMatern(hparams),
+      greater_covariance=greater_covariance,
+      points_sampled_points=points_sampled.points,
+      points_sampled_values=points_sampled.values,
+      gamma=gamma,
     )
     lpdf, gpdf, ei_vals = spe.evaluate_expected_improvement(points_to_sample)
     assert all(lpdf) > 0 and all(gpdf) > 0 and all(ei_vals) > 0 and len(ei_vals) == len(points_to_sample)
@@ -116,11 +117,11 @@ class TestSigoptParzenEstimator(NumericalTestCase):
       spe.evaluate_grad_expected_improvement(points_to_sample)
 
     spe = SigOptParzenEstimator(
-      C4RadialMatern(hparams),
-      greater_covariance,
-      points_sampled.points,
-      points_sampled.values,
-      gamma,
+      lower_covariance=C4RadialMatern(hparams),
+      greater_covariance=greater_covariance,
+      points_sampled_points=points_sampled.points,
+      points_sampled_values=points_sampled.values,
+      gamma=gamma,
     )
     assert spe.differentiable
     ei_grad = spe.evaluate_grad_expected_improvement(points_to_sample)
@@ -152,11 +153,11 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     # NOTE: max is used here since we don't apply MMI to values when creating SigOptParzenEstimator
     numpy.place(values, failures, numpy.max(values))
     spe = SigOptParzenEstimator(
-      C0RadialMatern(hparams),
-      greater_covariance,
-      points,
-      values,
-      gamma,
+      lower_covariance=C0RadialMatern(hparams),
+      greater_covariance=greater_covariance,
+      points_sampled_points=points,
+      points_sampled_values=values,
+      gamma=gamma,
     )
     sorted_indexed = numpy.argsort(values)
     points_sorted = points[sorted_indexed, :]
@@ -193,11 +194,11 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     )
     with pytest.raises(SPEInsufficientDataError):
       SigOptParzenEstimator(
-        C0RadialMatern(hparams),
-        greater_covariance,
-        points_sampled.points,
-        points_sampled.values,
-        gamma,
+        lower_covariance=C0RadialMatern(hparams),
+        greater_covariance=greater_covariance,
+        points_sampled_points=points_sampled.points,
+        points_sampled_values=points_sampled.values,
+        gamma=gamma,
       )
 
   @pytest.mark.parametrize(
@@ -224,11 +225,11 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     )
     with pytest.raises(SPEInsufficientDataError):
       SigOptParzenEstimator(
-        C0RadialMatern(hparams),
-        greater_covariance,
-        points_sampled.points,
-        points_sampled.values,
-        gamma,
+        lower_covariance=C0RadialMatern(hparams),
+        greater_covariance=greater_covariance,
+        points_sampled_points=points_sampled.points,
+        points_sampled_values=points_sampled.values,
+        gamma=gamma,
         forget_factor=0.5,
       )
 
@@ -237,11 +238,11 @@ class TestSigoptParzenEstimator(NumericalTestCase):
     points_sampled_points = domain.generate_quasi_random_points_in_domain(num_sampled)
     points_sampled_values = numpy.random.rand(num_sampled)
     spe = SigOptParzenEstimator(
-      C0RadialMatern(hparams),
-      greater_covariance,
-      points_sampled_points,
-      points_sampled_values,
-      gamma,
+      lower_covariance=C0RadialMatern(hparams),
+      greater_covariance=greater_covariance,
+      points_sampled_points=points_sampled_points,
+      points_sampled_values=points_sampled_values,
+      gamma=gamma,
     )
     assert spe.lower_points is not None
     assert spe.greater_points is not None

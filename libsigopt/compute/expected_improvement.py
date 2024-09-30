@@ -164,6 +164,7 @@ class ExpectedParallelImprovement(AcquisitionFunction):
     self,
     predictor,
     num_points_to_sample,
+    *,
     points_being_sampled=None,
     num_mc_iterations=DEFAULT_MC_ITERATIONS_TOTAL_QEI,
     num_mc_iterations_per_loop=DEFAULT_MC_ITERATIONS_PER_LOOP_QEI,
@@ -332,6 +333,7 @@ class ExpectedParallelImprovementWithFailures(ExpectedParallelImprovement):
     predictor,
     num_points_to_sample,
     failure_model,
+    *,
     points_being_sampled=None,
     num_mc_iterations=DEFAULT_MC_ITERATIONS_TOTAL_QEIWF,
     num_mc_iterations_per_loop=DEFAULT_MC_ITERATIONS_PER_LOOP_QEIWF,
@@ -339,7 +341,7 @@ class ExpectedParallelImprovementWithFailures(ExpectedParallelImprovement):
     super().__init__(
       predictor,
       num_points_to_sample,
-      points_being_sampled,
+      points_being_sampled=points_being_sampled,
       num_mc_iterations=num_mc_iterations,
       num_mc_iterations_per_loop=num_mc_iterations_per_loop,
     )

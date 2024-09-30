@@ -193,6 +193,7 @@ class SPENextPoints(View):
     sigopt_parzen_estimator,
     num_to_sample,
     domain,
+    *,
     num_multistarts=SPE_NUM_MULTISTARTS,
     batch_size=SPE_BATCH_SIZE,
     rejection_samples_limit=SPE_REJECTION_SAMPLES_LIMIT,

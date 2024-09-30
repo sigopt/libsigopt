@@ -338,6 +338,7 @@ class GPView(View):
     filtered_points_sampled_values,
     filtered_points_sampled_value_vars,
     filtered_scaled_lie_value,
+    *,
     hyperparameter_dict,
   ):
     one_hot_historical_data = HistoricalData(self.dim_with_task)
@@ -390,7 +391,7 @@ class GPView(View):
           filtered_points_sampled_values[:, i],
           filtered_points_sampled_value_vars[:, i],
           filtered_scaled_lie_value[i],
-          self.params["model_info"].hyperparameters[metric_index],
+          hyperparameter_dict=self.params["model_info"].hyperparameters[metric_index],
         )
         gaussian_process_list.append(gp)
       assert isinstance(self.multimetric_info.params, ConvexCombinationParams)
@@ -408,7 +409,7 @@ class GPView(View):
         filtered_points_sampled_values,
         filtered_points_sampled_value_vars,
         filtered_scaled_lie_value,
-        self.params["model_info"].hyperparameters[metric_index],
+        hyperparameter_dict=self.params["model_info"].hyperparameters[metric_index],
       )
     return main_gaussian_process
 
@@ -436,7 +437,7 @@ class GPView(View):
       points_sampled_values[:, relative_index],
       points_sampled_value_vars[:, relative_index],
       scaled_lie_values[relative_index],
-      self.params["model_info"].hyperparameters[metric_indexes[relative_index]],
+      hyperparameter_dict=self.params["model_info"].hyperparameters[metric_indexes[relative_index]],
     )
 
   # TODO(RTL-85): I think a lot of this workflow can be cleanup up with find_epsilon_constraint_value better now

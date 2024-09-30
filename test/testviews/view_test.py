@@ -1,6 +1,7 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
+# pylint: disable=too-many-positional-arguments
 import numpy
 import pytest
 from testviews.zigopt_input_utils import ZigoptSimulator, form_points_sampled

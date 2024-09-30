@@ -19,7 +19,7 @@ class VectorizedOptimizer(Optimizer):
   optimizer_name: str
   optimizer_parameters_type: type
 
-  def __init__(self, domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter):
+  def __init__(self, domain, acquisition_function, num_multistarts, *, optimizer_parameters, maxiter):
     """
         This is the base class for vectorized _maximization_.
         """
@@ -144,10 +144,17 @@ class DEOptimizer(VectorizedOptimizer):
     domain,
     acquisition_function,
     num_multistarts,
+    *,
     optimizer_parameters=None,
     maxiter=None,
   ):
-    super().__init__(domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter)
+    super().__init__(
+      domain,
+      acquisition_function,
+      num_multistarts=num_multistarts,
+      optimizer_parameters=optimizer_parameters,
+      maxiter=maxiter,
+    )
     self.strategy = self.optimizer_parameters.strategy
     self.mutation = self.optimizer_parameters.mutation
     self.crossover_probability = self.optimizer_parameters.crossover_probability
@@ -219,10 +226,13 @@ class AdamOptimizer(VectorizedOptimizer):
     domain,
     acquisition_function,
     num_multistarts,
+    *,
     optimizer_parameters=None,
     maxiter=None,
   ):
-    super().__init__(domain, acquisition_function, num_multistarts, optimizer_parameters, maxiter)
+    super().__init__(
+      domain, acquisition_function, num_multistarts, optimizer_parameters=optimizer_parameters, maxiter=maxiter
+    )
     self.learning_rate = self.optimizer_parameters.learning_rate
     assert self.learning_rate >= 0
     self.beta_1 = self.optimizer_parameters.beta_1

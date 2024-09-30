@@ -41,6 +41,7 @@ def form_one_hot_hyperparameter_domain(
   use_auto_noise,
   discrete_lower_limit,
   task_cost_populated,
+  *,
   select_hyper_opt_in_log_domain=SELECT_HYPER_OPT_IN_LOG_DOMAIN,
 ):
   ALPHA_LOWER_FACTOR = 0.001

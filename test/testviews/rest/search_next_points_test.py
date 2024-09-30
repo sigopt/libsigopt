@@ -1,6 +1,7 @@
 # Copyright © 2022 Intel Corporation
 #
 # SPDX-License-Identifier: Apache License 2.0
+# pylint: disable=too-many-positional-arguments
 import numpy
 import pytest
 from mock import patch

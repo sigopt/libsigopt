@@ -34,6 +34,7 @@ class SigOptParzenEstimator(ScipyOptimizable):
 
   def __init__(
     self,
+    *,
     lower_covariance,
     greater_covariance,
     points_sampled_points,

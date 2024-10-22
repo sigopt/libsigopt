@@ -192,7 +192,7 @@ def _form_domain_for_qei_parallelism(domain, acquisition_function):
     base_weights = this_constraint["weights"]
     no_constraint = [0] * len(base_weights)
     for i in range(num_points_to_sample):
-      extended_weights = []
+      extended_weights: list[float] = []
       for j in range(num_points_to_sample):
         extended_weights.extend(base_weights if i == j else no_constraint)
       extended_constraint_list.append(

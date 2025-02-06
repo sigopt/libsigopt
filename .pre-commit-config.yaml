@@ -27,7 +27,7 @@ repos:
         args: ["--license=Apache License 2.0", "--owner=Intel Corporation"]
       - id: sigoptlint-python
   - repo: https://github.com/PyCQA/isort.git
-    rev: "5.13.2"
+    rev: "6.0.0"
     hooks:
       - id: isort
   - repo: https://github.com/sigopt/black.git

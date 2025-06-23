@@ -339,7 +339,7 @@ class TestMultimetricFiltering(NumericalTestCase):
       points_sampled.failures,
       lie_values,
     )
-    optimizing_metric = multimetric_info.params.optimizing_metric
+    optimizing_metric = multimetric_info.params.optimizing_metric  # type: ignore
     expected_values = numpy.copy(points_sampled.values[:, optimizing_metric])
     expected_values[: num_points // 2] = modified_lie_value
 
@@ -371,7 +371,7 @@ class TestMultimetricFiltering(NumericalTestCase):
       points_sampled.failures,
       lie_values,
     )
-    optimizing_metric = multimetric_info.params.optimizing_metric
+    optimizing_metric = multimetric_info.params.optimizing_metric  # type: ignore
     expected_values = numpy.copy(points_sampled.values[:, optimizing_metric])
     expected_values[points_sampled.failures] = modified_lie_value
     expected_values[num_points // 2 : -1] = modified_lie_value

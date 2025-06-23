@@ -10,7 +10,7 @@ from libsigopt.compute.acquisition_function_optimization import (
   constant_liar_acquisition_function_optimization,
   qei_acquisition_function_optimization,
 )
-from libsigopt.compute.domain import CategoricalDomain, FixedIndicesOnContinuousDomain
+from libsigopt.compute.domain import CategoricalDomain, DomainConstraint, FixedIndicesOnContinuousDomain
 from libsigopt.compute.expected_improvement import ExpectedParallelImprovement
 from libsigopt.compute.misc.constant import CATEGORICAL_POINT_UNIQUENESS_TOLERANCE
 from libsigopt.compute.multitask_acquisition_function import MultitaskAcquisitionFunction
@@ -195,13 +195,12 @@ def _form_domain_for_qei_parallelism(domain, acquisition_function):
       extended_weights: list[float] = []
       for j in range(num_points_to_sample):
         extended_weights.extend(base_weights if i == j else no_constraint)
-      extended_constraint_list.append(
-        {
-          "weights": extended_weights,
-          "rhs": this_constraint["rhs"],
-          "var_type": this_constraint["var_type"],
-        }
-      )
+      new_constraint: DomainConstraint = {
+        "weights": extended_weights,
+        "rhs": this_constraint["rhs"],
+        "var_type": this_constraint["var_type"],
+      }
+      extended_constraint_list.append(new_constraint)
   constraint_list = extended_constraint_list
 
   augmented_domain = CategoricalDomain(domain_components, constraint_list, force_hitandrun_sampling)

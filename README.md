@@ -16,6 +16,14 @@ SPDX-License-Identifier: Apache License 2.0
 
 --------------------------------------------------------------------------------
 
+# PROJECT NOT UNDER ACTIVE MANAGEMENT
+
+This project will no longer be maintained by Intel.
+Intel has ceased development and contributions including, but not limited to, maintenance, bug fixes, new releases, or updates, to this project.
+Intel no longer accepts patches to this project.
+If you have an ongoing need to use this project, are interested in independently developing it, or would like to maintain patches for the open source software community, please create your own fork of this project.
+
+
 # `libsigopt`
 
 `libsigopt` is SigOpt’s computational library for intelligent experimentation. This library holds the core computation elements for running hyperparameter optimization, multimetric optimization and intelligent search. It is the core computational engine of [`sigopt-server`](https://github.com/sigopt/sigopt-server) and [`sigoptlite`](https://github.com/sigopt/sigoptlite).
